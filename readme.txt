@@ -1,5 +1,7 @@
 BAM Announcements Manager — Version 2.0 - BETA VERSION: 
 
+VERY EARLY BETA VERSION OF THIS PLUGIN. USE AT YOUR OWN RISK. 
+
    — New and updated! Please read this document fully, as some features have changed. Please be aware that this is a beta version. There is no warranty with this version, and there WILL be various issues that pop up. If you would like to contribute, please report these issues as you discover them, and I will make sure to fix them before the plugin’s release. Otherwise, hang tight. The official release will be out shortly!
 
 ————————————————————————————————
