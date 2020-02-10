@@ -138,7 +138,7 @@ GLOBAL ANNOUNCEMENTS:
   
 ORDERING ANNOUNCEMENTS: 
 
-   - Announcements are assigned a display order by default when adding a new announcement. You can edit these display orders on the announcements management index. Note that pinned announcements are always displayed first, regardless of their display order. If you have multiple pinned announcements, pinned announcements will be displayed first by their display orders, and non pinned announcements will then be displayed by their display orders. 
+   - Announcements are assigned a display order by default when adding a new announcement. You can edit these display orders on the announcements management index. Note that Sticky (non-dismissible) announcements are always displayed first, regardless of their display order. If you have multiple stickied announcements, sticky announcements will be displayed first by their display orders, and non-sticky announcements will then be displayed by their display orders. 
 
 ADDING CUSTOM STYLES/COLORS: 
 
