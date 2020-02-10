@@ -40,35 +40,72 @@ Features enabled by advanced mode:
     - New language tag to make announcements visible only on specific languages
     - Brings back the deprecated “announcement link” feature
 
+
+
+
+
+
+
 MAKING ANNOUNCEMENTS DISPLAY ON SPECIFIC PAGES: 
+
    - This is a brand new feature in BAM 2.0! This gives quite a bit of granularity on where announcements will be posted. You can make them display only on a specific user’s profile, or on a specific forum board, or on a specific thread, for example. 
-   - This setting allows you to paste links to specific pages that your announcement should be displayed on. When this setting is used, your announcement will ONLY display on these pages. 
-   - For stability and security reasons, there are specific constraints that must be met for the pages that are enabled by this setting. While most links will work, there are very specific fields that are parsed by this plugin. Many very obscure pages (such as the login redirect page) will not display announcements. 
+   - When this setting is used, your announcement will ONLY display on these pages. Global announcement settings are ignored. 
+   - The vast majority of pages on your forum will work simply by pasting the URL into the "Additional display pages" setting. Although this is a beta feature, it works very well for most common pages on the forum, and has been tested extensively. 
+   - There are certain pages where announcements won't display, or where the URL won't parse quite like you might expect. Many very obscure pages (such as the login redirect page) will not display announcements, for example. Most of these situations are documented below. If you have any issues with this setting, please refer to the steps below. 
 
 TECHNICAL DETAILS ON THE ADVANCED MODE PARSER (READ IF YOU ENCOUNTER ANY ISSUES): 
 
-Please note that you are using a beta version of this plugin. This feature will require rigorous testing before it can be considered stable. If the announcement does not display on the correct page, please read this documentation and make sure that all of the required steps are followed. Otherwise, the parser may look at the URL slightly different than a user would, and may determine that the page doesn’t match what it is looking for. 
+The URL parser works differently than it might seem at first glance. MyBB does not necessarily "see" your page's URL when you visit a page. Instead, it sees building blocks that tell it what to do and what to display. Some of these building blocks are very important. Others are much more minor or extraneous altogether. In any case, MyBB creates your page by displaying and executing the correct code, depending on which parameters (or building blocks) are present in your URL. 
 
-   - For security and stability reasons, only specific URL constraints are parsed. On redirect pages or on pages with unusual parameters, this won’t work.
-   - Any PHP file for your forum (such as index.php, portal.php, forumdisplay.php, member.php, etc.) will be capable of displaying announcements. 
-   - BAM does not check additional fields unless they exist in the announcement’s settings. If, for example, you use “forumdisplay.php,” BAM will completely ignore any additional URL fields as a user browses your forum. Any page that is served by forumdisplay.php will serve your announcement, regardless of anything that follows in the URL. (This is intended functionality. BAM would act very strangely otherwise. ) 
-   -  However, if you set an announcement with any additional fields outside of the .PHP file (e.g. “forumdisplay.php?fid=2”), BAM will make sure that ALL whitelisted fields match before displaying an announcement. 
-   - Before pasting your link, check if there are extra fields in the URL first. Try removing these fields, and make sure you still end up on the same page. If so, the URL is now safe to use for BAM announcements. 
+BAM+ does not look at the entire URL as a single link to check against the user's current page. Instead, it looks for these building blocks in the URL, and tries to determine whether it should display the page based on the parameters it is given. This was necessary for a number of reasons. BAM+ would act very strangely otherwise! 
 
-Again, this is an advanced feature because of its technical nature. It was implemented by request and is very powerful, but it may not work for certain pages. However, examples of pages it will work perfectly for include: 
+In general, this improves functionality rather than introducing bugs. If, for example, you give a URL of http://makestation.net/member.php?action=profile&uid=3, BAM will know that you need the announcement to display specifically, and exclusively, on a single user's profile. However, if you give BAM the URL of http://makestation.net/member.php?action=profile, BAM will see that a user ID is not in the URL, and then display the announcement on all user profiles. 
 
-- forumdisplay.php?fid=2                                   Displays only if the user is visiting a specific board (in this case, fid 2)
-- member.php?action=profile&uid=15               Displays on a specific user’s profile (UID 15). (Disclaimer: Not responsible for any forum drama. )
-- member.php?action=profile                             Displays on ALL user profiles
-- usercp.php                                                        Displays on the user control panel
-- member.php?action=register                           Displays on the registration page
-- memberlist.php                                                 Displays on the Memberlist    
-- showthread.php?tid=947.                                Display only on a specific thread (in this case, thread 947)
+This functionality works in exactly the same manner on almost every section of your forum. For example, if you want announcements to display only on one specific board/forum on your community, you would copy/paste a URL that looks like this: http://makestation.net/forumdisplay.php?fid=18 .  BAM would see that forumdisplay.php has an additional 'fid=18' parameter, and correctly assume that announcements should only be displayed on board ID 18. 
 
-Many other pages will work perfectly. These are just a few examples of some that are tested. If you need to define more than one page, you can do so by separating URLs with a comma. The URL parser will display your announcement on all pages that are valid. 
+In general, this works exactly like you would expect. Simply paste the link to the page that you need the announcement to display on, and BAM will do the rest. 
 
-List of whitelisted URL fields: fid, tid, uid, action
-  — (All other fields are ignored)
+WHEN THE LINK FUNCTIONALITY WORKS DIFFERENTLY: 
+
+- Because of the way that BAM parses the links that it is given, it may see certain links differently than you, as a user, would. A perfect example of this would be displaying an announcement on "forumdisplay.php." If you were to visit this page on your forum without any additional parameters, you would get an error. MyBB refuses to display a forum/board if it doesn't know what board to display. 
+
+- BAM sees this page differently. It will see that there are no parameters, and will conclude that it should display the announcement on ALL forums/boards. This might seem like a bug, but this is explicitly not a bug, and is exactly how BAM was designed to see these URLs. If BAM saw URLs "literally" rather than by parsing them as it does, there would be a lot of functionality that would be lost. It would, for example, be impossible to display announcements on all boards. 
+
+THINGS BAM EXPLICITLY IGNORES: 
+
+ - There are specific parameters that BAM explicitly does not parse. These omissions are not bugs, and they serve to make BAM behave in a way that is more consistent with how it would be expected to operate. Some of these fields include: 
+
+ - Page numbers. You can display an announcement on a specific thread, but you cannot make an announcement display only on a certain page of that thread. (If this functionality was enabled, users would, by accident, copy/paste a thread's URL that included a page number, and mistakenly disable announcements for every page except this particular page number.)
+ - Login and redirect pages. (Not supported at all)
+ - Specific search queries. (You can put announcements on the search page, but they will display for all search queries.) 
+
+THINGS BAM EXPLICITLY PARSES: 
+
+ - Any page's .php filename. If the ONLY thing in this field is this filename (such as portal.php, forumdisplay.php, etc.), BAM will display your announcement on EVERY page that includes this filename. This, for example, is how you can display announcements only on the portal, or on all boards. 
+ - any fid (forum/board ID), tid (thread ID), uid (user ID) or action (usually a page). 
+
+EXAMPLES: 
+
+- forumdisplay.php?fid=2                  Displays only if the user is visiting a specific board (in this case, fid 2)
+- forumdisplay.php 			  Displays on all boards. 
+- member.php?action=profile&uid=15        Displays on a specific user’s profile (UID 15). (Disclaimer: Not responsible for any forum drama. )
+- member.php?action=profile               Displays on ALL user profiles
+- usercp.php                              Displays on the user control panel
+- member.php?action=register              Displays on the registration page
+- memberlist.php                          Displays on the Memberlist    
+- showthread.php?tid=947.                 Display only on a specific thread (in this case, thread 947)
+
+In general, you can simply copy/paste a link to the page, and BAM will parse it correctly. These are just a few examples of some that are tested, and many others will work! If you have any issues with this setting, please refer to the documentation above, and report the issue if you feel that there is a bug! 
+
+DISPLAYING ON MULTIPLE PAGES: 
+
+If you need to define more than one page, you can do so by separating URLs with a comma. The URL parser will display your announcement on all pages that are valid. 
+
+
+
+
+
+
 
 
 DISPLAYING ANNOUNCEMENTS ON SPECIFIC THEMES:
