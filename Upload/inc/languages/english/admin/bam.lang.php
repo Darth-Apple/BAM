@@ -16,7 +16,7 @@
      */
 
 $l['bam_title'] = "BAM+ Announcements Manager";
-$l['bam_title_acronym'] = "BAM Announcements Manager (Updated and Improved!)";
+$l['bam_title_acronym'] = "BAM+ Announcements Manager (Updated and Improved!)";
 $l['bam_desc'] = "Allows you to create and manage announcements in your forum header.";
 $l['bam_announcements_menu'] = "BAM+ Announcements";
 $l['bam_enable'] = "Activate BAM Announcements Manager?";
@@ -36,7 +36,7 @@ $l['bam_index_page'] = "Index Page (Advanced Users)";
 $l['bam_index_page_desc'] = "Identify the page that will be considered the \"index page\" for non global announcements. By default, this should be set to index.php. Unless you have renamed index.php, you should not need to edit this value. <b>New in 2.0: This field now can take multiple values, separated by a comma. </b> Use multiple values if you want non-global announcements to display on several pages, such as portal.php and index.php. ";
 $l['bam_custom_css'] = "Custom CSS";
 $l['bam_custom_css_desc'] = "Add any custom CSS classes here. ";
-$l['bam_welcome'] = "[b]BAM has successfully been installed![/b] You may now manage your announcements via the ACP. ";
+$l['bam_welcome'] = "[b]BAM+ 2.0 has successfully been installed![/b] You may now manage your announcements via the ACP. ";
 $l['bam_date_enable'] = "Display Announcement Date?";
 $l['bam_date_desc'] = "If enabled, BAM will display the date posted for announcements. ";
 
@@ -52,8 +52,8 @@ $l['bam_guest_dismissal_enable_desc'] = "By default, guests cannot dismiss annou
 $l['bam_random_dismissal'] = "Enable Random Mode announcements to be dismissed?";
 $l['bam_random_dismissal_desc'] =  "Random mode handles announcement dismissals differently than standard mode. When an announcement is dismissed, it is simply removed from the page, and a new announcement will be loaded on the next page. This setting defines whether this behavior should be enabled, or whether dismissals should be completely disabled. <b> This setting only affects announcements that are created under random mode. Standard announcements follow normal settings. </b>";
 $l['bam_manage_popupmenu'] = "Manage";
-$l['bam_cookie_id_prefix'] = "Set Announcement ID Prefix for Cookies/Dismissals: ";
-$l['bam_cookie_id_prefix_desc'] = "Leave as default value if unsure. Change this value (to any numeric value) if you need to clear/reset all announcement dismissals. This value is created automatically when BAM is installed.";
+$l['bam_cookie_id_prefix'] = "Announcement ID Prefix for Cookies/Dismissals: ";
+$l['bam_cookie_id_prefix_desc'] = "Change this value (to any numeric value) if you need to clear/reset all announcement dismissals. This value is created automatically when BAM is installed.";
 $l['bam_dismissal_disable'] = "Disable all dismissals";
 $l['bam_dismissal_closeonly'] = "Close announcements only ";
 $l['bam_dismissal_savecookie'] = "Close and dismiss from displaying again ";
@@ -66,17 +66,20 @@ $l['bam_manage_announcements'] = "Manage Announcements";
 
 $l['bam_manage'] = "Manage";
 $l['bam_manage_random'] = "Random Mode";
-$l['bam_manage_random_desc'] = "This page allows you to manage random mode announcements. An announcement from this list will be selected randomly, and will be displayed below your other announcements on the forum index. See BAM's plugin configuration for more settings regarding random mode announcements. ";
-$l['bam_manage_desc_norandom'] = "This page allows you to manage, edit, delete, and re-order your announcements. This page only manages standard announcements. Enable Random Mode in BAM's plugin settings to access the Random Mode tab (new in BAM 2.0!)";
-$l['bam_manage_desc'] = "This page allows you to manage, edit, delete, and re-order your announcements. This page only manages standard announcements. See the Random Mode tab for randomly selected SMF-style announcement functionality.";
+$l['bam_manage_random_desc'] = "<b>BAM will randomly select one announcement from this list to display on the forum index.</b> These can be managed here! <br /><br />";
+$l['bam_manage_random_desc'] .= " - If you need more than one announcement to display, see BAM's configuration settings. <br />";
+$l['bam_manage_random_desc'] .= " - To add announcements to this list, select \"Random Announcement\" when adding a new announcement. <br />";
+$l['bam_manage_random_desc'] .= " - Use this feature if you want announcements to automatically refresh on each page visit. ";
+$l['bam_manage_desc_norandom'] = "This page allows you to manage, edit, delete, and re-order your announcements. This page only manages standard announcements. If you need announcements to be randomly selected on your forum index, enable <i>random mode</i> in BAM's plugin settings.";
+$l['bam_manage_desc'] = "This page allows you to manage, edit, delete, and re-order your announcements. This page only manages standard announcements. See the Random Mode tab for randomly selected SMF-style announcement functionality. ";
 $l['bam_edit'] = 'Edit';
 $l['bam_edit_desc'] = "This page allows you to edit an existing announcement. ";
-$l['bam_add_announcement_desc'] = "This page allows you to add a new announcement. You are using BAM+ in Advanced Mode, which enables additional features. Please see documentation for further details.";
-$l['bam_add_announcement_noadvance_desc'] = "This page allows you to add a new announcement. Please note that there are additional features available! Enable \"Advanced Mode\" (configuration -> BAM+ Announcements Manager settings) to enable additional functionality. ";
+$l['bam_add_announcement_desc'] = "Add new announcements here. You may add HTML in your announcements. ";
+$l['bam_add_announcement_noadvance_desc'] = "Add new announcements here. You may use BBcode in your announcements. If you need to use full HTML, you can enable this in BAM's settings. ";
 $l['bam_order_success'] = "Announcement orders updated successfully. ";
 $l['bam_no_announcement'] = "Error: no announcement to update. ";
 $l['bam_pin_success'] = "Successfully set announcement as sticky. It is now undismissable. ";
-$l['bam_unpin_success'] = 'Successfully unset this announcement as sticky. It can now be dismissed by users. ';
+$l['bam_unpin_success'] = 'Successfully set this announcement as unsticky. It can now be dismissed by users. ';
 $l['bam_error'] = "Error. ";
 $l['bam_form_announcement'] = 'Announcement: ';
 $l['bam_form_announcement_desc'] = 'You may use BBcode in your announcements. Up to 1024 characters are allowed.';
@@ -100,12 +103,12 @@ $l['bam_form_class_custom_desc'] = "Enter custom CSS classes to be used instead 
 // This is entered into javascript, so make sure there are no new lines in the string that is generated if you translate this. 
 $l['bam_remove_custom_class'] = "<i><font color=\'red\'>You must remove custom classes before setting a predefined color style. ";
 $l['bam_remove_custom_class'] .= "If you need to use a predefined color value in addition to a custom class, you can add both into the custom class setting below. </font>";
-$l['bam_remove_custom_class'] .= "Note that custom, non-builtin classes must be defined in your forum\'s CSS before they can be used. See documentation for details. </i>";
+$l['bam_remove_custom_class'] .= "See documentation for instructions on how to add custom classes. </i>";
 $l['bam_remove_custom_class'] .= "<br /><br />Example: \"blue my_custom_class\" &nbsp;&nbsp; (separate multiple classes by spaces)<br />";
 $l['bam_remove_custom_class'] .= "Built in classes: red, blue, yellow, green, magenta, silver <br/><br />";
 
-$l['bam_remove_additional_page'] = "<i><font color = \'red\'>You must remove additional pages before you can use BAM\'s normal settings for announcement locations. ";
-$l['bam_remove_additional_page'] .= "</font>This setting overwrites all other settings regarding where your announcement will be displayed. You can display your announcement on the index page or on specific boards by using the links to these pages. </i><br /><br />";
+$l['bam_remove_additional_page'] = "<i><font color = \'red\'>You must remove additional pages before using BAM\'s normal location settings. ";
+$l['bam_remove_additional_page'] .= "</font>If you need your announcement to display on the index.php page or on specific boards, you can add these fields along with any additional pages below.</i><br /><br />";
 $l['bam_remove_additional_page'] .= "<b>Example: index.php, forumdisplay.php?fid=2, forumdisplay.php?fid=3</b> &nbsp;&nbsp; (Display on index, board ID 2, board ID 3)<br /><br />";
 
 $l['bam_form_order'] = "Display Order: ";
@@ -115,7 +118,7 @@ $l['bam_form_groups_desc'] = "Select which groups will be allowed to view this a
 $l['bam_form_url'] = "Announcement URL (Optional): ";
 $l['bam_form_url_desc'] = "If you define a URL for this announcement, the announcement will be turned into a link. This setting can be left blank.";
 $l['bam_form_pinned'] = "Make This Announcement Sticky?";
-$l['bam_form_pinned_desc'] = "Sticky announcements cannot be dismissed, and display above other announcements. If this announcement is not set as sticky, it will follow BAM's general configuration settings for announcement dismissals instead. ";
+$l['bam_form_pinned_desc'] = "Sticky announcements cannot be dismissed, and display above other announcements.";
 $l['bam_form_add_submit'] = "Add New Announcement";
 $l['bam_form_add'] = "Add New Announcement";
 $l['bam_form_edit_submit'] = "Edit Announcement";
@@ -131,11 +134,11 @@ $l['bam_list_display_forums'] = "Display on specific forums/boards";
 $l['bam_list_display_special'] = "Other (advanced - define below)";
 $l['bam_make_global'] = "Make This Announcement Global?";
 $l['bam_make_global_desc'] = "Select whether this announcement will be made global. Global announcements are displayed on all pages, regardless of any other settings or constraints. ";
-$l['bam_additional_pages'] = "Define Custom Pages and Parameters (Advanced Mode): ";
+$l['bam_additional_pages'] = "Define Custom Pages and Parameters (Advanced Users): ";
 $l['bam_has_additional_pages'] = "This announcement has custom display settings.";
-$l['bam_additional_pages_desc'] = "<b>Leave blank if unsure. </b> Explicity sets which pages this announcement will be displayed on.
+$l['bam_additional_pages_desc'] = "<b>Set custom pages to display your announcement on. </b>
  Note that this setting overrides all other announcement settings regarding where this announcement is posted.
-<i>This announcement will only display on pages that are explicitely defined here. You can also use full URLs, if desired. </i><br /><br />
+<i>This announcement will only display on pages that are explicitely defined here. You can also copy/paste full links, if desired. </i><br /><br />
 
 <b>Examples:</b> <br />
   - \"forumdisplay.php, index.php\" &nbsp;&nbsp;&nbsp;&nbsp; -- <i>Display on index.php and forumdisplay.php only</i><br />
@@ -145,11 +148,11 @@ $l['bam_additional_pages_desc'] = "<b>Leave blank if unsure. </b> Explicity sets
 
 $l['bam_random_select'] = "Random Announcement";
 $l['bam_standard_select'] = "Standard Announcement";
-$l['bam_advanced_mode'] = "Advanced Mode";
-$l['bam_advanced_mode_desc'] = "This mode adds support for putting announcements on specialized pages that are not ordinarily defined by this plugin. Additionally, it enables full HTML support, and allows the use of some deprecated features from older versions of this plugin. Some of these features require technical knowledge to use properly. See documentation for more details. ";
+$l['bam_advanced_mode'] = "Allow HTML in announcements?";
+$l['bam_advanced_mode_desc'] = "By default, BAM parses BBcode in announcements. If you need full HTML, enable this setting.";
 $l['bam_manage_random_form_container'] = "Manage Random Mode Announcements";
 $l['bam_forum_select'] = "Boards to Display Announcement On: ";
-$l['bam_forum_select_desc'] = "Select which forums/boards this announcement should display on. Note that if BAM is set to display an announcement on specific forums, it will not display on the index. If you need an announcement to display on both, see \"Other (Advanced) \".";
+$l['bam_forum_select_desc'] = "Select which boards/forums BAM should display this announcement on. Hold CTRL to select multiple forums.";
 
 $l['bam_undefined'] = "Undefined";
 $l['bam_edit_success'] = "Successfully Edited Announcement. ";
@@ -173,8 +176,7 @@ $l['bam_invalid_post_code'] = "Invalid post code detected. Please try again. ";
 
 $l['bam_cookie_notice'] = "This forum uses cookies. By browsing this forum, you are agreeing and consenting to the use of cookies. ";
 
-$l['bam_announcement_tags_alert'] = "<b>Create your announcment here.</b> BAM supports additional tags and directives for your ";
-$l['bam_announcement_tags_alert'] .= "announcements. These are listed here. See documentation if you have any more questions. <br /><br />";
+$l['bam_announcement_tags_alert'] = "<b>BAM supports additional tags and directives within announcements. </b> These will be parsed when your announcement is displayed. </b><br /><br />";
 $l['bam_announcement_tags_alert'] .= "<b>Variables: </b><br />";
 $l['bam_announcement_tags_alert'] .= "&nbsp;&nbsp;&nbsp;&nbsp; {username} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Parses to user\'s username (or Guest if they are not logged in).</i>";
 $l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; {newestmember} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Parses to the username of the newest registered member.</i>";

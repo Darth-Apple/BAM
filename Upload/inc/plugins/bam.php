@@ -91,7 +91,7 @@ function bam_install () {
 		// We must create the templates. CSS and javascript for BAM go within the container template. 
 		// This was done to improve compatibility with heavily modified themes that might have issues with including new 
 		// stylesheets and scripts in the headerinclude file. Although this method is not ideal for large 
-		// stylesheets or JS scripts, the trade off for good compatibility and maintainability is worthwhile. 
+		// stylesheets or JS scripts, the trade off for good compatibility and maintainability is worth doing things this way. 
 		//
 		// Furthermore, because these are global templates, they will be compatible with any theme, regardless of whether 
 		// the theme was installed after BAM was installed. In other words, compatibility is all-around much improved this way. 
