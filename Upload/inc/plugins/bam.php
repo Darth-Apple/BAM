@@ -568,7 +568,12 @@ function bam_announcements () {
 		$themesEnabled = bamExplodeThemes($announcement);
 		$languagesEnabled = bamExplodeLanguages($announcement);
 		$announcement = preg_replace('/\[@themes:([a-zA-Z0-9_]*)\]/', "", $announcement);	
-		$announcement = preg_replace('/\[@languages:([a-zA-Z0-9_]*)\]/', "", $announcement);		
+		$announcement = preg_replace('/\[@languages:([a-zA-Z0-9_]*)\]/', "", $announcement);
+		
+		// Parse a special directive that disables an announcement. Unofficial feature. 
+		if (strpos("-".$announcement, "[@disabled]")) {
+			break; 
+		}	
 
 		// Run announcements through the post parser to process BBcode, images, HTML (advanced mode), etc. 
 		$announcement = $parser->parse_message($announcement, $parser_options); 
