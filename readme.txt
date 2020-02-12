@@ -16,6 +16,7 @@ NEW IN BAM 2.0
    - HTML, as well as the image tag are now enabled when using advanced mode. 
    - New ability to set announcements to display only on specific pages, on a per-announcement basis (see advanced mode section). 
    - “Unofficial” feature to display announcements only on specific themes and languages (see the section on theme tags). 
+   - New variables for announcements
 
 STANDARD FEATURES (BAM 1.0): 
    - Support for an unlimited number of header announcements, with the ability to order and reorder announcements. 
@@ -40,9 +41,7 @@ Features enabled by advanced mode:
     - New language tag to make announcements visible only on specific languages
     - Brings back the deprecated “announcement link” feature
 
-
-
-
+-----------------------------------------
 
 
 
@@ -102,12 +101,20 @@ DISPLAYING ON MULTIPLE PAGES:
 If you need to define more than one page, you can do so by separating URLs with a comma. The URL parser will display your announcement on all pages that are valid. 
 
 
+-----------------------------
 
 
+VARIABLES AND DIRECTIVES: 
+Place any of the following in your announcement to have BAM replace it with its value. 
 
+	{username}     		Parses to the current user's username (or Guest, if not registered)
+	{newestmember}     	Parses to the username of the most recently registered member. 
+	{newestmember_uid}	Parses to the UID of the most recent member. 
+	{newestmember_link}	Creates a link to the newest registered member. 
+	{threadreplies}		Only on showthread.php. Shows how many replies the current thread has. 
+	{countingthread}	For your forum games/counting thread. Parses to the CORRECT count based on the last 10 posts, regardless of whether your users get off track by accident (highly experimental feature. Only works on threads where a consecutive number is generally posted on every reply).
 
-
-
+ 
 DISPLAYING ANNOUNCEMENTS ON SPECIFIC THEMES:
 
     - This feature was implemented by request in BAM 2.0 as an “unofficial feature” to avoid cluttering the announcement settings. To use this feature, you must put a tag in your announcement with the theme IDs to display your announcement on. 
@@ -123,6 +130,8 @@ DISPLAYING ANNOUNCEMENTS ON SPECIFIC LANGUAGES:
 [@languages: 1, 2] 
 
 Both theme tags and language tags are internal directives for BAM, and are removed from announcements before being displayed. Although they are displayed on the management panel, users will not be able to see these tags on your forum! 
+
+---------------------------------
 
 RANDOM MODE:
 
@@ -152,6 +161,8 @@ ADDING CUSTOM STYLES/COLORS:
     }
 
   You will now be able to use "aqua" in the custom class field. 
+
+
 
 UPGRADING FROM BAM 1.0: IMPORTANT 
 

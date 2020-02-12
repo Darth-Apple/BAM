@@ -22,6 +22,10 @@ error_reporting(E_ALL); */
 		die("Hacking attempt."); // direct access to this file not allowed. 
 	}
 
+	//ini_set('display_errors', 1);
+	//ini_set('display_startup_errors', 1);
+	//error_reporting(E_ALL);
+	
 	$lang->load('bam');
 	
 	$class_select = array(
@@ -36,8 +40,9 @@ error_reporting(E_ALL); */
 
 	// list of locations for location selector. 
 	$location_select = array(
-		"index" => $lang->bam_list_display_index,
 		"global" => $lang->bam_list_display_global,
+		"index" => $lang->bam_list_display_index,
+		"forums" => $lang->bam_list_display_forums,
 		"special" => $lang->bam_list_display_special
 	); // list of programmed classes for BAM announcements. This list may expand in future versions of this plugin.
 	
@@ -46,6 +51,9 @@ error_reporting(E_ALL); */
 		"random" => $lang->bam_random_select
 	); // list of programmed classes for BAM announcements. This list may expand in future versions of this plugin. 
 	
+
+	$tags_button = " <button id='showtags_link' onclick='showAnnouncementTags();'>".$lang->bam_form_tags_link." </button>";
+
 	global $class_select;
 
 	/***** Add breadcrumbs and tabs *****/
@@ -208,10 +216,12 @@ error_reporting(E_ALL); */
 			$data['announcement'] = $querydata['announcement'];
 			$data['class'] = $querydata['class'];
 			$data['pinned'] = (int)$querydata['pinned'];
+			$data['forums'] = create_selectedForumArray(htmlspecialchars($querydata['forums']));
 			$data['disporder'] = (int)$querydata['disporder'];
 			$data['link'] = $querydata['link'];
-			$data['global'] = (int)$querydata['global'];
+			$data['global'] = (int)$querydata['global']; // deprecated. Will remove in next beta. 
 			$data['random'] = (int)$querydata['random'];
+			$data['location'] = (int)$querydata['global'];
 			$data['additional_pages'] = $querydata['additional_display_pages'];
 			$data['usergroup'] = $querydata['groups'];
 			$data['usergroup'] = explode(',', $querydata['groups']);
@@ -219,6 +229,19 @@ error_reporting(E_ALL); */
 
 		$form = new Form("index.php?module=config-bam", "post");
 		$form_container = new FormContainer($lang->bam_edit_announcement);
+
+		if ($data['location'] == 2) {
+			$announcementLocation = "forums"; // set to specific forums. Specific forums is 2 in MyBB selector.  
+		}
+		else if ($data['location'] == 1) {
+			$announcementLocation = "global"; // select to global. Global = 0 in MyBB selector.  
+		}
+		else if ($data['location'] == 0) {
+			$announcementLocation = "index"; // Set to index only. Index only is 1 in MyBB selector. 
+		}
+		else {
+			$announcementLocation = "special"; // Set to other. 3 in MyBB selector element. 
+		}
 
 
 		// Display a random mode selector if random mode is enabled. 
@@ -242,10 +265,17 @@ error_reporting(E_ALL); */
 			$edit_announcement_description = $lang->bam_form_announcement_advanced_desc; 
 		}
 
+		$edit_announcement_description .= $tags_button;
+
 		// Generate input fields. 
 		$form_container->output_row($lang->bam_form_pinned,  $lang->bam_form_pinned_desc, $form->generate_yes_no_radio('pinned', $data['pinned'], array("id" => "sticky_select", "class" => "remove_on_random")), 'sticky_select_row');
-		$form_container->output_row($lang->bam_make_global,  $lang->bam_make_global_desc, $form->generate_yes_no_radio('global', $data['global'], array("id" => "global_select", "class" => "remove_on_random")), 'global_select_row');
-		$form_container->output_row($lang->bam_form_announcement, $edit_announcement_description, $form->generate_text_area("announcement", html_entity_decode($data['announcement']), array("class" => "text_input align_left", "style" => "width: 50%;")), 'announcement');
+
+		$form_container->output_row($lang->bam_display_mode, $lang->bam_display_mode_desc, $form->generate_select_box('location', $location_select, $announcementLocation, array('id' => 'location')), 'location');
+		$form_container->output_row($lang->bam_forum_select,  $lang->bam_forum_select_desc, $form->generate_forum_select('forum_select', $data['forums'], array("id" => "forum_select", "class" => "forum_select", 'size' => 6, 'multiple' => true)), 'forum_select_row');
+		$form_container->output_row($lang->bam_additional_pages, $lang->bam_additional_pages_desc, $form->generate_text_box("additional_pages", html_entity_decode($data['additional_pages']), array("class" => "text_input", "id" => 'additional_pages', "style" => "width: 75%;")), 'additional_pages');
+
+		// $form_container->output_row($lang->bam_make_global,  $lang->bam_make_global_desc, $form->generate_yes_no_radio('global', $data['global'], array("id" => "global_select", "class" => "remove_on_random")), 'global_select_row');
+		$form_container->output_row($lang->bam_form_announcement, $edit_announcement_description, $form->generate_text_area("announcement", html_entity_decode($data['announcement']), array("class" => "text_input align_left", "style" => "width: 75%;", "id" => "announcement_text")), 'announcement');
 		
 		echo $form->generate_hidden_field("id", intval($id));
 		echo $form->generate_hidden_field("action", "submit_edit");
@@ -261,7 +291,6 @@ error_reporting(E_ALL); */
 
 		$form_container->output_row($lang->bam_form_style, $lang->bam_form_style_desc, $form->generate_select_box('class', $class_select, $class_select_active, array('id' => 'style', 'value' => 'bam_custom')), 'class');
 		$form_container->output_row($lang->bam_form_class_custom, $lang->bam_form_class_custom_desc, $form->generate_text_box("custom_class", html_entity_decode($custom_class), array("class" => "text_input", "style" => "width: 25%;", "id" => "custom_class", 'value' => $data['class'])), 'custom_class');	
-		$form_container->output_row($lang->bam_form_order, $lang->bam_form_order_desc, $form->generate_text_box("disporder", $data['disporder'], array("class" => "text_input align_right", "style" => "width: 25%;")), 'disporder');
 		
 		$options = array();
 		$query = $db->simple_select("usergroups", "gid, title", null, array('order_by' => 'title'));
@@ -276,14 +305,15 @@ error_reporting(E_ALL); */
 		// $form_container->output_row($lang->bam_form_pinned, $lang->bam_form_pinned_desc, $form->generate_yes_no_radio('pinned', (int)$data['pinned']));
 			// Announcement URL mode is deprecated in version 2.0 due to the fact that BBcode can easily create links. Advanced mode brings it back. 
 		
-			if ($mybb->settings['bam_advanced_mode'] == 1) {
-			$form_container->output_row($lang->bam_form_url, $lang->bam_form_url_desc, $form->generate_text_box("url", html_entity_decode($data['link']), array("class" => "text_input align_right", "style" => "width: 25%;")), 'url');
-			$form_container->output_row($lang->bam_additional_pages, $lang->bam_additional_pages_desc, $form->generate_text_box("additional_pages", html_entity_decode($data['additional_pages']), array("class" => "text_input", "style" => "width: 75%;")), 'additionalPages');
+		if ($mybb->settings['bam_advanced_mode'] == 1) {
+			$form_container->output_row($lang->bam_form_order, $lang->bam_form_order_desc, $form->generate_text_box("disporder", $data['disporder'], array("class" => "text_input align_right", "style" => "width: 25%;")), 'disporder');
 		}
 		else {
-			echo $form->generate_hidden_field("url", "");
+			// echo $form->generate_hidden_field("url", "");
 			echo $form->generate_hidden_field("additional_pages", "");
 		}	
+
+		$form_container->output_row($lang->bam_form_url, $lang->bam_form_url_desc, $form->generate_text_box("url", html_entity_decode($data['link']), array("class" => "text_input align_right", "style" => "width: 25%;")), 'url');
 
 		$buttons[] = $form->generate_submit_button($lang->bam_form_edit_submit);
 		$form_container->end();
@@ -312,11 +342,21 @@ error_reporting(E_ALL); */
 			$isRandom = 1; 
 		}
 
-		if ($mybb->input['global'] == 1) {
+		$forumList = null; 
+		// This is repurposed to a full drop down select box. 1 = global. 0 = index. 2 = forum select boards. 
+		if ($mybb->input['location'] == "global") {
 			$isGlobal = 1;
 		}
+		// Activate forum select box. Repurposed in drop down global selector. 
+		else if ($mybb->input['location'] == "special") { 
+			$isGlobal = 3;
+		}
+		else if ($mybb->input['location'] == "index") {
+			$isGlobal = 0; // display index only. 
+		}
 		else {
-			$isGlobal = 0;
+			$isGlobal = 2; // 
+			// $forumList = $db->escape_string($mybb->input['forum_select']);
 		}
 
 		if ($mybb->input['additional_pages'] != null) {
@@ -333,13 +373,36 @@ error_reporting(E_ALL); */
 			$class = $db->escape_string(htmlspecialchars($mybb->input['class'], ENT_QUOTES));
 		}
 
+		/*
+		if (isset($mybb->input['forum_select'])) {
+			$forumList = "";
+			foreach ($mybb->input['forum_select'] as $forum) {
+				if (strlen($forumList) > 0) {
+					$forumList = $forumList . ", " . (int) $forum; 
+				}
+				else {
+					$forumList = (int) $forum; // it's the first forum selected. Don't put a comma at the beginning. 
+				}
+			}
+		*/ 
+		
+	
+		if((!isset($mybb->input['forum_select'])) || (empty($mybb->input['forum_select'])) || (in_array('*', $mybb->input['forum_select']))) {
+			$mybb->input['forum_select'] = '*';
+		}
+		else {
+			$mybb->input['forum_select'] = implode(',', array_map('intval', $mybb->input['forum_select']));
+		}
 
+		$forumList = $mybb->input['forum_select'];
+
+		/*
 		if (($mybb->input['custom_class'] != null)) {
 			$class = $db->escape_string(htmlspecialchars($mybb->input['custom_class'], ENT_QUOTES));
 		}
 		else {
 			$class = $db->escape_string(htmlspecialchars($mybb->input['class'], ENT_QUOTES));
-		}
+		} */
 		
 		if ($mybb->input['url'] != null) {
 			$url = $db->escape_string(htmlspecialchars($mybb->input['url'], ENT_QUOTES));
@@ -362,7 +425,7 @@ error_reporting(E_ALL); */
 		$disporder = (int)$mybb->input['disporder'];
 		$announcement = $db->escape_string(htmlspecialchars($mybb->input['announcement'], ENT_QUOTES));
 
-		$db->update_query("bam", array('pinned' => $pinned, 'disporder' => $disporder, 'random' => $isRandom, 'global' => $isGlobal, 'additional_display_pages' => $additionalPages, 'announcement' => $announcement, 'groups' => $usergroups, 'link' => $url, 'class' => $class), "PID='$id'");
+		$db->update_query("bam", array('pinned' => $pinned, 'disporder' => $disporder, 'random' => $isRandom, 'global' => $isGlobal, 'additional_display_pages' => $additionalPages, 'announcement' => $announcement, 'groups' => $usergroups, 'link' => $url, 'class' => $class, 'forums' => $forumList), "PID='$id'");
 
 		flash_message($lang->bam_edit_success, 'success');
 		if ($isRandom == 0) {
@@ -387,12 +450,47 @@ error_reporting(E_ALL); */
 			$isRandom = 1; 
 		}
 
-		if ($mybb->input['global'] == 1) {
+		// Activate forum select box. 
+		$forumList = null;
+		if ($mybb->input['location'] == "global") {
 			$isGlobal = 1;
 		}
-		else {
-			$isGlobal = 0;
+		// Activate forum select box. Repurposed in drop down global selector. 
+		else if ($mybb->input['location'] == "special") { 
+			$isGlobal = 3;
 		}
+		else if ($mybb->input['location'] == "index") {
+			$isGlobal = 0; // display index only. 
+		}
+		else {
+			$isGlobal = 2; 
+		}
+
+		/*
+		// Get the forum list (if it exists). Null otherwise. 
+		if (isset($mybb->input['forum_select'])) {
+			flash_message("test: " . var_dump($mybb->input['forum_select']), 'success');
+			admin_redirect("index.php");
+			$forumList = "";
+			foreach ($mybb->input['forum_select'] as $forum) {
+				if (strlen($forumList) > 0) {
+					$forumList = $forumList . ", " . (int) $forum; 
+				}
+				else {
+					$forumList = (int) $forum; // it's the first forum selected. Don't put a comma at the beginning. 
+				}
+			}*/ 
+
+		if((!isset($mybb->input['forum_select'])) || (empty($mybb->input['forum_select'])) || (in_array('*', $mybb->input['forum_select']))) {
+			$mybb->input['forum_select'] = '*';
+		}
+		else {
+			$mybb->input['forum_select'] = implode(',', array_map('intval', $mybb->input['forum_select']));
+		}
+		$forumList = $mybb->input['forum_select'];
+
+
+
 
 		if ($mybb->input['additional_pages'] != null) {
 			$additionalPages = $db->escape_string(htmlspecialchars($mybb->input['additional_pages']), ENT_QUOTES);
@@ -433,6 +531,7 @@ error_reporting(E_ALL); */
 			'pinned' => $pinned,
 			'global' => $isGlobal,
 			'random' => $isRandom,
+			'forums' => $forumList,
 			'additional_display_pages' => $additionalPages,
 			'date' => time(),
 			'disporder' => (int)$mybb->input['disporder'],
@@ -478,7 +577,6 @@ error_reporting(E_ALL); */
 		$db->delete_query('bam', "PID='{$PID}'");		
 		flash_message($lang->bam_delete_success, 'success');
 		admin_redirect('index.php?module=config-bam');
-		
 	}
 		
 
@@ -523,14 +621,20 @@ error_reporting(E_ALL); */
 		if ($mybb->settings['bam_advanced_mode'] == 1) {
 			$add_announcement_description = $lang->bam_form_announcement_advanced_desc; 
 		}
-
-		// Generate input fields. 
-		$form_container->output_row($lang->bam_form_pinned,  $lang->bam_form_pinned_desc, $form->generate_yes_no_radio('pinned', 1, array("id" => "sticky_select", "class" => "remove_on_random")), 'sticky_select_row');
 		
-		$form_container->output_row($lang->bam_make_global,  $lang->bam_make_global_desc, $form->generate_yes_no_radio('global', 0, array("id" => "global_select", "class" => "remove_on_random")), 'global_select_row');
-		$form_container->output_row($lang->bam_form_announcement, $add_announcement_description, $form->generate_text_area("announcement", '', array("class" => "text_input align_left", "style" => "width: 75%;", "id" => "announcementType")), 'announcement');	
+		//$add_announcement_description .= $lang->bam_form_tags_link;
+
+		$add_announcement_description .= $tags_button;
+		// Generate input fields. 
+		$form_container->output_row($lang->bam_form_pinned,  $lang->bam_form_pinned_desc, $form->generate_yes_no_radio('pinned', 0, array("id" => "sticky_select", "class" => "remove_on_random")), 'sticky_select_row');
+		
+		$form_container->output_row($lang->bam_display_mode, $lang->bam_display_mode_desc, $form->generate_select_box('location', $location_select, 'index', array('id' => 'location')), 'location');
+		$form_container->output_row($lang->bam_forum_select,  $lang->bam_forum_select_desc, $form->generate_forum_select('forum_select', 0, array("id" => "forum_select", "class" => "forum_select", 'size' => 6, 'multiple' => true, 'main_option' => $lang->all_forums)), 'forum_select_row');
+		$form_container->output_row($lang->bam_additional_pages, $lang->bam_additional_pages_desc, $form->generate_text_box("additional_pages", $additionalPages, array("class" => "text_input", "style" => "width: 75%;", "id" => "additional_pages")), 'additionalPages');
+
+		// $form_container->output_row($lang->bam_make_global,  $lang->bam_make_global_desc, $form->generate_yes_no_radio('global', 0, array("id" => "global_select", "class" => "remove_on_random")), 'global_select_row');
+		$form_container->output_row($lang->bam_form_announcement, $add_announcement_description, $form->generate_text_area("announcement", '', array("class" => "text_input align_left", "style" => "width: 75%;", "id" => "announcement_text")), 'announcement');	
 		$form_container->output_row($lang->bam_form_style, $lang->bam_form_style_desc, $form->generate_select_box('class', $class_select, $fieldType, array('id' => 'style')), 'class');
-		// $form_container->output_row($lang->bam_display_mode, $lang->bam_display_mode_desc, $form->generate_select_box('location', $location_select, $fieldType, array('id' => 'style')), 'location');
 		$form_container->output_row($lang->bam_form_class_custom, $lang->bam_form_class_custom_desc, $form->generate_text_box("custom_class", $customClass, array("class" => "text_input", "style" => "width: 25%;", "id" => "custom_class")), 'custom_class');	
 
 		// Generate usergroup select box. 
@@ -546,18 +650,15 @@ error_reporting(E_ALL); */
 		
 		$query = $db->query("SELECT disporder FROM ".TABLE_PREFIX."bam ORDER BY disporder DESC LIMIT 1"); // select last announcement by display order. 
 		$last = $db->fetch_array($query);
-		
-		$form_container->output_row($lang->bam_form_order, $lang->bam_form_order_desc, $form->generate_text_box("disporder", ((int) $last['disporder'] + 1), array("class" => "text_input align_right", "style" => "width: 25%;")), 'disporder');
-		
-		// Announcement URL mode is deprecated in version 2.0 due to the fact that BBcode can easily create links. Advanced mode brings it back. 
-		if ($mybb->settings['bam_advanced_mode'] == 1) {
+
+		if ($mybb->settings['bam_advanced_mode'] == 1) {		
 			$form_container->output_row($lang->bam_form_url, $lang->bam_form_url_desc, $form->generate_text_box("url", $mybb->input['url'], array("class" => "text_input align_right", "style" => "width: 25%;")), 'url');
-			$form_container->output_row($lang->bam_additional_pages, $lang->bam_additional_pages_desc, $form->generate_text_box("additional_pages", $additionalPages, array("class" => "text_input", "style" => "width: 75%;", "id" => "additional_pages")), 'additionalPages');
 		}
 		else {
 			echo $form->generate_hidden_field("url", "");
-			echo $form->generate_hidden_field("additional_pages", "");
+			// echo $form->generate_hidden_field("additional_pages", "");
 		}	
+		$form_container->output_row($lang->bam_form_order, $lang->bam_form_order_desc, $form->generate_text_box("disporder", ((int) $last['disporder'] + 1), array("class" => "text_input align_right", "style" => "width: 25%;")), 'disporder');		
 
 		$buttons[] = $form->generate_submit_button($lang->bam_form_add_submit);
 		$form_container->end();
@@ -712,6 +813,12 @@ function generate_announcement_controls ($id, $ispinned) {
 	return $popup;
 }
 
+// For the edit page. Processes the data in the database and turns it into a format that can be sent to the multi-select box. 
+function create_selectedForumArray($forums) { 
+	$explodedForums = explode(',', $forums);
+	return array_map('trim',$explodedForums);
+}
+
 // We need to output some javascript for the add and edit announcement pages. 
 // This removes fields that don't pertain to random mode announcements, based on the select box for announcement type. 
 // If the user re-selects "standard," the fields return. 
@@ -719,8 +826,24 @@ function generate_announcement_controls ($id, $ispinned) {
 $form_javascript = " 
 <script>
 	const isEmpty = str => !str.trim().length;
+
+	document.getElementById('location').onchange = function() {manageDisplayModes(changed='true')}
+	manageDisplayModes();
+	correctForumSelector(); 
+
 	document.getElementById('style').onchange = function() {setCustomClass()}
 	setCustomClass();
+	manageDisplayModes();
+
+	// Bug fix. MyBB's default forum selector does not properly create a multiple select item. 
+	// So we ghetto rig it because this works. And we can select multiple forums now. 
+
+	function correctForumSelector() {
+		forumSelector = document.getElementById('forum_select'); 
+		if (forumSelector != null) {
+			forumSelector.setAttribute('name', 'forum_select[]');
+		}
+	}
 
 	if (document.getElementById('announcementType') != null) {
 		document.getElementById('announcementType').onchange = function() {deleteRandomElements()}
@@ -729,9 +852,15 @@ $form_javascript = "
 
 		function deleteRandomElements() {
 			var sel = document.getElementById('announcementType');
+			
+			var displayLocationSel = document.getElementById('location');
+			var forumClass = document.getElementById('forum_select');
+
+			
 			if (sel.tagName != 'SELECT') {
 				return; 
 			}
+			
 			var value = sel.options[sel.selectedIndex].value;
 			var text = sel.options[sel.selectedIndex].text;
 
@@ -739,6 +868,9 @@ $form_javascript = "
 			if ((text == '" . $lang->bam_random_select . "') || value == 'random') {
 				var displayVar = 'none';
 			}
+
+			forumClass.parentNode.parentNode.style.display = displayVar; 
+			displayLocationSel.parentNode.parentNode.parentNode.style.display = displayVar;
 
 			var pinned = document.querySelectorAll(\"input[name='pinned']\");
 			var i;
@@ -757,6 +889,54 @@ $form_javascript = "
 				specialPages.parentNode.parentNode.style.display = displayVar;
 			}
 			
+		}
+
+		function manageDisplayModes (changed=null) {
+			var displaySel = document.getElementById('location');
+			var value = displaySel.options[displaySel.selectedIndex].value;
+			var text = displaySel.options[displaySel.selectedIndex].text;
+
+			// Determine whether which fields should be displayed. 
+
+			var displayVarAdditional = 'None';
+			var displayVarForums = 'None';
+			correctForumSelector();
+
+			if ((text == '" . $lang->bam_list_display_special . "') || value == 'special') {
+				
+				var displayVarAdditional = '';
+				var displayVarForums = 'None';
+			}
+			else if ((text == '" . $lang->bam_list_display_forums . "') || value == 'forums') {
+				var displayVarAdditional = 'None';
+				var displayVarForums = '';
+			}
+			else {
+				var displayVarAdditional = 'None';
+				var displayVarForums = 'None';
+			}
+ 
+			var forumClass = document.getElementById('forum_select');
+			var specialSelect = document.getElementById('additional_pages');
+			
+			// old forumselect. remove a parent node.
+			forumClass.parentNode.parentNode.parentNode.style.display = displayVarForums; 
+			forumClass.parentNode.parentNode.style.display = displayVarForums; 
+			specialSelect.parentNode.parentNode.parentNode.style.display = displayVarAdditional;
+
+			if (!isEmpty(specialSelect.value)) {
+				if (changed) {
+					var specialClassContainer = specialSelect.parentNode.parentNode.getElementsByClassName('description')[0];
+					specialClassContainer.innerHTML = '<span class=\"description\"></span>" . $lang->bam_remove_additional_page . "';
+					specialSelect.parentNode.parentNode.parentNode.style.display = '';
+					displaySel.value = 'special';
+					forumClass.parentNode.parentNode.style.display = 'None';
+					forumClass.parentNode.parentNode.parentNode.display = 'None';
+					correctForumSelector(); // correct a MyBB bug. 
+				}
+			} else {
+				specialSelect.parentNode.parentNode.style.display = displayVarAdditional;
+			} 
 		}
 
 		// 
@@ -782,6 +962,15 @@ $form_javascript = "
 			} else {
 				customClass.parentNode.parentNode.style.display = displayVar;
 			}
+		}
+
+		// See lang file for the full alert text. 
+
+		function showAnnouncementTags() {
+			var announcement = document.getElementById('announcement_text');
+			var announcementContainer = announcement.parentNode.parentNode.getElementsByClassName('description')[0];
+			announcementContainer.innerHTML = '".$lang->bam_announcement_tags_alert."';
+			// announcementContainer.parentNode.parentNode.style.display = '';
 		}
 
  </script>";

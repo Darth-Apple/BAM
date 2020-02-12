@@ -63,9 +63,12 @@ function bam_install () {
 				`global` INT UNSIGNED DEFAULT 0, 
 				`random` INT UNSIGNED DEFAULT 0,
 				additional_display_pages VARCHAR(512) DEFAULT NULL,
+				forums VARCHAR(256) DEFAULT NULL,
   				PRIMARY KEY (PID)
 				) ENGINE=MyISAM
 				".$db->build_create_table_collation().";"
+
+				// ALTER TABLE `mybb_bam` ADD `forums` VARCHAR(256) NULL DEFAULT NULL ;
 
 				// ALTER TABLE `mybb_bam` ADD `display_mode` SET('global', 'index', 'special') NOT NULL DEFAULT 'index' //
 				// AFTER `pinned`, // 
@@ -217,7 +220,7 @@ function bam_install () {
 
 		// Create the BAM announcement template used for each individual announcement. 
 
-		$template['bam_announcement'] = '<p class="{$bam_unsticky} {$class}" id="announcement-{$announcement_id}">{$announcement} <span class="bam_date">{$date}</span>
+		$template['bam_announcement'] = '<p class="{$bam_unsticky} {$class}" id="announcement-{$bcprefix}{$announcement_id}">{$announcement} <span class="bam_date">{$date}</span>
 		<span class=\'close_bam_announcement {$display_close}\'>x</span>
 </p>'; 
 	
@@ -251,30 +254,6 @@ function bam_install () {
 			'isdefault' => 1,
 			'gid' => $group['gid']
 		);
-/*
-		$new_config[] = array(
-			'name' => 'bam_enable_dismissal',
-			'title' => $db->escape_string($lang->bam_enable_dismissal),
-			'description' => $db->escape_string($lang->bam_enable_dismissal_desc),
-			'optionscode' => 'yesno',
-			'value' => '1',
-			'disporder' => 2,
-			'isdefault' => 1,
-			'gid' => $group['gid']
-		); */
-
-/*
-		$new_config[] = array(
-			'name' => 'bam_guest_dismissal_enable',
-			'title' => $db->escape_string($lang->bam_guest_dismissal_enable),
-			'description' => $db->escape_string($lang->bam_guest_dismissal_enable_desc),
-			'optionscode' => 'yesno',
-			'value' => '0',
-			'disporder' => 7,
-			'isdefault' => 1,
-			'gid' => $group['gid']
-		); */
-
 
 		$new_config[] = array(
 			'name' => 'bam_advanced_mode',
@@ -312,19 +291,6 @@ function bam_install () {
 			'gid' => $group['gid']
 		);
 
-		/*$new_config[] = array(
-			'name' => 'bam_global',
-			'title' => $db->escape_string($lang->bam_global),
-			'description' => $db->escape_string($lang->bam_global_desc),
-'optionscode' => 'select
-= '.$lang->bam_global_disable.'
-global_pinned= '.$lang->bam_global_pinned.'
-global_all= '.$lang->bam_global_all,
-			'value' => 'global_none',
-			'disporder' => 7,
-			'isdefault' => 1,
-			'gid' => $group['gid']
-		); // bad indentation intentional*/
 		
 		$new_config[] = array(
 			'name' => 'bam_date_enable',
@@ -397,6 +363,17 @@ global_all= '.$lang->bam_global_all,
 			'optionscode' => 'textarea',
 			'value' => '/* Replace this field with any custom CSS classes. */',
 			'disporder' => 12,
+			'gid' => $group['gid']
+		);
+
+		$cookiePrefix = rand(1, 999999); 
+		$new_config[] = array(
+			'name' => 'bam_cookie_id_prefix',
+			'title' => $db->escape_string($lang->bam_cookie_id_prefix),
+			'description' => $db->escape_string($lang->bam_cookie_id_prefix_desc),
+			'optionscode' => 'numeric',
+			'value' => $cookiePrefix,
+			'disporder' => 13,
 			'gid' => $group['gid']
 		);
 
@@ -522,6 +499,8 @@ function bam_announcements () {
 
 		// Get announcement ID for cookies. Used for saving dismissed announcements. 
 		$announcement_id = (int) $querydata['PID'];
+		$bcprefix = (int) $mybb->settings['bam_cookie_id_prefix']; // Used to reset dismissals if BAM is reinstalled. 
+		$announcement = html_entity_decode($querydata['announcement']);
 
 		// This feature is deprecated (not generally useful). It is still available with advanced mode, and therefore still implemented. 
 		if(!empty($querydata['link'])) {
@@ -536,7 +515,16 @@ function bam_announcements () {
 				$username = $lang->guest; // user is not logged in. Parse as "Guest" instead. 
 			}
 			
-			$announcement = str_replace('{$username}', $username, html_entity_decode($querydata['announcement']));
+			if (strpos("-" . $announcement, "{newestmember")) { // Added character at beginning before searching to fix bug. 
+				$newUser = getNewestMember(); // Fetch the newest member
+				$announcement = str_replace('{newestmember}', $newUser['username'], $announcement);
+				$announcement = str_replace('{newestmember_uid}', (int) $newUser['uid'], $announcement);
+				$announcement = str_replace('{newestmember_link}', "<a href='member.php?action=profile&uid=".(int) $newUser['uid']."'>".$newUser['username']."</a>", $announcement);
+			}
+			// Parse additional variables. 
+			
+			$announcement = str_replace('{$username}', $username, $announcement);
+			$announcement = parseThreadVariables($announcement);	// parses {threadreplies} to thread reply count. 		
 		}
 
 		
@@ -548,7 +536,7 @@ function bam_announcements () {
 
 			// Set dismissals are permanent. 
 			if ((int) $mybb->settings['bam_enable_dismissal'] == 1) {
-				$display_close = "dissmiss-notification";
+				$display_close = "dismiss-notification";
 			}
 
 			// Set dismissals as temporary. When dismissed, the announcement returns on the next page load. 
@@ -585,6 +573,7 @@ function bam_announcements () {
 		// Run announcements through the post parser to process BBcode, images, HTML (advanced mode), etc. 
 		$announcement = $parser->parse_message($announcement, $parser_options); 
 		$class = "bam_announcement " . htmlspecialchars($querydata['class']); // parse class/style
+		$forums = $querydata['forums']; // fetch forum list, if enabled. 
 
 		if ($mybb->settings['bam_date_enable'] == 1) {
 			// Technically, we should have some sort of plugin setting for the date since we aren't using the MyBB default, but to save space in announcements, this plugin doesn't display the year unless necessary. This solution seems to be working well enough for now. Perhaps a future version will "fix" this issue.  
@@ -607,6 +596,7 @@ function bam_announcements () {
 		$data[$count]['languagesEnabled'] = $themesEnabled;
 		$data[$count]['class'] = $class;
 		$data[$count]['display_close'] = $display_close;
+		$data[$count]['forums'] = $forums; // list of forums enabled, if set. 
 		$data[$count]['bam_unsticky'] = $bam_unsticky; 
 		$data[$count]['announcement'] = $announcement; // Parsed text for the announcement. 
 		$data[$count]['PID'] = (int) $announcement_id; // Used to create an element ID. Needed for javascript cookies.
@@ -632,6 +622,7 @@ function bam_announcements () {
 		$count++; 
 	}
 
+	$count_unpinned = 0;
 	shuffle($unpinned_ids); // place unpinned announcements into a random order. 
 	if (bam_display_permissions($mybb->settings['bam_random_group'])) {
 		foreach ($unpinned_ids as $ID) {
@@ -653,7 +644,6 @@ function bam_announcements () {
 				$bam_unsticky = ""; 
 				$display_close = "bam_nodismiss";
 			}
-
 			eval("\$announcements .= \"".$templates->get("bam_announcement")."\";");
 			$count_unpinned++;
 		}
@@ -749,6 +739,128 @@ function bamExplodeLanguages($announcementText) {
 	return null;
 }
 
+
+// New in 2.0. {newestmember} parses to the username of the newest user. 
+
+function getNewestMember() {
+    global $db;
+    $query = $db->query('SELECT uid FROM mybb_users ORDER BY uid DESC LIMIT 1');
+    $query = $db->fetch_array( $query );
+    return get_user( $query['uid'] );
+}
+
+// This function is only called on showthread.php, and parses some extra variables. 
+// Currently, {threadreplies} and {countingthread} are parsed. These are experimental, but have been testd to work as expected. 
+
+function parseThreadVariables($announcementText) {
+	global $current_page; 
+
+	// Check to make sure we are on showthread.php and we have a thread to display. 
+	if ($current_page == "showthread.php" && (int) $_GET['tid'] != null) {
+
+		// Get the thread from the database. 
+		$threadID = (int) $_GET['tid'];
+		$thread = get_thread($threadID);
+		
+		// Parse number of replies in thread. Primarily useful for forum games. 
+		if (strpos("-".$announcementText, "{threadreplies}")) {
+			return str_replace("{threadreplies}", (int) $thread['replies'], $announcementText); // replace variable and return. 
+		}
+
+		// Parse the counting thread. This is similar to above, but attempts to correct invalid counts.
+		else if (strpos("-".$announcementText, "{countingthread}")) {
+
+			// We are going to try to determine the correct count for the counting thread based on previous replies. 
+			// This is an easter egg feature! Very useful for forum games where users frequently get off count. 
+
+			$threadID = (int) $_GET['tid']; 
+			$threadData = getThreadData($threadID);
+			$arrayofNumbers = array();
+			$maxLen = 0;
+			$leadingNumber = 0;
+
+			// We need to extract the number from each post generated from the getThreadData query. 
+			// If a number doesn't exist, it simply gets put in as a 0 in the array. 
+			// This function depends on counts being in every post. It can handle one missing count, but behaves unpredictably if more are missing. 
+
+			foreach ($threadData as $post) { 
+				$arrayofNumbers[] = parseForumGameCounter($post);
+			}
+			
+			// Next, we must explode these into arrays of consecutive numbers. 
+			$results = getConsecutiveNumbers($arrayofNumbers);
+			foreach ($results as $row) {
+
+				// We must fetch the largest set of consecutive numbers from recent posts. This will serve as the basis for the correct count. 
+				if (count($row) > $maxLen) {
+					$maxLen = count($row);
+					$leadingRow = $row; 
+					$leadingNumber = $leadingRow[0];
+				}
+			}
+
+			// Get the correct count based on offsets from the largest consecutive set. Parse the variable for the announcement. 
+			$leadingKey = array_search($leadingNumber, $arrayofNumbers);
+			$numPostsAway = count($arrayofNumbers) - $leadingKey; 
+			$finalValue = number_format((int) ($arrayofNumbers[$leadingKey] + $leadingKey));
+			return str_replace("{countingthread}", $finalValue, $announcementText);
+		}
+	}
+	
+	// No replacements. Return the announcement unchanged. 
+	return $announcementText;
+}
+
+// Credit: https://stackoverflow.com/questions/28614124/php-number-of-consecutive-elements-in-array
+
+function getConsecutiveNumbers($array) {
+
+	// This function creates a multidimensional array of lists of consecutive numbers from the input $array. 
+	// This can be used to determine the correct count in counting threads, and to correct the wrong count being posted. 
+
+	$array = array_unique($array);
+	$previous = null; 
+	$result = array();
+	$consecutiveArray = array();
+
+	// Get consecutive sequences where the next number is exactly 1 less than the previous number. 
+	foreach($array as $number) {
+		if ($number == $previous - 1) {
+			$consecutiveArray[] = $number;
+		} else {
+			$result[] = $consecutiveArray;
+			$consecutiveArray = array($number);
+		}
+		$previous = $number;
+	}
+	$result[] = $consecutiveArray;
+	return $result;
+}
+
+function parseForumGameCounter($post) {
+	// This function extracts a number/count from a post in counting threads. It returns the number found, or 0 if not found. 
+	$match = "";
+
+	preg_match ('/([0-9]+)/', $post['message'], $match);
+	if ($match[0] != 0 ) {
+		return (int) $match[0];
+	}
+	return 0;
+}
+
+
+// Helper function that returns the thread data. Used for parseThreadVariables (above)
+function getThreadData($threadID) {
+    global $db;
+    $tid = (int) $threadID; 
+
+    // Get the most recent ten posts from the database by thread ID.  
+    return $db->query("
+    SELECT p.message, p.tid, p.dateline
+    FROM ".TABLE_PREFIX."posts p WHERE p.tid='$tid'
+    ORDER BY p.dateline DESC LIMIT 0,10");
+}
+
 // This function checks the user's permissions, and determines if the user's group is in $display_groups
 // Returns true to display the announcement. False if the user is not permitted to view it. 
 
@@ -797,16 +909,38 @@ function checkAnnouncementDisplay($announcement) {
 	// Check if the user has defined an alternative page. If so, run the check to see if this page is valid. 
 	// If this alternative page is not valid, we don't display the page, regardless of whether it is global. 
 
-	if (($mybb->settings['bam_advanced_mode'] == 1) && ($announcement['additional_display_pages'] != null)) {
+	// if (($mybb->settings['bam_advanced_mode'] == 1) && ($announcement['additional_display_pages'] != null)) {
+	if (($announcement['additional_display_pages'] != null)) {
 		return isAlternatePageValid($announcement); 
 	}
 
 	// The announcement has a special page, but advanced mode is disabled. Don't display this announcement. 
-	else if (($mybb->settings['bam_advanced_mode'] == 0) && ($announcement['additional_display_pages'] != null)) {
-		return false;
+	// else if (($mybb->settings['bam_advanced_mode'] == 0) && ($announcement['additional_display_pages'] != null)) {
+	//	return false;
+	// }
+
+	// Check if announcement is in forum-display mode. (global = 2)
+	// If so, we need to check if this announcement is in a forum ID that is enabled. 
+	else if (($announcement['forums'] != null)  && ($announcement['global'] == 2)) {
+		
+		// Check if all forums are enabled. If so, enable the announcement. 
+		if (($announcement['forums'] == "*" || $announcement['forums'] == "-1") && ((int) $_GET['fid'] != null)) {
+			return true; 
+		}
+
+		// User hasn't enabled announcement for every board. Check if the board we are on is in the list of enabled boards. 
+		else {
+			$explodedForums = explode(',', $announcement['forums']);
+			if (in_array((int) $_GET['fid'], $explodedForums)) {
+				return true; // This board is enabled.
+			}
+			else {
+				return false; // This board isn't enabled. Return false. 
+			}
+		}
 	}
 
-	// We aren't on a custom alternative page. So we will check if we are on a page that BAM is set to consider the index page. 
+	// We aren't on a custom alternative page or forum mode. So we will check if we are on the index page. 
 	// With no alternative page set: Announcements are always displayed on the index page, regardless of whether they are global, random, or otherwise. 
 	else if (isIndexPage($announcement)) {
 		return true; // this is the index page. No need to check for global announcement settings. 
@@ -814,8 +948,9 @@ function checkAnnouncementDisplay($announcement) {
 	else if ($announcement['global'] == 1) {
 		return true;
 	}
+
 	// This announcement can't be displayed under any conditions.
-	// We aren't on the index, the announcement isn't global, and we aren't on an alternative page. Return false. 
+	// We aren't on the index, no forums match, the announcement isn't global, and we aren't on an alternative page. Return false. 
 	else {
 		return false; 
 	}
@@ -852,13 +987,12 @@ function isIndexPage($otherPage=null) {
 // Only called if BAM is in advanced mode and the additional_url_parameters setting is set with a value.
 
 function isAlternatePageValid($announcement) { 
-	// echo "<br /> Called function <br />";
 	global $mybb, $current_page, $additional_page_parameters;
 
 	// Developers: If you are using this plugin and your URL settings are not being accepted, you can add
 	// new acceptable parameteres here. However, please be aware that this is a whitelist that is intended
 	// to prevent unexpected or insecure behavior. This setting was explicitely ommitted on the ACP for 
-	// this reason. Please be mindful and add parameters, but do not remove the whitelist for your forum. 
+	// this reason. Please be mindful and add parameters as needed, but do not remove the whitelist for your forum. 
 	$additional_page_parameters = array('fid', 'action', 'uid', 'tid');
 	
 	$explodedPages = explode(',', $announcement['additional_display_pages']);
@@ -928,7 +1062,7 @@ function isAlternatePageValid($announcement) {
 }
 
 
-// Thank you for using, developin for, and viewing BAM's source. If you have any questions or would like to contribute,
+// Thank you for using, developing for, and viewing BAM's source. If you have any questions or would like to contribute,
 // please send me (Darth-Apple) a message on github or on the MyBB community forums!
 // Regards, 
 // -Darth Apple
