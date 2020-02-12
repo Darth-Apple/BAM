@@ -575,6 +575,16 @@ function bam_announcements () {
 			break; 
 		}	
 
+		// Directive allows you to define a different template for this announcement. Useful if you need javascript in announcement. 
+		if (strpos("-".$announcement, "[@template:")) { 
+			// Get alternative template defined in announcement. 
+			$announcementTemplate = bamExplodeTemplates($announcement); 
+			$announcement = preg_replace('/\[@template:([a-zA-Z0-9_]*)\]/', "", $announcement);	
+		}
+		else {
+			$announcementTemplate = "bam_announcement";
+		}
+
 		// Run announcements through the post parser to process BBcode, images, HTML (advanced mode), etc. 
 		$announcement = $parser->parse_message($announcement, $parser_options); 
 		$class = "bam_announcement " . htmlspecialchars($querydata['class']); // parse class/style
@@ -601,6 +611,7 @@ function bam_announcements () {
 		$data[$count]['languagesEnabled'] = $themesEnabled;
 		$data[$count]['class'] = $class;
 		$data[$count]['display_close'] = $display_close;
+		$data[$count]['template'] = $announcementTemplate;
 		$data[$count]['forums'] = $forums; // list of forums enabled, if set. 
 		$data[$count]['bam_unsticky'] = $bam_unsticky; 
 		$data[$count]['announcement'] = $announcement; // Parsed text for the announcement. 
@@ -621,7 +632,7 @@ function bam_announcements () {
 			
 			// If the announcement isn't random, we need to check if the theme and language is enabled. If so, render. 
 			if (bamThemeEnabled($data[$count]['themesEnabled']) && bamLanguageEnabled($data[$count]['languagesEnabled'])) {
-				eval("\$announcements .= \"".$templates->get("bam_announcement")."\";");
+				eval("\$announcements .= \"".$templates->get($data[$count]['template'])."\";");
 			}
 		}
 		$count++; 
@@ -649,7 +660,7 @@ function bam_announcements () {
 				$bam_unsticky = ""; 
 				$display_close = "bam_nodismiss";
 			}
-			eval("\$announcements .= \"".$templates->get("bam_announcement")."\";");
+			eval("\$announcements .= \"".$templates->get($data[$ID]['template'])."\";");
 			$count_unpinned++;
 		}
 	}
@@ -744,6 +755,21 @@ function bamExplodeLanguages($announcementText) {
 	return null;
 }
 
+// Search the announcement's text for a theme tag. If so, return an array with a list of themes. 
+function bamExplodeTemplates($announcementText) { 
+	$matched_template_raw = "";
+	if(preg_match('/\[@template:([a-zA-Z0-9_]*)\]/', $announcementText, $matched_template_raw)) {
+		// echo "<br />Theme selector found: " . $matched_themes[0] . "<br />";
+		$matched_template_raw = str_replace("[@template:", "", $matched_template_raw[0]);
+		$matched_template_raw = str_replace("]", "", $matched_template_raw);
+
+		// Remove non alphanumeric characters for security and stability. 
+		$processedTemplate = preg_replace( '/[\W]/', '', $matched_template_raw); 
+		// echo "template: " . $processedTemplate . "<br />";
+		return $processedTemplate;
+	}
+	return null;
+}
 
 // New in 2.0. {newestmember} parses to the username of the newest user. 
 
