@@ -131,6 +131,13 @@ DISPLAYING ANNOUNCEMENTS ON SPECIFIC LANGUAGES:
 
 Both theme tags and language tags are internal directives for BAM, and are removed from announcements before being displayed. Although they are displayed on the management panel, users will not be able to see these tags on your forum! 
 
+OTHER DIRECTIVES:
+
+[@disabled]      		 -- Disables an announcement without deleting it. 
+[@template:custom_template]      -- Selects a different template for this announcement. 
+
+If you use custom templates, you must define this template in your forum's global templates. Please note that using custom templates may break features such as announcement dismissals and date functionality. 
+
 ---------------------------------
 
 RANDOM MODE:

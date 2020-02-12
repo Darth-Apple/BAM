@@ -608,7 +608,7 @@ function bam_announcements () {
 		// Save an array of unpinned announcements. This allows us to re-order and display these later without running another query. 
 		$data[$count]['date'] = $date;
 		$data[$count]['themesEnabled'] = $themesEnabled;
-		$data[$count]['languagesEnabled'] = $themesEnabled;
+		$data[$count]['languagesEnabled'] = $languagesEnabled;
 		$data[$count]['class'] = $class;
 		$data[$count]['display_close'] = $display_close;
 		$data[$count]['template'] = $announcementTemplate;
@@ -728,7 +728,7 @@ function bamExplodeThemes($announcementText) {
 function bamLanguageEnabled($languages) {
 	global $mybb; 
 	$userLanguage = $mybb->user['language'];
-	if ($tlanguage != null) {
+	if ($languages != null) {
 		if (in_array($userLanguage, $languages)) {
 			return true;
 		}
@@ -746,10 +746,10 @@ function bamExplodeLanguages($announcementText) {
 	$matched_languages_raw = "";
 	if(preg_match('/\[@languages:([a-zA-Z0-9_]*)\]/', $announcementText, $matched_languages_raw)) {
 		// echo "<br />Theme selector found: " . $matched_themes[0] . "<br />";
-		$matched_languages_raw = str_replace("[@themes:", "", $matched_languages_raw[0]);
+		$matched_languages_raw = str_replace("[@languages:", "", $matched_languages_raw[0]);
 		$matched_languages_raw = str_replace("]", "", $matched_languages_raw);
 		$explodedLanguages = explode(',', $matched_languages_raw);
-		$processedLanguages = array_map('trim',$explodedlanguages);
+		$processedLanguages = array_map('trim',$explodedLanguages);
 		return $processedLanguages;
 	}
 	return null;
@@ -764,8 +764,7 @@ function bamExplodeTemplates($announcementText) {
 		$matched_template_raw = str_replace("]", "", $matched_template_raw);
 
 		// Remove non alphanumeric characters for security and stability. 
-		$processedTemplate = preg_replace( '/[\W]/', '', $matched_template_raw); 
-		// echo "template: " . $processedTemplate . "<br />";
+		$processedTemplate = preg_replace( '/[\W]_/', '', $matched_template_raw); 
 		return $processedTemplate;
 	}
 	return null;
