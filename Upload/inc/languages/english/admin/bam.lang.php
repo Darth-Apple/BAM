@@ -67,9 +67,11 @@ $l['bam_manage_announcements'] = "Manage Announcements";
 $l['bam_manage'] = "Manage";
 $l['bam_manage_random'] = "Random Mode";
 $l['bam_manage_random_desc'] = "<b>BAM will randomly select one announcement from this list to display on the forum index.</b> These can be managed here! <br /><br />";
-$l['bam_manage_random_desc'] .= " - If you need more than one announcement to display, see BAM's configuration settings. <br />";
 $l['bam_manage_random_desc'] .= " - To add announcements to this list, select \"Random Announcement\" when adding a new announcement. <br />";
-$l['bam_manage_random_desc'] .= " - Use this feature if you want announcements to automatically refresh on each page visit. ";
+$l['bam_manage_random_desc'] .= " - BAM has some special configuration settings for these. See BAM's plugin settings for more options. <br />";
+$l['bam_manage_random_desc'] .= " - These announcements will be ordered beneath standard announcements. <br /> ";
+$l['bam_manage_random_desc'] .= " - Use this feature if you want announcements to automatically refresh on each page visit.";
+
 $l['bam_manage_desc_norandom'] = "This page allows you to manage, edit, delete, and re-order your announcements. This page only manages standard announcements. If you need announcements to be randomly selected on your forum index, enable <i>random mode</i> in BAM's plugin settings.";
 $l['bam_manage_desc'] = "This page allows you to manage, edit, delete, and re-order your announcements. This page only manages standard announcements. See the Random Mode tab for randomly selected SMF-style announcement functionality. ";
 $l['bam_edit'] = 'Edit';
