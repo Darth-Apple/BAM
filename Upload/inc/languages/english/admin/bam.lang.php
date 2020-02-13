@@ -87,6 +87,13 @@ $l['bam_form_announcement'] = 'Announcement: ';
 $l['bam_form_announcement_desc'] = 'You may use BBcode in your announcements. Up to 1024 characters are allowed.';
 $l['bam_form_announcement_advanced_desc'] = "You may use BBcode and HTML in your announcements. Up to 1024 characters are allowed. ";
 $l['bam_form_tags_link'] = "Show Available Tags.";
+$l['bam_make_standard'] = "Make Static";
+$l['bam_make_standard_confirm'] = "Set your announcement as a standard announcement?";
+$l['bam_make_random_confirm'] = "Set your announcement as a random mode announcement?";
+$l['bam_make_random'] = "Make Announcement Random";
+$l['bam_make_random_success'] = "Successfully made your announcement a <i>random mode</i> announcement. Please make sure all settings look correct. ";
+$l['bam_make_standard_success'] = "Successfully reset your announcement to standard mode. Please edit any additional settings and make sure they look correct!";
+$l['bam_make_standard_header'] = "Manage Type";
 
 $l['bam_green'] = "Green/Success";
 $l['bam_blue'] = "Blue/Notice";
@@ -148,8 +155,8 @@ $l['bam_additional_pages_desc'] = "<b>Set custom pages to display your announcem
   <b>Supported pages: </b> Any .php page within your forum's directory. <br />
   <b>URL parameters supported: </b> action, uid, tid, fid. All other URL parameters will be ignored. See documentation for details. <br />";
 
-$l['bam_random_select'] = "Random Announcement";
-$l['bam_standard_select'] = "Standard Announcement";
+$l['bam_random_select'] = "Random Mode Announcement";
+$l['bam_standard_select'] = "Static Announcement (always display)";
 $l['bam_advanced_mode'] = "Allow HTML in announcements?";
 $l['bam_advanced_mode_desc'] = "By default, BAM parses BBcode in announcements. If you need full HTML, enable this setting.";
 $l['bam_manage_random_form_container'] = "Manage Random Mode Announcements";

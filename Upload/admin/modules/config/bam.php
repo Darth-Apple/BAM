@@ -177,6 +177,34 @@ error_reporting(E_ALL); */
 		admin_redirect('index.php?module=config-bam');
 	}
 
+	// Turns this announcement into a random mode announcement. Redirects to the edit page afterwards. 
+	if(($mybb->input['action'] == 'make_random') && ($mybb->request_method=="get") && !empty($mybb->input['id'])) {
+		$key = verify_post_check($mybb->input['my_post_key'], true); 
+		if ($key == false) {
+			flash_message($lang->bam_invalid_post_code, 'error');
+			admin_redirect("index.php?module=config-bam");
+		}
+		
+		$id = (int)$mybb->input['id'];
+		$db->update_query("bam", array('random' => 1), "PID='$id'");
+		flash_message($lang->bam_make_random_success, 'success');
+		admin_redirect('index.php?module=config-bam&action=edit&id='.(int) $id);
+	}
+
+	// Process the "make standard mode" link. This resets the announcement to standard mode and displays the edit page. 
+	if(($mybb->input['action'] == 'make_standard') && ($mybb->request_method=="get") && !empty($mybb->input['id'])) {
+		$key = verify_post_check($mybb->input['my_post_key'], true); 
+		if ($key == false) {
+			flash_message($lang->bam_invalid_post_code, 'error');
+			admin_redirect("index.php?module=config-bam");
+		}
+		
+		$id = (int)$mybb->input['id'];
+		$db->update_query("bam", array('random' => 0), "PID='$id'");
+		flash_message($lang->bam_make_standard_success, 'success');
+		admin_redirect('index.php?module=config-bam&action=edit&id='.(int) $id);
+	}
+
 
 	if(($mybb->input['action'] == 'unpin') && ($mybb->request_method=="get") && !empty($mybb->input['id'])) {
 		// Process unpin announcement request
@@ -229,6 +257,9 @@ error_reporting(E_ALL); */
 
 		$form = new Form("index.php?module=config-bam", "post");
 		$form_container = new FormContainer($lang->bam_edit_announcement);
+
+		// Used to enable javascript for announcement add/edit forms. 
+		echo $form->generate_hidden_field("announcementPageFlag", "true", array("id"=>"announcementPageFlag"));
 
 		if ($data['location'] == 2) {
 			$announcementLocation = "forums"; // set to specific forums. Specific forums is 2 in MyBB selector.  
@@ -588,6 +619,9 @@ error_reporting(E_ALL); */
 		$form = new Form("index.php?module=config-bam", "post");
 		$form_container = new FormContainer($lang->bam_form_add);
 
+		// Used to enable javascript for announcement add/edit forms. 
+		echo $form->generate_hidden_field("announcementPageFlag", "true", array("id"=>"announcementPageFlag"));
+
 		// Initialize custom class variable. 
 		if (isset($mybb->input['custom_class'])) {
 			$customClass = htmlspecialchars($mybb->input['custom_class']);
@@ -714,7 +748,13 @@ error_reporting(E_ALL); */
 		
 		$table->output_row_header($lang->bam_manage_announcement, array('width' => '64%'));
 		$table->output_row_header($lang->bam_manage_class, array('width' => '12%'));
-		$table->output_row_header($lang->bam_manage_order, array('width' => '11%')); 
+		
+		// Output the correct table header depending on the announcement's type. 
+		if ($type == "random") {
+			$table->output_row_header($lang->bam_make_standard_header, array('width' => '11%')); 
+		} else {
+			$table->output_row_header($lang->bam_manage_order, array('width' => '11%')); 
+		}
 		$table->output_row_header($lang->bam_manage_actions, array('width' => '13%', 'text-align' => 'center')); 
 		
 		if ($type == "random") {
@@ -774,7 +814,12 @@ error_reporting(E_ALL); */
 				if ((isset($data[$i]['PID'])) && ($data[$i]['PID'] != null)) {
 					$table->output_cell($data[$i]['announcement']);
 					$table->output_cell($data[$i]['class']);
-					$table->output_cell("<center><input type='text' name=\"disporder[".$data[$i]['PID']."]\" value='".$data[$i]['disporder']."' /></center>");
+					//$table->output_cell("<center><input type='text' name=\"disporder[".$data[$i]['PID']."]\" value='".$data[$i]['disporder']."' /></center>");
+					if ($type == "random") {
+						$table->output_cell("<center><a href=\"index.php?module=config-bam&action=make_standard&id=".(int) $data[$i]['PID']. "&my_post_key=".$mybb->post_code . "\" onclick=\"confirm('".$lang->bam_make_standard_confirm."');\">" . $lang->bam_make_standard . "</a></center>");
+					} else {
+						$table->output_cell("<center><input type='text' name=\"disporder[".$data[$i]['PID']."]\" value='".$data[$i]['disporder']."' /></center>");
+					}
 					// $table->output_cell("");
 
 					// Generate the options menu. 
@@ -804,10 +849,15 @@ function generate_announcement_controls ($id, $ispinned) {
 	$popup->add_item($lang->bam_manage_edit, 'index.php?module=config-bam&action=edit&id=' . $id);
 	$popup->add_item($lang->bam_manage_delete,  "index.php?module=config-bam&action=delete&id=" . $id . "&my_post_key=".$mybb->post_code, "return confirm('".$lang->bam_manage_delete_confirm."');");
 	
-	if ($ispinned) {
-		$popup->add_item($lang->bam_manage_unpin,  "index.php?module=config-bam&action=unpin&id=" . $id . "&my_post_key=".$mybb->post_code);
-	} else {
-		$popup->add_item($lang->bam_manage_pin,  "index.php?module=config-bam&action=pin&id=" . $id . "&my_post_key=".$mybb->post_code);
+	// Add the link to make an announcement random if random mode is enabled and we are on the standard page. 
+	if (($_GET['action'] != "manage_random") && $mybb->settings['bam_random'] != 0) {
+		$popup->add_item($lang->bam_make_random,  "index.php?module=config-bam&action=make_random&id=" . $id . "&my_post_key=".$mybb->post_code, "return confirm('".$lang->bam_make_random_confirm."');");
+		
+		if ($ispinned) {
+			$popup->add_item($lang->bam_manage_unpin,  "index.php?module=config-bam&action=unpin&id=" . $id . "&my_post_key=".$mybb->post_code);
+		} else {
+			$popup->add_item($lang->bam_manage_pin,  "index.php?module=config-bam&action=pin&id=" . $id . "&my_post_key=".$mybb->post_code);
+		}	
 	}
 
 	return $popup;
@@ -826,14 +876,16 @@ function create_selectedForumArray($forums) {
 $form_javascript = " 
 <script>
 	const isEmpty = str => !str.trim().length;
+	// if (document.getElementById('announcementPageFlag' != null)) {
+	if (document.getElementById('announcementType') != null) {
+		document.getElementById('location').onchange = function() {manageDisplayModes(changed='true')}
+		manageDisplayModes();
+		correctForumSelector(); 
 
-	document.getElementById('location').onchange = function() {manageDisplayModes(changed='true')}
-	manageDisplayModes();
-	correctForumSelector(); 
-
-	document.getElementById('style').onchange = function() {setCustomClass()}
-	setCustomClass();
-	manageDisplayModes();
+		document.getElementById('style').onchange = function() {setCustomClass()}
+		setCustomClass();
+		manageDisplayModes();
+	}
 
 	// Bug fix. MyBB's default forum selector does not properly create a multiple select item. 
 	// So we ghetto rig it because this works. And we can select multiple forums now. 
