@@ -1,6 +1,7 @@
 <?php
 
-/* ini_set('display_errors', 1);
+/*
+ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL); */
 
@@ -725,16 +726,16 @@ error_reporting(E_ALL); */
 
 		echo $form_t->generate_hidden_field("action", "order");
 		
-		$table->output_row_header($lang->bam_manage_announcement, array('width' => '64%'));
-		$table->output_row_header($lang->bam_manage_class, array('width' => '12%'));
+		$table->output_row_header($lang->bam_manage_announcement, array('width' => '68%'));
+		$table->output_row_header($lang->bam_manage_class, array('width' => '14%'));
 		
 		// Output the correct table header depending on the announcement's type. 
 		if ($type == "random") {
-			$table->output_row_header($lang->bam_make_standard_header, array('width' => '11%')); 
+			$table->output_row_header($lang->bam_make_standard_header, array('width' => '9%')); 
 		} else {
-			$table->output_row_header($lang->bam_manage_order, array('width' => '11%')); 
+			$table->output_row_header($lang->bam_manage_order, array('width' => '8%')); 
 		}
-		$table->output_row_header($lang->bam_manage_actions, array('width' => '13%', 'text-align' => 'center')); 
+		$table->output_row_header($lang->bam_manage_actions, array('width' => '10%', 'text-align' => 'center')); 
 		
 		if ($type == "random") {
 			$query = $db->query("
@@ -754,15 +755,9 @@ error_reporting(E_ALL); */
 		$count = 0;
 		$prefixVal = "";
 		while($querydata = $db->fetch_array($query))
-		{	
-			if (($querydata['additional_display_pages'] != null)) {
-				// $prefixVal = "<img src='../images/jump.png' alt='{$lang->bam_has_additional_pages}' title='{$lang->bam_has_additional_pages}'> &nbsp;&nbsp;";
-				$prefixVal = "<div class=\"float_right\"><img src='../images/jump.png' title='{$lang->bam_has_additional_pages}'alt='{$lang->bam_has_additional_pages}' /></div>";
-			}
-			else {
-				$prefixVal = "";
-			}
+		{
 
+			// Parse announcement so that BBcode and HTML display (full preview).
 			if ($querydata['link'] != null) {
 				$announcementText = $parser->parse_message("[url=".$querydata['link']."]".html_entity_decode($querydata['announcement'])."[/url]", $parser_options);
 			}
@@ -771,10 +766,56 @@ error_reporting(E_ALL); */
 				$announcementText = $parser->parse_message(html_entity_decode($querydata['announcement']), $parser_options); // parse bbcode
 			}
 
+
+			// Get indicator icons for management page. 
+			$prefixVal = "<div class=\"float_right\" style='padding-left: 3px;'>";	
+
+			// Special pages icon
+			if (($querydata['additional_display_pages'] != null) && $querydata['global'] == 3) {
+				$prefixVal .= "<img src='styles/default/images/icons/custom.png' title='{$lang->bam_has_additional_pages}'alt='{$lang->bam_has_additional_pages}' />";
+			}
+			
+			// Random mode icon
+			else if ($querydata['random'] != 0) {
+				$prefixVal .= "<img src='styles/default/images/icons/run_task.png' title='{$lang->bam_announcement_is_random}'alt='{$lang->bam_announcement_is_random}' />";
+			}
+			
+			// Global icon
+			else if ($querydata['global'] == 1) {
+				$prefixVal .= "<img src='styles/default/images/icons/world.png' title='{$lang->bam_announcement_is_global}'alt='{$lang->bam_announcement_is_global}' />";
+			}
+			
+			// Index icon
+			else if ($querydata['global'] == 0) {
+				$style = "padding: 1px 0 1px 16px; background-image: url(../images/usercp_sprite.png); background-repeat: no-repeat; background-position: 0 -400px;";
+				$prefixVal .= "<span style='$style' title='$lang->bam_announcement_is_index'></span>";
+			}
+			
+			// Displayed on specific forums. 
+			else {
+				$style = "padding: 1px 0 1px 16px; background-image: url(../images/headerlinks_sprite.png); background-repeat: no-repeat; background-position: 0 -140px;";
+				$prefixVal .= "<span style='$style' title='$lang->bam_announcement_is_forums'></span>";
+			}
+			
+			// If announcement is stickied. 
+			if ($querydata['pinned'] == 1) {
+				$style = "padding: 0px 0 1px 16px; background-image: url(../images/modcp_sprite.png); background-repeat: no-repeat; background-position: 0 -20px;";
+				$prefixVal .= "<span style='$style' title='$lang->bam_announcement_is_sticky'></span>";
+			}
+
+			// Check if announcement has special directives. 
+			$directives = "";
+			if (strpos("-".$announcementText, "[@") && strpos($announcementText, "]")) {
+				$prefixVal .= "<img src='../images/jump.png' title='{$lang->bam_announcement_has_directives}'alt='{$lang->bam_announcement_has_directives}' />";				
+			}
+			$prefixVal .= "</div>"; 
+
+
 			// echo "<br /><br /> announcementText" . $announcementText;
-			$data[$count]['announcement'] = $prefixVal . $announcementText;
+			// $data[$count]['announcement'] = $prefixVal . $announcementText;
+			$data[$count]['announcement'] = $announcementText;
 			$data[$count]['PID'] = $querydata['PID'];
-			$data[$count]['class'] = $querydata['class'];
+			$data[$count]['class'] = $prefixVal . $querydata['class'];
 			$data[$count]['pinned'] = $querydata['pinned'];
 			$data[$count]['disporder'] = $querydata['disporder'];
 			$count++;
@@ -793,7 +834,8 @@ error_reporting(E_ALL); */
 				if ((isset($data[$i]['PID'])) && ($data[$i]['PID'] != null)) {
 					$table->output_cell($data[$i]['announcement']);
 					$table->output_cell($data[$i]['class']);
-					//$table->output_cell("<center><input type='text' name=\"disporder[".$data[$i]['PID']."]\" value='".$data[$i]['disporder']."' /></center>");
+
+					// Output either the "make standard" link or the display order field, depending on which mode this page displays. 
 					if ($type == "random") {
 						$table->output_cell("<center><a href=\"index.php?module=config-bam&action=make_standard&id=".(int) $data[$i]['PID']. "&my_post_key=".$mybb->post_code . "\" onclick=\"confirm('".$lang->bam_make_standard_confirm."');\">" . $lang->bam_make_standard . "</a></center>");
 					} else {
@@ -877,8 +919,10 @@ function create_selectedForumArray($forums) {
 
 $form_javascript = " 
 <script>
+	// Create a trim function for cookies. 
 	const isEmpty = str => !str.trim().length;
-	// if (document.getElementById('announcementPageFlag' != null)) {
+
+	// Check if we are on a new announcement or edit announcement page. If so, enable some javascript for improved functionality. 
 	if (document.getElementById('announcementType') != null) {
 		document.getElementById('location').onchange = function() {manageDisplayModes(changed='true')}
 		manageDisplayModes();
@@ -889,8 +933,7 @@ $form_javascript = "
 		manageDisplayModes();
 	}
 
-	// Bug fix. MyBB's default forum selector does not properly create a multiple select item. 
-	// So we ghetto rig it because this works. And we can select multiple forums now. 
+	// Bug fix. Properly allow forum select to take multiple values. 
 
 	function correctForumSelector() {
 		forumSelector = document.getElementById('forum_select'); 

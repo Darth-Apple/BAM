@@ -96,6 +96,13 @@ $l['bam_make_standard_success'] = "Successfully reset your announcement to stand
 $l['bam_make_standard_header'] = "Manage Type";
 $l['bam_add_new_random'] = "Create Random Announcement";
 
+$l['bam_announcement_is_global'] = "This announcement is global (displayed on all pages).";
+$l['bam_announcement_is_index'] = "This announcement is displayed on the default homepage.";
+$l['bam_announcement_is_sticky'] = "This announcement is sticky (cannot be dismissed).";
+$l['bam_announcement_is_forums'] = "This announcement is displayed on specific forums.";
+$l['bam_announcement_is_random'] = "This is a random mode announcement.";
+$l['bam_announcement_has_directives'] = "This announcement has special directives. ";
+
 $l['bam_green'] = "Green/Success";
 $l['bam_blue'] = "Blue/Notice";
 $l['bam_yellow'] = 'Yellow/Alert';
