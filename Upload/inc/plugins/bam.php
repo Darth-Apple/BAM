@@ -728,6 +728,19 @@ function bamExplodeThemes($announcementText) {
 function bamLanguageEnabled($languages) {
 	global $mybb; 
 	$userLanguage = $mybb->user['language'];
+
+	// If the user is on the default language and this language is set for the announcement, display the announcement. 
+	if (!isset($userLanguage) || $userLanguage == null) {
+		if ($languages != null) {
+			if (in_array($mybb->settings['bblanguage'], $languages)) {
+				return true; 
+			}
+			// user is on default language, but announcement specifies a different announcement. 
+			else {
+				return false; 
+			}
+		}
+	}
 	if ($languages != null) {
 		if (in_array($userLanguage, $languages)) {
 			return true;
@@ -888,7 +901,7 @@ function getThreadData($threadID) {
     return $db->query("
     SELECT p.message, p.tid, p.dateline
     FROM ".TABLE_PREFIX."posts p WHERE p.tid='$tid'
-    ORDER BY p.dateline DESC LIMIT 0,10");
+    ORDER BY p.dateline DESC LIMIT 0,20");
 }
 
 // This function checks the user's permissions, and determines if the user's group is in $display_groups
