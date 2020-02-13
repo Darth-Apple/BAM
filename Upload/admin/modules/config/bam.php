@@ -896,7 +896,9 @@ function generate_announcement_controls ($id, $ispinned) {
 	// Add the link to make an announcement random if random mode is enabled and we are on the standard page. 
 	if (($_GET['action'] != "manage_random") && $mybb->settings['bam_random'] != 0) {
 		$popup->add_item($lang->bam_make_random,  "index.php?module=config-bam&action=make_random&id=" . $id . "&my_post_key=".$mybb->post_code, "return confirm('".$lang->bam_make_random_confirm."');");
-		
+	}
+
+	if ($_GET['action'] != "manage_random") {
 		if ($ispinned) {
 			$popup->add_item($lang->bam_manage_unpin,  "index.php?module=config-bam&action=unpin&id=" . $id . "&my_post_key=".$mybb->post_code);
 		} else {
@@ -923,7 +925,7 @@ $form_javascript = "
 	const isEmpty = str => !str.trim().length;
 
 	// Check if we are on a new announcement or edit announcement page. If so, enable some javascript for improved functionality. 
-	if (document.getElementById('announcementType') != null) {
+	if (document.getElementById('announcementType') != null || document.getElementById('announcementTypeHidden') != null) {
 		document.getElementById('location').onchange = function() {manageDisplayModes(changed='true')}
 		manageDisplayModes();
 		correctForumSelector(); 
