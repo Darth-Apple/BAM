@@ -387,7 +387,6 @@ error_reporting(E_ALL); */
 		}
 		else {
 			$isGlobal = 2; // 
-			// $forumList = $db->escape_string($mybb->input['forum_select']);
 		}
 
 		if ($mybb->input['additional_pages'] != null) {
@@ -404,20 +403,7 @@ error_reporting(E_ALL); */
 			$class = $db->escape_string(htmlspecialchars($mybb->input['class'], ENT_QUOTES));
 		}
 
-		/*
-		if (isset($mybb->input['forum_select'])) {
-			$forumList = "";
-			foreach ($mybb->input['forum_select'] as $forum) {
-				if (strlen($forumList) > 0) {
-					$forumList = $forumList . ", " . (int) $forum; 
-				}
-				else {
-					$forumList = (int) $forum; // it's the first forum selected. Don't put a comma at the beginning. 
-				}
-			}
-		*/ 
-		
-	
+		// Get forum select data. 
 		if((!isset($mybb->input['forum_select'])) || (empty($mybb->input['forum_select'])) || (in_array('*', $mybb->input['forum_select']))) {
 			$mybb->input['forum_select'] = '*';
 		}
@@ -497,21 +483,7 @@ error_reporting(E_ALL); */
 			$isGlobal = 2; 
 		}
 
-		/*
-		// Get the forum list (if it exists). Null otherwise. 
-		if (isset($mybb->input['forum_select'])) {
-			flash_message("test: " . var_dump($mybb->input['forum_select']), 'success');
-			admin_redirect("index.php");
-			$forumList = "";
-			foreach ($mybb->input['forum_select'] as $forum) {
-				if (strlen($forumList) > 0) {
-					$forumList = $forumList . ", " . (int) $forum; 
-				}
-				else {
-					$forumList = (int) $forum; // it's the first forum selected. Don't put a comma at the beginning. 
-				}
-			}*/ 
-
+		// Get forum selector data. 
 		if((!isset($mybb->input['forum_select'])) || (empty($mybb->input['forum_select'])) || (in_array('*', $mybb->input['forum_select']))) {
 			$mybb->input['forum_select'] = '*';
 		}
@@ -645,6 +617,13 @@ error_reporting(E_ALL); */
 
 		// Display a random mode selector if random mode is enabled. 
 		if ($mybb->settings['bam_random'] == 1) {
+
+			if (isset($_GET['make_random'])) {
+				$fieldType = "random";
+			}
+			else {
+				$fieldType = "";
+			}
 			$form_container->output_row($lang->bam_announcement_type, $lang->bam_announcement_type_desc, $form->generate_select_box('announcement_type', $announcement_type, $fieldType, array('id' => 'announcementType')), 'announcement_type');
 		} else {
 			echo $form->generate_hidden_field("announcement_type", "standard", array("id"=>"announcementTypeHidden"));
@@ -734,7 +713,7 @@ error_reporting(E_ALL); */
 		// We create different fields, depending on whether random mode is enabled or not. 
 
 		if ($type == "random") {
-			$form_t = new Form("index.php?module=config-bam&action=manage_random", "post");
+			$form_t = new Form("index.php?module=config-bam&action=add&make_random=1", "post");
 			$table = new FormContainer($lang->bam_manage_random_form_container);
 			echo $form_t->generate_hidden_field("mode", "random");
 		}
@@ -832,10 +811,33 @@ error_reporting(E_ALL); */
 			}
 		
 		}
-	
-		$table->end();
+
 		$buttons = array();
-		$buttons[] = $form_t->generate_submit_button($lang->bam_manage_order_submit);	
+
+		// Because this form submits with post, we have issues with setting additional parameters on the add page. 
+		// We must create a link and style it like a button. 
+		if ($type == "random") {
+			$style = "
+				border: 1px solid #999;
+				padding: 4px 7px;
+				background: #e3e3e3 url(images/submit_bg.png) repeat-x top !important;
+				color: #444;
+				font-weight: bold;
+				font-family: 'Lucida Grande', Tahoma, Verdana, Arial, sans-serif;
+				margin-right: 3px;
+				font-size: 1.1em;
+				border-radius: 5px;
+				-moz-border-radius: 5px;
+				-webkit-border-radius: 5px;
+				outline: 0;		
+			";
+			$buttons[] = "<a style='$style' href='index.php?module=config-bam&action=add&make_random=1'>".$lang->bam_add_new_random."</a>";
+		} else {
+			// Not managing random mode display page. Generate a normal button for display orders. 
+			$buttons[] = $form_t->generate_submit_button($lang->bam_manage_order_submit);
+		}
+
+		$table->end();			
 		$form_t->output_submit_wrapper($buttons);
 	}
 

@@ -94,6 +94,7 @@ $l['bam_make_random'] = "Make Announcement Random";
 $l['bam_make_random_success'] = "Successfully made your announcement a <i>random mode</i> announcement. Please make sure all settings look correct. ";
 $l['bam_make_standard_success'] = "Successfully reset your announcement to standard mode. Please edit any additional settings and make sure they look correct!";
 $l['bam_make_standard_header'] = "Manage Type";
+$l['bam_add_new_random'] = "Create Random Announcement";
 
 $l['bam_green'] = "Green/Success";
 $l['bam_blue'] = "Blue/Notice";
