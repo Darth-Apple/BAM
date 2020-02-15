@@ -1,9 +1,6 @@
 <?php
 
-/*
- ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL); */
+
 
 		/*    This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,7 +52,7 @@ error_reporting(E_ALL); */
 	// If these settings don't exist, BAM knows it's running on the old version and prompts for an upgrade.
 
 	if (!isset($mybb->settings['bam_advanced_mode']) || $mybb->settings['bam_advanced_mode'] == null) {
-		if (!isset($mybb->settings['bam_random_mode_dismiss'])) {
+		if (!isset($mybb->settings['bam_random_dismissal'])) {
 
 			// Flash the upgrade notification. 
 			if ($mybb->input['action'] != "upgrade") {

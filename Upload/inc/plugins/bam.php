@@ -32,14 +32,22 @@ $plugins->add_hook("admin_config_menu", "bam_config_menu");
 $plugins->add_hook("admin_config_action_handler", "bam_confighandler");
 
 function bam_info() {
-	global $lang, $mybb;
+	global $lang, $mybb, $plugins, $cache;
 	$lang->load('bam');
 
 	// Generate an upgrade link, if it exists.
 
 	$desc = $lang->bam_desc;
-	if (!isset($mybb->settings['bam_advanced_mode']) && !isset($mybb->settings['bam_random_dismissal'])) {
-		$desc = $lang->bam_info_upgrade . "<br/><br /><b><a href='index.php?module=config-bam&action=upgrade&post_key=".$mybb->post_code."'>".$lang->bam_upgrade_link_text."</a></b>"; 
+	if (bam_is_installed()) {
+		if (!isset($mybb->settings['bam_advanced_mode']) && !isset($mybb->settings['bam_random_dismissal'])) {
+			$desc = $lang->bam_info_upgrade . "<br />";
+
+			// Make BAM aware of whether it is activated or not.
+			$activePlugins = $cache->read("plugins"); 
+			if (in_array("bam" ,$activePlugins['active'])) {
+				$desc .= "<br /><b><a href='index.php?module=config-bam&action=upgrade&post_key=".$mybb->post_code."'>".$lang->bam_upgrade_link_text_plugins_panel."</a></b>"; 
+			}
+		}
 	}
 
 	return array(

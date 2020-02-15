@@ -92,14 +92,11 @@ ADDING CUSTOM STYLES/COLORS:
 
 UPGRADING FROM BAM 1.0: IMPORTANT 
 
-  - This is a major upgrade, as BAM 2.0 introduces a number of database and template changes. BAM will not work unless the database tables are updated with the new version. To upgrade, it is very important that the steps below be followed during an installation. Your announcements will need to be re-added after the upgrade, so copy/paste any announcements if you need them saved.  
+RECOMMENDED: Uninstall the old version of BAM. Upload the new version, and install as usual. 
 
-  - Go to ACP -> plugins. Uninstall the old version of BAM. 
-  - Upload BAM 2.0 to the server, overwriting any existing files if prompted. 
-  - Go to ACP -> plugins. Install/activate the new version of BAM. 
-  - You're now upgraded! 
+ALTERNATIVE: Deactivate (but don't uninstall) the original version of BAM. Use the upgrade script. Upload the new version of BAM. Visit your plugins page (or the BAM announcements management page), and click on the link to upgrade BAM. 
 
-Do not upload the new version of BAM announcements manager before uninstalling the old version. You DO NOT need to remove the old files before doing this! It is ONLY necessary to uninstall it from the ACP -> plugins panel. 
+  - Please note that the upgrade script is not perfect. It adds the new database fields to your database without deleting the old one, and replaces your templates with the new BAM templates. However, it cannot migrate your settings. Some settings in BAM 2.0 have also changed, so make sure you double check each announcement to make sure that the user group permissions, display pages, color classes, etc. are correct. 
 
 
 INSTALLATION: 
