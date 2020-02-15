@@ -122,6 +122,12 @@ function bam_install () {
 		border: 1px solid #8DC93E;
 	}
 
+	.bam_announcement.orange {
+		background: #f58f10;
+		border: 1px solid #926c28;
+		color: #fff;
+	}
+
 	.bam_announcement.blue {
 		background: #ADCBE7;
 		border: 1px solid #0F5C8E;
@@ -476,7 +482,7 @@ function bam_announcements () {
     		'nl2br' => 'yes'
 	);
 
-	$class_select = array('green', 'yellow', 'red', 'blue', 'silver', 'magenta'); // list of programmed BAM classes. 
+	$class_select = array('green', 'yellow', 'red', 'blue', 'silver', 'magenta', 'orange'); // list of programmed BAM classes. 
 
 	$query = $db->query("
 		SELECT *
@@ -632,21 +638,43 @@ function bam_announcements () {
 		$data[$count]['random'] = (int) $querydata['random'];	// - added functionality in BAM 2.0
 		$data[$count]['global'] = (int) $querydata['global'];   // - added functionality in BAM 2.0 
 
-		// Random mode functionality. 
-		if(($mybb->settings['bam_random'] == 1) && ($querydata['random'] == 1) && (bam_display_permissions($querydata['groups'])) && (checkAnnouncementDisplay($data[$count]))) {
-			// This is a random announcement. Wait to render these until after standard announcements are displayed. 
-			$unpinned_ids[] = $count;
-			$total_unpinned++;	
-		}
 
-		// New in BAM 2.0: Random announcements are no longer rendered as normal announcements if random mode is disabled. 
-		if((($querydata['random'] == 0) && (bam_display_permissions($querydata['groups']))) && (checkAnnouncementDisplay($data[$count]))) {
-			
-			// If the announcement isn't random, we need to check if the theme and language is enabled. If so, render. 
-			if (bamThemeEnabled($data[$count]['themesEnabled']) && bamLanguageEnabled($data[$count]['languagesEnabled'])) {
-				eval("\$announcements .= \"".$templates->get($data[$count]['template'])."\";");
+		// Detect if BAM is running on BAM 1's database or on BAM 2's database. 
+		// This allows BAM 2.0 to render announcements properly even if the database hasn't been migrated. 
+		// This is required because BAM must be activated to upgrade. This prevents interuptions on the forum! 
+
+		if (!isset($mybb->settings['bam_advanced_mode']) && !isset($mybb->settings['bam_random_dismissal'])) {
+			if (($querydata['pinned'] == 0) && $mybb->settings['bam_random'] == 1) {
+				$unpinned_ids[] = $count;
+				$total_unpinned++;
+			}
+			if((($querydata['pinned'] == 1) || ($mybb->settings['bam_random'] == 0)) && (bam_display_permissions($querydata['groups'])) && (global_display($querydata['pinned']))) {
+				eval("\$announcements .= \"".$templates->get("bam_announcement")."\";");
 			}
 		}
+
+		// Else: The database has been properly migrated to BAM 2.0. 
+		// We must render announcements properly for BAM 2.0 
+		else {
+			// Random mode functionality. 
+			if(($mybb->settings['bam_random'] == 1) && ($querydata['random'] == 1) && (bam_display_permissions($querydata['groups'])) && (checkAnnouncementDisplay($data[$count]))) {
+				// This is a random announcement. Wait to render these until after standard announcements are displayed. 
+				$unpinned_ids[] = $count;
+				$total_unpinned++;	
+			}
+
+			// New in BAM 2.0: Random announcements are no longer rendered as normal announcements if random mode is disabled. 
+			if((($querydata['random'] == 0) && (bam_display_permissions($querydata['groups']))) && (checkAnnouncementDisplay($data[$count]))) {
+				
+				// If the announcement isn't random, we need to check if the theme and language is enabled. If so, render. 
+				if (bamThemeEnabled($data[$count]['themesEnabled']) && bamLanguageEnabled($data[$count]['languagesEnabled'])) {
+					eval("\$announcements .= \"".$templates->get($data[$count]['template'])."\";");
+				}
+			}
+
+		}
+
+
 		$count++; 
 	}
 
@@ -723,7 +751,6 @@ function bamThemeEnabled($themes) {
 function bamExplodeThemes($announcementText) { 
 	$matched_themes_raw = "";
 	if(preg_match('/\[@themes:([a-zA-Z0-9_]*)\]/', $announcementText, $matched_themes_raw)) {
-		// echo "<br />Theme selector found: " . $matched_themes[0] . "<br />";
 		$matched_themes_raw = str_replace("[@themes:", "", $matched_themes_raw[0]);
 		$matched_themes_raw = str_replace("]", "", $matched_themes_raw);
 		$explodedThemes = explode(',', $matched_themes_raw);
@@ -774,7 +801,6 @@ function bamLanguageEnabled($languages) {
 function bamExplodeLanguages($announcementText) { 
 	$matched_languages_raw = "";
 	if(preg_match('/\[@languages:([a-zA-Z0-9_]*)\]/', $announcementText, $matched_languages_raw)) {
-		// echo "<br />Theme selector found: " . $matched_themes[0] . "<br />";
 		$matched_languages_raw = str_replace("[@languages:", "", $matched_languages_raw[0]);
 		$matched_languages_raw = str_replace("]", "", $matched_languages_raw);
 		$explodedLanguages = explode(',', $matched_languages_raw);
@@ -954,7 +980,6 @@ function bam_display_permissions ($display_groups) {
 			return true;
 		}
 	}
-
 	// User is not in a valid usergroup to view this announcement. Return false. 
 	return false;
 }
@@ -1110,6 +1135,28 @@ function isAlternatePageValid($announcement) {
 	} // End loop for URLs. 
 
 	return $acceptPage;
+}
+
+
+// Legacy function that is not used in BAM 2.0. Only used if BAM 2.0 is uploaded to a server and the upgrade script has not run. 
+// This allows BAM 2.0 to properly display old BAM 1 announcements before they are migrated. 
+// This is necessary because BAM must be activated to run the upgrade script. This prevents unnecessary interuptions. 
+
+function global_display($pinned) {
+	global $mybb, $current_page;
+	if ($current_page == $mybb->settings['bam_index_page']) {
+		return true; // this is the index page. No need to check for global announcement settings. 
+	}
+
+	if ($mybb->settings['bam_global'] == 'global_all') {
+		return true;
+	}
+	else if (($mybb->settings['bam_global'] == 'global_pinned') && ($pinned == "1")) {
+		return true; 
+	}
+	else {
+		return false; 
+	}
 }
 
 

@@ -29,6 +29,7 @@
 		"red" => $lang->bam_red,
 		"blue" => $lang->bam_blue,
 		"magenta" => $lang->bam_magenta,
+		"orange" => $lang->bam_orange,
 		"silver" => $lang->bam_silver,
 		"bam_custom" => $lang->bam_custom
 	); 

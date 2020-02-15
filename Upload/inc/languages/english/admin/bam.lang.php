@@ -107,6 +107,7 @@ $l['bam_announcement_has_directives'] = "This announcement has special directive
 $l['bam_green'] = "Green/Success";
 $l['bam_blue'] = "Blue/Notice";
 $l['bam_yellow'] = 'Yellow/Alert';
+$l['bam_orange'] = 'Orange/Alert';
 $l['bam_red'] = "Red/Alert";
 $l['bam_silver'] = 'Silver/Info';
 $l['bam_magenta'] = "Magenta/Info";
@@ -123,7 +124,7 @@ $l['bam_remove_custom_class'] = "<i><font color=\'red\'>You must remove custom c
 $l['bam_remove_custom_class'] .= "If you need to use a predefined color value in addition to a custom class, you can add both into the custom class setting below. </font>";
 $l['bam_remove_custom_class'] .= "See documentation for instructions on how to add custom classes. </i>";
 $l['bam_remove_custom_class'] .= "<br /><br />Example: \"blue my_custom_class\" &nbsp;&nbsp; (separate multiple classes by spaces)<br />";
-$l['bam_remove_custom_class'] .= "Built in classes: red, blue, yellow, green, magenta, silver <br/><br />";
+$l['bam_remove_custom_class'] .= "Built in classes: red, blue, yellow, green, magenta, orange, silver <br/><br />";
 
 $l['bam_remove_additional_page'] = "<i><font color = \'red\'>You must remove additional pages before using BAM\'s normal location settings. ";
 $l['bam_remove_additional_page'] .= "</font>If you need your announcement to display on the index.php page or on specific boards, you can add these fields along with any additional pages below.</i><br /><br />";

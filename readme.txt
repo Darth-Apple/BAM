@@ -133,7 +133,7 @@ I INSTALLED BAM, BUT THE ANNOUNCEMENTS DON'T DISPLAY.
 ADDING CUSTOM STYLES/COLORS:
 ----------------------------------------------------
 
-  - By default, BAM comes with six color styles, and two of these are new styles that come with BAM+. You can add additional styles easily by defining the background color and border color in a new class. Other properties of the announcement layout (padding, etc.) are defined by a global class used by all announcements. You can place your custom style classes in the Custom CSS field in your plugin settings. Once you have saved your custom CSS classes, simply define the "custom class" field when creating announcements to use your new custom color style!
+  - By default, BAM comes with seven color styles, and three of these are new styles that come with BAM+. You can add additional styles easily by defining the background color and border color in a new class. Other properties of the announcement layout (padding, etc.) are defined by a global class used by all announcements. You can place your custom style classes in the Custom CSS field in your plugin settings. Once you have saved your custom CSS classes, simply define the "custom class" field when creating announcements to use your new custom color style!
 
   Example: 
     
@@ -151,16 +151,16 @@ UPGRADING FROM BAM 1.0: IMPORTANT
 
 RECOMMENDED: Uninstall the old version of BAM. Upload the new version, and install as usual. 
 
- - This is the more stable way to perform an upgrade. If you don't have many announcements currently, it is recommended to perform an upgrade with a full uninstall/reinstall. 
+ - This is the more stable way to perform an upgrade. If you don't have many announcements currently, it is recommended to perform an upgrade with a full uninstall/reinstall. This will delete all current announcements! 
 
 
-ALTERNATIVE: Use the built in upgrader (less stable). Upload the new version of BAM. Make sure to leave BAM activated, and navigate to your plugins page. Click the upgrade link that appears in BAM's plugin description. This will make all of the necessary changes to upgrade you to BAM 2.0! 
+ALTERNATIVE: Use the built in upgrader to keep existing announcements. Upload the new version of BAM. Make sure to leave BAM activated, and navigate to your plugins page. Click the upgrade link that appears in BAM's plugin description. This will make all of the necessary changes to upgrade you to BAM 2.0! 
 
- - The upgrade script REQUIRES bam to be fully activated first. This will not break your forum, as the new BAM is able to display forum announcements on the old templates and database temporarily. 
+ - The upgrade script REQUIRES bam to be fully activated first. This is because BAM's upgrade script runs from straight within the BAM ACP module. Due to the way that MyBB plugins work, BAM is not able to load its own upgrade script unless it is activated. 
 
- - This is because BAM's upgrade script runs from straight within the BAM ACP module. Due to the way that MyBB plugins work, BAM is not able to load its own upgrade script unless it is activated. 
+ - This will not break your forum or interrupt announcements, as the BAM 2.0 has been specifically designed to enable the new version of BAM to display using the old version's templates and database temporarily. Your forum announcements will remain uninterrupted.  
 
- - This script doesn't migrate general plugin settings. These have changed heavily from BAM 1 to BAM 2. Make sure to reconfigure BAM once the upgrade has completed! 
+ - This script doesn't migrate general plugin settings. These have changed heavily from BAM 1 to BAM 2. Make sure to reconfigure BAM's general plugin settings once the upgrade has completed! 
 
 
 -----------------------------------------------------
