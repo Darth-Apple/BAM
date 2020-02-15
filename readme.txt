@@ -2,7 +2,10 @@ Notice: This is a beta version. If you would like to test on a live board, pleas
 
 BAM Announcements Manager has been updated, and is better than ever before! This plugin allows you to manage announcements on your forum’s header area, specific boards, or on any page of your community. These are styled based on the announcements used on the MyBB Support Forum, so if you’ve been looking for a plugin to make similar announcements, this plugin is the answer to your requests! 
 
-(Major Update) New Version Features: 
+
+-------------------------------------------------------
+(MAJOR UPDATE) FEATURES IN BAM 2.0: 
+-------------------------------------------------------
 
  - Manage unlimited announcements on ANY page of your forum. 
  - Six included colors and styles for announcements. You can create additional styles if you desire. 
@@ -14,21 +17,16 @@ BAM Announcements Manager has been updated, and is better than ever before! This
  - Specify alternative templates to display announcements with (useful if you need javascript announcements) 
  - Full support for BBCode, HTML, {username} tags, and several other new variables
  - Optional Random Mode: Make a new announcement appear on each page refresh.
- - Sticky announcements: Select which announcements are undismissable by users.  
-
- EASTER EGGS: 
-
- - Can create a banner with the CORRECT count on your counting thread (forum games), even if the count in your thread is offset from the actual reply count. We use it over at Makestation. (Try posting the wrong count in your thread. The counter retains the correct count even if the wrong count is posted by a user!)
- - {newmember} and {newmember_link} parse to the username and the profile link of the newest registered member, respectively. 
- - Updated ACP interface that displays more information about where announcements will be posted. 
- - Turn announcement into a link without the use of BBcode. Simply paste a link into the URL field. 
-
-This plugin is supported on all MyBB 1.8.X forums, and has been tested extensively. If you used BAM 1.0 before, it is strongly recommended to update to the new version of this plugin, as it is significantly more advanced and more powerful than the initial version. Many thanks to @Guardian and @Eldenroot for many ideas and for feedback on the new version of this mod! 
+ - Sticky announcements: Select which announcements are undismissable by users. 
 
 
+This plugin is supported on all MyBB 1.8.X forums, and has been tested extensively. If you used BAM 1.0 before, it is strongly recommended to update to the new version of this plugin, as it is significantly more advanced and more powerful than the initial version. Many thanks to @Guardian (Sawedoff) and @Eldenroot for many ideas and for feedback on the new version of this mod! 
+ 
 
+-------------------------------------------------------
+CUSTOM ANNOUNCEMENT PAGES (ADVANCED):  
+-------------------------------------------------------
 
-CUSTOM ANNOUNCEMENT PAGES: 
 
 This is a new feature in BAM 2.0 that allows you to paste a link to a specific page to display your announcement. This setting can also take multiple values, separated by commas. Some examples of possible inputs are listed below. 
 
@@ -51,13 +49,18 @@ EXAMPLES:
 More documentation is available in advanced_documentation.txt. This is an advanced feature that is very powerful, but that has specific parameters that must be met in order to work properly. 
 
 
-
-FAQ: 
+--------------------------------------------------
+FREQUENTLY ASKED QUESTIONS:  
+--------------------------------------------------
 
 
 CAN I DISABLE AN ANNOUNCEMENT WITHOUT DELETING IT? 
 
-    - There are two ways you can do this. 1) Disable all usergroups for the announcement. 2) Put the [@disabled] tag in the announcement. Both will disable the announcement without deleting it! 
+    - There are two ways you can do this. 
+
+1) Disable all usergroups for the announcement. 
+2) Put the [@disabled] tag in the announcement. Both will disable the announcement without deleting it! 
+
 
 HOW DOES THE FORUM GAMES COUNTING THREAD VARIABLE WORK? 
  
@@ -68,20 +71,29 @@ HOW DOES THE FORUM GAMES COUNTING THREAD VARIABLE WORK?
 WHAT IS RANDOM MODE? 
 
     - Random mode allows announcements to be refreshed on each page visit. BAM will select an announcement randomly from the random mode tab, and will display a different announcement each time your forum's index is visited. 
-    - Due to the complexity of how BAM manages different types of announcements, you can’t put random mode announcements on other pages (or at least, not yet. Maybe a future release will expand upon this). They display on the forum’s index, below standard announcements. There are certain settings that work differently in random mode, so make sure to double check your annoncement’s settings if you convert your announcement from standard to random mode. 
+    - Due to the complexity of how BAM manages different types of announcements, you can’t put random mode announcements on other pages in this version. (Maybe a future release will expand upon this). They display on the forum’s index, below standard announcements. There are certain settings that work differently in random mode, so make sure to double check your announcement’s settings if you convert your announcement from standard to random mode. 
+
 
 CAN I USE HTML IN ANNOUNCEMENTS? 
 
- - Yes. Enable the HTML setting in BAM's plugin settings to allow HTML. This does not work for javascript. If you need javascript, see below. 
+ - Yes. Ordinarily, only BBcode is supported. However, you may enable the HTML setting in BAM's plugin settings to allow HTML. Please note that, by design, this does not work for javascript, which is purposefully removed before rendering announcements. If you need javascript, see below. 
+
 
 CAN I PUT JAVASCRIPT IN AN ANNOUNCEMENT? 
 
-    - Technically, yes. Javascript is not, by default, enabled. However, you can make BAM load a different template for a specific announcement. If you have a global template named my_announcement_template, put [@template:my_announcement_template] anywhere in your announcement’s text. This tag tells BAM to load a different template, which can contain javascript or anything else that you need. 
+    - Javascript is not, by default, enabled. However, you can make BAM load a different template for a specific announcement. If you have a global template named my_announcement_template, put [@template:my_announcement_template] anywhere in your announcement’s text. This tag tells BAM to load a different template, which can contain javascript or anything else that you need. 
 
 
-CAN I MAKE BAM DISPLAY ON MULTIPLE THEMES WITHOUT DISPLAY ON EVERY THEME? 
+CAN I MAKE BAM DISPLAY ON MULTIPLE THEMES WITHOUT DISPLAYING ON EVERY THEME? 
 
     - Yes. Put [@themes:1,2,3] anywhere in your announcement’s text. This works for languages too! 
+
+
+HOW TO I GET MY LANGUAGE AND THEME IDS FOR ANNOUNCEMENT TAGS? 
+
+    - Language IDs are based on the folder name of the language pack on your forum. Navigate to /inc/languages to see the language packs. The name of your language's folder (english, espanol, etc.) is the value you should use for the language tag. 
+
+    - Theme IDs can be seen from the URL when you edit a specific theme in the ACP. Visit your theme. Edit it, and look for (tid=some_number) in your URL. This is your theme ID!
 
 
 CAN I MAKE ANNOUNCEMENTS UNDISMISSABLE FOR GUESTS? 
@@ -95,9 +107,31 @@ CAN I RESET ALL DISMISSALS ON THE FORUM?
     - You can also configure how long the cookie lasts (and how long dismissed announcements remain dismissed). 
 
 
+CAN I DISPLAY ANNOUNCEMENTS GLOBALLY? 
+
+    - Yes! Set your announcement to "global" in the drop down menu when creating a new announcement. 
 
 
-ADDING CUSTOM STYLES/COLORS: 
+CAN I DISPLAY ANNOUNCEMENTS ON THE PORTAL AND ON THE INDEX? 
+
+    - Yes! Go to BAM's plugin settings. In the "index page" setting, set it to "portal.php, index.php" (without the quotes), and save. BAM will now consider both of these pages to be your forum's "index page." Any announcement that is set to display on the index will now display on both. 
+
+
+CAN I DISPLAY ANNOUNCEMENTS ON SPECIFIC PAGES OF MY FORUM? 
+
+    - Yes! When creating an announcement, select (Other - Advanced) in the drop down menu. Paste a link to specific pages to display your announcement on. This field can take multiple values, separated by a comma. 
+
+    - Note that while this works for most pages, there are certain pages that cannot display announcements. See the the "custom pages" section of this readme (above) for more information. 
+
+
+I INSTALLED BAM, BUT THE ANNOUNCEMENTS DON'T DISPLAY. 
+
+    - BAM, (must like most other MyBB plugins), makes template modifications in order to display on your forum. The vast majority of themes can be modified by BAM's installer without issues. However, if your announcements don't display, see the installation instructions (below) for instructions on how to manually modify your template!
+
+
+----------------------------------------------------
+ADDING CUSTOM STYLES/COLORS:
+----------------------------------------------------
 
   - By default, BAM comes with six color styles, and two of these are new styles that come with BAM+. You can add additional styles easily by defining the background color and border color in a new class. Other properties of the announcement layout (padding, etc.) are defined by a global class used by all announcements. You can place your custom style classes in the Custom CSS field in your plugin settings. Once you have saved your custom CSS classes, simply define the "custom class" field when creating announcements to use your new custom color style!
 
@@ -111,8 +145,9 @@ ADDING CUSTOM STYLES/COLORS:
   You will now be able to use "aqua" in the custom class field. 
 
 
-
+-----------------------------------------------------
 UPGRADING FROM BAM 1.0: IMPORTANT 
+-----------------------------------------------------
 
 RECOMMENDED: Uninstall the old version of BAM. Upload the new version, and install as usual. 
 
@@ -128,15 +163,26 @@ ALTERNATIVE: Use the built in upgrader (less stable). Upload the new version of 
  - This script doesn't migrate general plugin settings. These have changed heavily from BAM 1 to BAM 2. Make sure to reconfigure BAM once the upgrade has completed! 
 
 
-
-
+-----------------------------------------------------
 INSTALLATION: 
+-----------------------------------------------------
 
   - To install, simply upload the contents of "Upload" folder on this zip file to your MyBB root directory, and enable "BAM Announcements Manager 2.0” from your admin control panel. A new "Announcements" link will be added to the sidebar under the configuration tab, allowing you to manage your announcements. 
  
   - This plugin adds a variable in your header template after the {$awaitingusers} variable on installation. On the default theme, this causes announcements to display before the page breadcrumbs. While this method seems to ensure the best compatibility of this plugin with various themes, some users may wish you have the announcements display after the breadcrumbs. To do this, simply find "<!-- BAM -->{$bam_announcements}<!-- /BAM -->" in your templates, and copy/paste this text to a new line after "<navigation>" in your header template. 
 
-Known issues: HTML does not work in announcements. Will be fixed for final release. 
+
+-------------------------------------------------------
+EASTER EGGS AND EXTRAS: 
+-------------------------------------------------------
+
+ - Can create a banner with the CORRECT count on your counting thread (forum games), even if the count in your thread is offset from the actual reply count. Use the {countingthread} variable to enable this functionality. To demonstrate, try posting the wrong count in your counting thread. 
+
+ - {newmember} and {newmember_link} parse to the username and the profile link of the newest registered member, respectively. 
+
+ - Updated ACP interface that displays more information (with new icons) about where announcements will be posted. 
+
+ - Both BAM 1.0 and 2.0 allow you to turn your announcement into a link without the use of BBcode. Simply paste a link into the URL field!
 
 
 Copyright: 
