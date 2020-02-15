@@ -303,7 +303,7 @@ function bam_install () {
 			'title' => $db->escape_string($lang->bam_random_enable),
 			'description' => $db->escape_string($lang->bam_random_desc),
 			'optionscode' => 'onoff',
-			'value' => '0',
+			'value' => '1',
 			'disporder' => 7,
 			'isdefault' => 1,
 			'gid' => $group['gid']

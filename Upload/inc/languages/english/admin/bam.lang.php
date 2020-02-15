@@ -22,7 +22,7 @@ $l['bam_announcements_menu'] = "BAM+ Announcements";
 $l['bam_enable'] = "Activate BAM Announcements Manager?";
 $l['bam_enable_desc'] = "Enable or disable BAM Announcements Manager without the need to uninstall this plugin.";
 $l['bam_random_enable'] = "Enable/Disable Random Mode";
-$l['bam_random_desc'] = "If this setting is enabled, BAM will randomly select results from a list of available announcements to display. This setting is disabled by default. ";
+$l['bam_random_desc'] = "Enables the <i>random mode</i> tab, along with automatically refreshing announcements. This feature does not affect your standard announcements!";
 $l['bam_random_max'] = "Random Results Generated";
 $l['bam_random_max_desc'] = "Maximum number of random results generated if random mode is enabled. This setting does nothing if random mode is disabled. ";
 $l['bam_random_group'] = "Random Mode Permissions";
@@ -73,7 +73,7 @@ $l['bam_manage_random_desc'] .= " - These announcements will be ordered beneath 
 $l['bam_manage_random_desc'] .= " - Use this feature if you want announcements to automatically refresh on each page visit.";
 
 $l['bam_manage_desc_norandom'] = "This page allows you to manage, edit, delete, and re-order your announcements. This page only manages standard announcements. If you need announcements to be randomly selected on your forum index, enable <i>random mode</i> in BAM's plugin settings.";
-$l['bam_manage_desc'] = "This page allows you to manage, edit, delete, and re-order your announcements. This page only manages standard announcements. See the Random Mode tab for randomly selected SMF-style announcement functionality. ";
+$l['bam_manage_desc'] = "This page allows you to manage, edit, delete, and re-order your announcements. These announcements are standard, static announcements. They always display. See <i>random mode</i> for automatically refreshing announcements.";
 $l['bam_edit'] = 'Edit';
 $l['bam_edit_desc'] = "This page allows you to edit an existing announcement. ";
 $l['bam_add_announcement_desc'] = "Add new announcements here. You may add HTML in your announcements. ";
