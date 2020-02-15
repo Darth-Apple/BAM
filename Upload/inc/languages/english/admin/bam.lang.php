@@ -209,3 +209,8 @@ $l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; [@template:
 $l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; [@disabled] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Ghost mode (disables announcement).</i>";
 
 $l['bam_announcement_tags_alert'] .= "<br /><br />These directives can be placed anywhere in your announcement\'s text, and will be removed before your announcement is displayed on your forum. These features are considered experimental. Please request support or visit the documentation with any questions!<br /><br />";
+
+$l['bam_announcement_too_long'] = "Error. Your announcement cannot be more than 1023 characters. ";
+$l['bam_announcement_link_too_long'] = "Error. Your announcement's URL cannot be more than 159 characters. ";
+$l['bam_class_too_long'] = "Error. Your custom classes cannot be more than 39 characters. ";
+$l['bam_additional_pages_too_long'] = "Error. Additional pages field cannot be more than 511 characters. ";

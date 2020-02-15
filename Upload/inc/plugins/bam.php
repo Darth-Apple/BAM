@@ -168,10 +168,6 @@ function bam_install () {
 	<!-- Don\'t remove this. Needed for handling announcement dismissals. --> 
 <script>
 	
-	// Announcements must fade in to avoid javascript bugs if the script doesn\'t execute before announcements are rendered. 
-	$(document).ready(function() {
-		$(\'.bam_announcement\').delay(1).fadeIn(500);
-	});
 		// Allow me to give credit. This was great:  https://lifeofadesigner.com/javascript/hide-dismissed-notifications-with-jquery-and-cookies
 	
 	$(document).ready(function () {
@@ -221,7 +217,7 @@ function bam_install () {
 
 		// Create the BAM announcement template used for each individual announcement. 
 
-		$template['bam_announcement'] = '<p class="{$bam_unsticky} {$class}" id="announcement-{$bcprefix}{$announcement_id}" style="display: none; ">{$announcement} <span class="bam_date">{$date}</span>
+		$template['bam_announcement'] = '<p class="{$bam_unsticky} {$class}" id="announcement-{$bcprefix}{$announcement_id}">{$announcement} <span class="bam_date">{$date}</span>
 <span class=\'close_bam_announcement {$display_close}\'>x</span></p>'; 
 	
 		// Insert the templates into the database. 

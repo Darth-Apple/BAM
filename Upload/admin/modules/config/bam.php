@@ -241,7 +241,7 @@ error_reporting(E_ALL); */
 			$data['announcement'] = $querydata['announcement'];
 			$data['class'] = $querydata['class'];
 			$data['pinned'] = (int)$querydata['pinned'];
-			$data['forums'] = create_selectedForumArray(htmlspecialchars($querydata['forums'], ENT_QUOTES));
+			$data['forums'] = create_selectedForumArray($querydata['forums']);
 			$data['disporder'] = (int)$querydata['disporder'];
 			$data['link'] = $querydata['link'];
 			$data['global'] = (int)$querydata['global']; // deprecated. Will remove in next beta. 
@@ -250,6 +250,7 @@ error_reporting(E_ALL); */
 			$data['additional_pages'] = $querydata['additional_display_pages'];
 			$data['usergroup'] = $querydata['groups'];
 			$data['usergroup'] = explode(',', $querydata['groups']);
+			$data['usergroup'] = sanitize_a_bam_array_to_int($data['usergroup']);
 		}
 
 		$form = new Form("index.php?module=config-bam", "post");
@@ -296,8 +297,8 @@ error_reporting(E_ALL); */
 
 		// Generate input fields. 
 
-		$form_container->output_row($lang->bam_form_pinned,  $lang->bam_form_pinned_desc, $form->generate_yes_no_radio('pinned', $data['pinned'], array("id" => "sticky_select", "class" => "remove_on_random")), 'sticky_select_row');
-		$form_container->output_row($lang->bam_display_mode, $lang->bam_display_mode_desc, $form->generate_select_box('location', $location_select, $announcementLocation, array('id' => 'location')), 'location');
+		$form_container->output_row($lang->bam_form_pinned,  $lang->bam_form_pinned_desc, $form->generate_yes_no_radio('pinned', (int) $data['pinned'], array("id" => "sticky_select", "class" => "remove_on_random")), 'sticky_select_row');
+		$form_container->output_row($lang->bam_display_mode, $lang->bam_display_mode_desc, $form->generate_select_box('location', $location_select, htmlspecialchars($announcementLocation), array('id' => 'location')), 'location');
 		$form_container->output_row($lang->bam_forum_select,  $lang->bam_forum_select_desc, $form->generate_forum_select('forum_select', $data['forums'], array("id" => "forum_select", "class" => "forum_select", 'size' => 6, 'multiple' => true)), 'forum_select_row');
 		$form_container->output_row($lang->bam_additional_pages, $lang->bam_additional_pages_desc, $form->generate_text_box("additional_pages", html_entity_decode($data['additional_pages']), array("class" => "text_input", "id" => 'additional_pages', "style" => "width: 75%;")), 'additional_pages');
 		$form_container->output_row($lang->bam_form_announcement, $edit_announcement_description, $form->generate_text_area("announcement", html_entity_decode($data['announcement']), array("class" => "text_input align_left", "style" => "width: 75%;", "id" => "announcement_text")), 'announcement');
@@ -314,8 +315,8 @@ error_reporting(E_ALL); */
 			$custom_class = $data['class'];
 		}
 
-		$form_container->output_row($lang->bam_form_style, $lang->bam_form_style_desc, $form->generate_select_box('class', $class_select, $class_select_active, array('id' => 'style', 'value' => 'bam_custom')), 'class');
-		$form_container->output_row($lang->bam_form_class_custom, $lang->bam_form_class_custom_desc, $form->generate_text_box("custom_class", html_entity_decode($custom_class), array("class" => "text_input", "style" => "width: 25%;", "id" => "custom_class", 'value' => $data['class'])), 'custom_class');	
+		$form_container->output_row($lang->bam_form_style, $lang->bam_form_style_desc, $form->generate_select_box('class', $class_select, htmlspecialchars($class_select_active), array('id' => 'style', 'value' => 'bam_custom')), 'class');
+		$form_container->output_row($lang->bam_form_class_custom, $lang->bam_form_class_custom_desc, $form->generate_text_box("custom_class", htmlspecialchars($custom_class), array("class" => "text_input", "style" => "width: 25%;", "id" => "custom_class", 'value' => $data['class'])), 'custom_class');	
 		
 		$options = array();
 		$query = $db->simple_select("usergroups", "gid, title", null, array('order_by' => 'title'));
@@ -326,15 +327,7 @@ error_reporting(E_ALL); */
 		}
 
 		$form_container->output_row($lang->bam_form_groups, $lang->bam_form_groups_desc, $form->generate_select_box('usergroup[]', $options, $data['usergroup'], array('id' => 'usergroup', 'multiple' => true, 'size' => 5)), 'usergroup');
-		
-		if ($mybb->settings['bam_advanced_mode'] == 1) {
-			$form_container->output_row($lang->bam_form_order, $lang->bam_form_order_desc, $form->generate_text_box("disporder", $data['disporder'], array("class" => "text_input align_right", "style" => "width: 25%;")), 'disporder');
-		}
-		else {
-			// echo $form->generate_hidden_field("url", "");
-			echo $form->generate_hidden_field("additional_pages", "");
-		}	
-
+		$form_container->output_row($lang->bam_form_order, $lang->bam_form_order_desc, $form->generate_text_box("disporder", $data['disporder'], array("class" => "text_input align_right", "style" => "width: 25%;")), 'disporder');
 		$form_container->output_row($lang->bam_form_url, $lang->bam_form_url_desc, $form->generate_text_box("url", html_entity_decode($data['link']), array("class" => "text_input align_right", "style" => "width: 25%;")), 'url');
 
 		$buttons[] = $form->generate_submit_button($lang->bam_form_edit_submit);
@@ -353,8 +346,91 @@ error_reporting(E_ALL); */
 		$url = null;
 		$disporder = 1;
 		$pinned = 0;
+		
+		// Make sure inputs aren't too long. Display error if so. 
 
-		// We're editing a non-random-mode announcement. 
+		// We must check to make sure these are set before we do anything with them. 
+		$alength = 0;
+		$plength = 0;
+		$clength = 0;
+		$ulength = 0; 
+
+		// Make sure inputs aren't too long. Display error if so. 
+		if (isset($mybb->input['announcement'])) {
+			$alength = strlen($mybb->input['announcement']);
+		}
+		if (isset($mybb->input['additional_pages'])) {
+			$plength = strlen($mybb->input['additional_pages']);
+		}
+		if (isset($mybb->input['custom_class'])) {
+			$clength = strlen($mybb->input['custom_class']);
+		}
+		if (isset($mybb->input['url'])) {
+			$ulength = strlen($mybb->input['url']);
+		}
+
+				// We must check to make sure these are set before we do anything with them. 
+		$alength = 0;
+		$plength = 0;
+		$clength = 0;
+		$ulength = 0; 
+
+		// Make sure inputs aren't too long. Display error if so. 
+		if (isset($mybb->input['announcement'])) {
+			$alength = strlen($mybb->input['announcement']);
+		}
+		if (isset($mybb->input['additional_pages'])) {
+			$plength = strlen($mybb->input['additional_pages']);
+		}
+		if (isset($mybb->input['custom_class'])) {
+			$clength = strlen($mybb->input['custom_class']);
+		}
+		if (isset($mybb->input['url'])) {
+			$ulength = strlen($mybb->input['url']);
+		}
+
+		if ($alength > 1023) {
+			flash_message($lang->bam_announcement_too_long, 'error');
+			admin_redirect('index.php?module=config-bam');
+		}
+
+		if ($plength > 511) {
+			flash_message($lang->bam_additional_pages_too_long, 'error');
+			admin_redirect('index.php?module=config-bam');
+		}
+
+		if ($clength > 39) {
+			flash_message($lang->bam_class_too_long, 'error');
+			admin_redirect('index.php?module=config-bam');
+		}
+
+		if ($ulength > 159) {
+			flash_message($lang->bam_announcement_link_too_long, 'error');
+			admin_redirect('index.php?module=config-bam');
+		}
+
+		if ($alength > 1023) {
+			flash_message($lang->bam_announcement_too_long, 'error');
+			admin_redirect('index.php?module=config-bam');
+		}
+
+		if ($plength > 511) {
+			flash_message($lang->additional_pages_too_long, 'error');
+			admin_redirect('index.php?module=config-bam');
+		}
+
+		if ($clength > 39) {
+			flash_message($lang->bam_class_too_long, 'error');
+			admin_redirect('index.php?module=config-bam');
+		}
+
+		if ($ulength > 159) {
+			flash_message($lang->bam_announcement_link_too_long, 'error');
+			admin_redirect('index.php?module=config-bam');
+		}
+
+
+		// Check if we're editing a non-random-mode announcement. 
 		if ($mybb->input['announcement_type'] == "standard") {
 			$isRandom = 0; 
 		} else {
@@ -439,6 +515,46 @@ error_reporting(E_ALL); */
 		$url = null;
 		$disporder = 1;
 		$pinned = 0; // Code refactored from version one. Ths is the sticky setting. 
+
+		// We must check to make sure these are set before we do anything with them. 
+		$alength = 0;
+		$plength = 0;
+		$clength = 0;
+		$ulength = 0; 
+
+		// Make sure inputs aren't too long. Display error if so. 
+		if (isset($mybb->input['announcement'])) {
+			$alength = strlen($mybb->input['announcement']);
+		}
+		if (isset($mybb->input['additional_pages'])) {
+			$plength = strlen($mybb->input['additional_pages']);
+		}
+		if (isset($mybb->input['custom_class'])) {
+			$clength = strlen($mybb->input['custom_class']);
+		}
+		if (isset($mybb->input['url'])) {
+			$ulength = strlen($mybb->input['url']);
+		}
+
+		if ($alength > 1023) {
+			flash_message($lang->bam_announcement_too_long, 'error');
+			admin_redirect('index.php?module=config-bam');
+		}
+
+		if ($plength > 511) {
+			flash_message($lang->bam_additional_pages_too_long, 'error');
+			admin_redirect('index.php?module=config-bam');
+		}
+
+		if ($clength > 39) {
+			flash_message($lang->bam_class_too_long, 'error');
+			admin_redirect('index.php?module=config-bam');
+		}
+
+		if ($ulength > 159) {
+			flash_message($lang->bam_announcement_link_too_long, 'error');
+			admin_redirect('index.php?module=config-bam');
+		}
 
 		// We're adding a non-random-mode announcement. 
 		if ($mybb->input['announcement_type'] == "standard") {
@@ -635,13 +751,8 @@ error_reporting(E_ALL); */
 		
 		$query = $db->query("SELECT disporder FROM ".TABLE_PREFIX."bam ORDER BY disporder DESC LIMIT 1"); // select last announcement by display order. 
 		$last = $db->fetch_array($query);
-
-		if ($mybb->settings['bam_advanced_mode'] == 1) {		
-			$form_container->output_row($lang->bam_form_url, $lang->bam_form_url_desc, $form->generate_text_box("url", $mybb->input['url'], array("class" => "text_input align_right", "style" => "width: 25%;")), 'url');
-		}
-		else {
-			echo $form->generate_hidden_field("url", "");
-		}	
+		
+		$form_container->output_row($lang->bam_form_url, $lang->bam_form_url_desc, $form->generate_text_box("url", $mybb->input['url'], array("class" => "text_input align_right", "style" => "width: 25%;")), 'url');
 		$form_container->output_row($lang->bam_form_order, $lang->bam_form_order_desc, $form->generate_text_box("disporder", ((int) $last['disporder'] + 1), array("class" => "text_input align_right", "style" => "width: 25%;")), 'disporder');		
 
 		$buttons[] = $form->generate_submit_button($lang->bam_form_add_submit);
@@ -876,9 +987,28 @@ function generate_announcement_controls ($id, $ispinned) {
 }
 
 // For the edit page. Processes the data in the database and turns it into a format that can be sent to the multi-select box. 
+
 function create_selectedForumArray($forums) { 
 	$explodedForums = explode(',', $forums);
+	$explodedForums = sanitize_a_bam_array_to_int($explodedForums);
 	return array_map('trim',$explodedForums);
+}
+
+// This is overkill. 
+// But if someone (from the ACP) tries to put rogue input into the usergroup field and get scripts into the ACP, this will stop them. 
+
+function sanitize_a_bam_array_to_int ($values) {
+	$newValues = array();
+	
+	if (empty($values)) {
+		return $values;
+	}
+
+	foreach ($values as $val) {
+		array_push($newValues, (int) $val);
+	}
+
+	return $newValues;
 }
 
 // We need to output some javascript for the add and edit announcement pages. 
@@ -896,12 +1026,15 @@ $form_javascript = "
 	if (document.getElementById('announcementType') != null || document.getElementById('announcementTypeHidden') != null) {
 		document.getElementById('location').onchange = function() {manageDisplayModes(changed='true')}
 		manageDisplayModes();
-		correctForumSelector(); 
 
-		document.getElementById('style').onchange = function() {setCustomClass()}
+		document.getElementById('style').onchange = function() {setCustomClass(changed='true')}
 		setCustomClass();
-		manageDisplayModes();
+
+		correctForumSelector(); 
+		// manageDisplayModes();
 	}
+
+
 
 	// Bug fix. Properly allow forum select to take multiple values. 
 
@@ -1011,7 +1144,7 @@ $form_javascript = "
 
 		// Javascript for the custom class input field. 
 
-		function setCustomClass() {
+		function setCustomClass(changed=null) {
 			var classSel = document.getElementById('style');
 			var value = classSel.options[classSel.selectedIndex].value;
 			var text = classSel.options[classSel.selectedIndex].text;
@@ -1027,10 +1160,12 @@ $form_javascript = "
 			
 			// Don't let the user switch back to a built in class if the custom class field has text. 
 			if (!isEmpty(customClass.value)) {
-				var customClassContainer = customClass.parentNode.parentNode.getElementsByClassName('description')[0];
-				customClassContainer.innerHTML = '" . $lang->bam_remove_custom_class . "';
-				customClass.parentNode.parentNode.style.display = '';
-				classSel.value = 'bam_custom';
+				if (changed) {
+					var customClassContainer = customClass.parentNode.parentNode.getElementsByClassName('description')[0];
+					customClassContainer.innerHTML = '" . $lang->bam_remove_custom_class . "';
+					customClass.parentNode.parentNode.style.display = '';
+					classSel.value = 'bam_custom';
+				}
 			} else {
 				customClass.parentNode.parentNode.style.display = displayVar;
 			}
