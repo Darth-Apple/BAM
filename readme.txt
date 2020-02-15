@@ -94,9 +94,18 @@ UPGRADING FROM BAM 1.0: IMPORTANT
 
 RECOMMENDED: Uninstall the old version of BAM. Upload the new version, and install as usual. 
 
-ALTERNATIVE: Deactivate (but don't uninstall) the original version of BAM. Use the upgrade script. Upload the new version of BAM. Visit your plugins page (or the BAM announcements management page), and click on the link to upgrade BAM. 
+ - This is the more stable way to perform an upgrade. If you don't have many announcements currently, it is recommended to perform an upgrade with a full uninstall/reinstall. 
 
-  - Please note that the upgrade script is not perfect. It adds the new database fields to your database without deleting the old one, and replaces your templates with the new BAM templates. However, it cannot migrate your settings. Some settings in BAM 2.0 have also changed, so make sure you double check each announcement to make sure that the user group permissions, display pages, color classes, etc. are correct. 
+
+ALTERNATIVE: Use the built in upgrader (less stable). Upload the new version of BAM. Make sure to leave BAM activated, and navigate to your plugins page. Click the upgrade link that appears in BAM's plugin description. This will make all of the necessary changes to upgrade you to BAM 2.0! 
+
+ - The upgrade script REQUIRES bam to be fully activated first. This will not break your forum, as the new BAM is able to display forum announcement's on the old templates and database temporarily. 
+
+ - This is because BAM's upgrade script runs from straight within the BAM ACP module. Due to the way that MyBB plugins work, BAM is not able to load its own upgrade script unless it is activated. 
+
+ - This script doesn't migrate general plugin settings. These have changed heavily from BAM 1 to BAM 2. Make sure to reconfigure BAM once the upgrade has completed! 
+
+
 
 
 INSTALLATION: 
