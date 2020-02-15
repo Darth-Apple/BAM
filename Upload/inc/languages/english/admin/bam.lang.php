@@ -71,7 +71,7 @@ $l['bam_manage_random_desc'] .= " - To add announcements to this list, select \"
 $l['bam_manage_random_desc'] .= " - BAM has some special configuration settings for these. See BAM's plugin settings for more options. <br />";
 $l['bam_manage_random_desc'] .= " - These announcements will be displayed below standard announcements. <br /> ";
 $l['bam_manage_random_desc'] .= " - Use this feature if you want announcements to automatically refresh on each page visit.";
-$l['bam_manage_random_desc'] .= "<br /><br /><i>Note that BAM only displays these on the forum index.";
+$l['bam_manage_random_desc'] .= "<br /><br /><i>Note that BAM only displays these on the forum index.</i>";
 
 $l['bam_manage_desc_norandom'] = "This page allows you to manage, edit, delete, and re-order your announcements. This page only manages standard announcements. If you need announcements to be randomly selected on your forum index, enable <i>random mode</i> in BAM's plugin settings.";
 $l['bam_manage_desc'] = "This page allows you to manage, edit, delete, and re-order your announcements. These announcements are standard, static announcements. They always display. See <i>random mode</i> for automatically refreshing announcements.";
