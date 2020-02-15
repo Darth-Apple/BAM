@@ -57,7 +57,7 @@
 			// Flash the upgrade notification. 
 			if ($mybb->input['action'] != "upgrade") {
 				$link = "<br /><br /><a href='index.php?module=config-bam&action=upgrade&post_code=".$mybb->post_code."'>".$lang->bam_upgrade_link_text."</a><br />";
-				flash_message($lang->bam_upgrade_required . $link, 'alert');
+				flash_message($lang->bam_upgrade_required . $link, 'error');
 				admin_redirect("index.php?module=config");
 			}
 			else {
