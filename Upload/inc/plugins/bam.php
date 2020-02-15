@@ -801,7 +801,7 @@ function parseThreadVariables($announcementText) {
 	if ($current_page == "showthread.php" && (int) $_GET['tid'] != null) {
 
 		// Get the thread from the database. 
-		$threadID = (int) $mybb->input['tid'];
+		$threadID = (int) $_GET['tid'];
 		$thread = get_thread($threadID);
 		
 		// Parse number of replies in thread. Primarily useful for forum games. 
@@ -815,7 +815,7 @@ function parseThreadVariables($announcementText) {
 			// We are going to try to determine the correct count for the counting thread based on previous replies. 
 			// This is an easter egg feature! Very useful for forum games where users frequently get off count. 
 
-			$threadID = (int) $mybb->input['tid']; 
+			$threadID = (int) $_GET['tid']; 
 			$threadData = getThreadData($threadID);
 			$arrayofNumbers = array();
 			$maxLen = 0;
@@ -879,9 +879,8 @@ function getConsecutiveNumbers($array) {
 	return $result;
 }
 
-// This function extracts a number/count from a post in counting threads. It returns the number found, or 0 if not found. 
-
 function parseForumGameCounter($post) {
+	// This function extracts a number/count from a post in counting threads. It returns the number found, or 0 if not found. 
 	$match = "";
 
 	preg_match ('/([0-9]+)/', $post['message'], $match);
