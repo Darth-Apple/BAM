@@ -795,13 +795,13 @@ function getNewestMember() {
 // Currently, {threadreplies} and {countingthread} are parsed. These are experimental, but work as expected.  
 
 function parseThreadVariables($announcementText) {
-	global $current_page; 
+	global $current_page, $mybb; 
 
 	// Check to make sure we are on showthread.php and we have a thread to display. 
 	if ($current_page == "showthread.php" && (int) $_GET['tid'] != null) {
 
 		// Get the thread from the database. 
-		$threadID = (int) $_GET['tid'];
+		$threadID = (int) $mybb->input['tid'];
 		$thread = get_thread($threadID);
 		
 		// Parse number of replies in thread. Primarily useful for forum games. 
@@ -815,7 +815,7 @@ function parseThreadVariables($announcementText) {
 			// We are going to try to determine the correct count for the counting thread based on previous replies. 
 			// This is an easter egg feature! Very useful for forum games where users frequently get off count. 
 
-			$threadID = (int) $_GET['tid']; 
+			$threadID = (int) $mybb->input['tid']; 
 			$threadData = getThreadData($threadID);
 			$arrayofNumbers = array();
 			$maxLen = 0;
