@@ -51,6 +51,30 @@ error_reporting(E_ALL); */
 	); 
 	
 
+	// Check for upgrade. This checks for settings that only exist in BAM 2.0. 
+	// If these settings don't exist, BAM knows it's running on the old version and prompts for an upgrade.
+
+	if (!isset($mybb->settings['bam_advanced_mode']) || $mybb->settings['bam_advanced_mode'] == null) {
+		if (!isset($mybb->settings['bam_random_mode_dismiss'])) {
+
+			// Flash the upgrade notification. 
+			if ($mybb->input['action'] != "upgrade") {
+				$link = "<br /><br /><a href='index.php?module=config-bam&action=upgrade&post_code=".$mybb->post_code."'>".$lang->bam_upgrade_link_text."</a><br />";
+				flash_message($lang->bam_upgrade_required . $link, 'alert');
+				admin_redirect("index.php?module=config");
+			}
+			else {
+				verify_post_check($mybb->input['post_code']);
+				// Run the upgrade. 
+				require  ("../inc/plugins/bam_upgrade/bam_upgrade.php");
+				flash_message($lang->bam_upgrade_success, 'success');
+				bam_upgrade();
+				admin_redirect("index.php?module=config");
+			}
+		}
+	}
+
+
 	$tags_button = " <button id='showtags_link' onclick='showAnnouncementTags();'>".$lang->bam_form_tags_link." </button>";
 	global $class_select;
 

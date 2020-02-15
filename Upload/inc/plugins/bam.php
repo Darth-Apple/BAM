@@ -14,6 +14,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
      */
+
 global $mybb;
 
 global $templatelist; 
@@ -31,11 +32,19 @@ $plugins->add_hook("admin_config_menu", "bam_config_menu");
 $plugins->add_hook("admin_config_action_handler", "bam_confighandler");
 
 function bam_info() {
-	global $lang;
+	global $lang, $mybb;
 	$lang->load('bam');
+
+	// Generate an upgrade link, if it exists.
+
+	$desc = $lang->bam_desc;
+	if (!isset($mybb->settings['bam_advanced_mode']) && !isset($mybb->settings['bam_random_dismissal'])) {
+		$desc = $lang->bam_info_upgrade . "<br/><br /><b><a href='index.php?module=config-bam&action=upgrade&post_key=".$mybb->post_code."'>".$lang->bam_upgrade_link_text."</a></b>"; 
+	}
+
 	return array(
 		'name'			=> $lang->bam_title,
-		'description'	=> $lang->bam_desc,
+		'description'	=> $desc,
 		'website'		=> 'http://www.makestation.net',
 		'author'		=> 'Darth Apple',
 		'authorsite'	=> 'http://www.makestation.net',
@@ -500,7 +509,7 @@ function bam_announcements () {
 
 		// Make the announcement a link if it has a URL field defined.  
 		if(!empty($querydata['link'])) {
-			$announcement = "[url=".htmlspecialchars($querydata['link'], ENT_QUOTES)."]".htmlspecialchars($querydata['announcement'], ENT_QUOTES)."[/url]";
+			$announcement = "<a href='".htmlspecialchars($querydata['link'], ENT_QUOTES)."'>".htmlspecialchars($querydata['announcement'], ENT_QUOTES)."</a>";
 		}
 		else {
 			// Parse the {$username} variable within announcements. Parses to "Guest" if the user is not logged in. 

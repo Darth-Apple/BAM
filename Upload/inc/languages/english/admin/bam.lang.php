@@ -206,7 +206,7 @@ $l['bam_announcement_tags_alert'] .= "<br /><br /><b>Announcement Directives: </
 $l['bam_announcement_tags_alert'] .= "&nbsp;&nbsp;&nbsp;&nbsp;These directives give BAM additional information on where to display announcements. These are experimental. <br />";
 $l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; [@themes:1,2] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Display announcement only on theme IDs 1 and 2. </i>";
 $l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; [@languages:espanol] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Show announcement only in Spanish (or any language you choose). </i>";
-$l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; [@template:custom] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Use an alternative global template for this announcement (advanced).</i>";
+$l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; [@template:custom] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Use an alternative global template for this announcement (Advanced - use if you need javascript).</i>";
 $l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; [@disabled] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Ghost mode (disables announcement).</i>";
 
 $l['bam_announcement_tags_alert'] .= "<br /><br />These directives can be placed anywhere in your announcement\'s text, and will be removed before your announcement is displayed on your forum. These features are considered experimental. Please request support or visit the documentation with any questions!<br /><br />";
@@ -215,3 +215,8 @@ $l['bam_announcement_too_long'] = "Error. Your announcement cannot be more than 
 $l['bam_announcement_link_too_long'] = "Error. Your announcement's URL cannot be more than 159 characters. ";
 $l['bam_class_too_long'] = "Error. Your custom classes cannot be more than 39 characters. ";
 $l['bam_additional_pages_too_long'] = "Error. Additional pages field cannot be more than 511 characters. ";
+
+$l['bam_upgrade_required'] = "<b>Warning: Highly experimental upgrade. While this plugin is in beta, please do not perform this on a live board! </b> You have successfully uploaded BAM 2.0 to the server. In order to use BAM 2.0, you must run BAM's upgrade script to refresh database fields and templates. Please note that the upgrade script does not migrate settings, and it can only migrate announcements! Visit BAM's settings after running your upgrade, and verify that everything still looks correct. If you have any issues afterwards, uninstall BAM and do a fresh install from the plugins page. ";
+$l['bam_upgrade_link_text'] = "Click here to run the upgrade!";
+$l['bam_upgrade_success'] = "You have successfully updated BAM to BAM+ 2.0! Verify any settings are correct, as these have been completely refreshed and restored to defaults from the upgrade. If you have any additional issues, uninstall BAM and reinstall from the plugins page. This will resolve any remaining issues.";
+$l['bam_info_upgrade'] = "<font color='red'>You have uploaded BAM 2.0 to the server, but you must run the upgrade script before it will function properly. </font> ";
