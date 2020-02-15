@@ -20,15 +20,12 @@ error_reporting(E_ALL); */
     
      */
 	if(!defined("IN_MYBB")) {
-		die("Hacking attempt."); // direct access to this file not allowed. 
+		die("You're wonderful. Hacking attempt."); // direct access to this file not allowed. 
 	}
-
-	//ini_set('display_errors', 1);
-	//ini_set('display_startup_errors', 1);
-	//error_reporting(E_ALL);
 	
 	$lang->load('bam');
-	
+
+	// list of programmed classes for BAM announcements. This list may expand in future versions of this plugin. 
 	$class_select = array(
 		"green" => $lang->bam_green,
 		"yellow" => $lang->bam_yellow,
@@ -37,7 +34,7 @@ error_reporting(E_ALL); */
 		"magenta" => $lang->bam_magenta,
 		"silver" => $lang->bam_silver,
 		"bam_custom" => $lang->bam_custom
-	); // list of programmed classes for BAM announcements. This list may expand in future versions of this plugin. 
+	); 
 
 	// list of locations for location selector. 
 	$location_select = array(
@@ -45,16 +42,16 @@ error_reporting(E_ALL); */
 		"index" => $lang->bam_list_display_index,
 		"forums" => $lang->bam_list_display_forums,
 		"special" => $lang->bam_list_display_special
-	); // list of programmed classes for BAM announcements. This list may expand in future versions of this plugin.
+	); 
 	
+	// list of programmed announcement types.
 	$announcement_type = array(
 		"standard" => $lang->bam_standard_select,
 		"random" => $lang->bam_random_select
-	); // list of programmed classes for BAM announcements. This list may expand in future versions of this plugin. 
+	); 
 	
 
 	$tags_button = " <button id='showtags_link' onclick='showAnnouncementTags();'>".$lang->bam_form_tags_link." </button>";
-
 	global $class_select;
 
 	/***** Add breadcrumbs and tabs *****/
@@ -75,6 +72,7 @@ error_reporting(E_ALL); */
 	}
 
 	// The normal manage page has a different description if random mode is disabled. Load the correct description based on the setting.
+
 	$bam_random = false;
 	$normal_manage_description = $lang->bam_manage_desc_norandom;
 
@@ -83,12 +81,12 @@ error_reporting(E_ALL); */
 		$normal_manage_description = $lang->bam_manage_desc;
 	}
 	// Create tabs that always display. 
+
 	$sub_tabs['bam_manage'] = array(
 		'title' => $lang->bam_manage,
 		'link' => "index.php?module=config-bam",
 		'description' => $normal_manage_description
 	);
-
 		if ($bam_random) {
 			$sub_tabs['bam_manage_random'] = array(
 				'title' => $lang->bam_manage_random,
@@ -98,11 +96,11 @@ error_reporting(E_ALL); */
 		}
 
 	// Display a different description if the user hasn't enabled advanced mode. 
+
 	$bam_add_description = $lang->bam_add_announcement_desc;
 	if ($mybb->settings['bam_advanced_mode'] == 0) {
 		$bam_add_description = $lang->bam_add_announcement_noadvance_desc;
 	}
-
 	$sub_tabs['bam_add'] = array(
 		'title' => $lang->bam_add_announcement,
 		'link' => "index.php?module=config-bam&action=add",
@@ -132,8 +130,6 @@ error_reporting(E_ALL); */
 
 	else {
 		$page->output_nav_tabs($sub_tabs, 'bam_manage');
-		
-		/* $page->output_nav_tabs($sub_tabs, 'bam_manage_random'); */
 	}
 
 	/***** Process requests *****/
@@ -245,7 +241,7 @@ error_reporting(E_ALL); */
 			$data['announcement'] = $querydata['announcement'];
 			$data['class'] = $querydata['class'];
 			$data['pinned'] = (int)$querydata['pinned'];
-			$data['forums'] = create_selectedForumArray(htmlspecialchars($querydata['forums']));
+			$data['forums'] = create_selectedForumArray(htmlspecialchars($querydata['forums'], ENT_QUOTES));
 			$data['disporder'] = (int)$querydata['disporder'];
 			$data['link'] = $querydata['link'];
 			$data['global'] = (int)$querydata['global']; // deprecated. Will remove in next beta. 
@@ -275,10 +271,9 @@ error_reporting(E_ALL); */
 			$announcementLocation = "special"; // Set to other. 3 in MyBB selector element. 
 		}
 
-
 		// Display a random mode selector if random mode is enabled. 
-		if ($mybb->settings['bam_random'] == 1) {
-			
+
+		if ($mybb->settings['bam_random'] == 1) {			
 			if ($data['random'] == 1) {
 				$currentType = "random";
 			} else {
@@ -286,12 +281,12 @@ error_reporting(E_ALL); */
 			}
 
 			$form_container->output_row($lang->bam_announcement_type, $lang->bam_announcement_type_desc, $form->generate_select_box('announcement_type', $announcement_type, $currentType, array('id' => 'announcementType')), 'announcement_type');
-			
 		} else {
 			echo $form->generate_hidden_field("announcement_type", "standard", array("id"=>"announcementTypeHidden"));
 		}
 
 		// Show the currect description text depending on whether BAM is in advanced or standard mode. 
+
 		$edit_announcement_description = $lang->bam_form_announcement_desc; 
 		if ($mybb->settings['bam_advanced_mode'] == 1) {
 			$edit_announcement_description = $lang->bam_form_announcement_advanced_desc; 
@@ -300,13 +295,11 @@ error_reporting(E_ALL); */
 		$edit_announcement_description .= $tags_button;
 
 		// Generate input fields. 
-		$form_container->output_row($lang->bam_form_pinned,  $lang->bam_form_pinned_desc, $form->generate_yes_no_radio('pinned', $data['pinned'], array("id" => "sticky_select", "class" => "remove_on_random")), 'sticky_select_row');
 
+		$form_container->output_row($lang->bam_form_pinned,  $lang->bam_form_pinned_desc, $form->generate_yes_no_radio('pinned', $data['pinned'], array("id" => "sticky_select", "class" => "remove_on_random")), 'sticky_select_row');
 		$form_container->output_row($lang->bam_display_mode, $lang->bam_display_mode_desc, $form->generate_select_box('location', $location_select, $announcementLocation, array('id' => 'location')), 'location');
 		$form_container->output_row($lang->bam_forum_select,  $lang->bam_forum_select_desc, $form->generate_forum_select('forum_select', $data['forums'], array("id" => "forum_select", "class" => "forum_select", 'size' => 6, 'multiple' => true)), 'forum_select_row');
 		$form_container->output_row($lang->bam_additional_pages, $lang->bam_additional_pages_desc, $form->generate_text_box("additional_pages", html_entity_decode($data['additional_pages']), array("class" => "text_input", "id" => 'additional_pages', "style" => "width: 75%;")), 'additional_pages');
-
-		// $form_container->output_row($lang->bam_make_global,  $lang->bam_make_global_desc, $form->generate_yes_no_radio('global', $data['global'], array("id" => "global_select", "class" => "remove_on_random")), 'global_select_row');
 		$form_container->output_row($lang->bam_form_announcement, $edit_announcement_description, $form->generate_text_area("announcement", html_entity_decode($data['announcement']), array("class" => "text_input align_left", "style" => "width: 75%;", "id" => "announcement_text")), 'announcement');
 		
 		echo $form->generate_hidden_field("id", intval($id));
@@ -333,9 +326,6 @@ error_reporting(E_ALL); */
 		}
 
 		$form_container->output_row($lang->bam_form_groups, $lang->bam_form_groups_desc, $form->generate_select_box('usergroup[]', $options, $data['usergroup'], array('id' => 'usergroup', 'multiple' => true, 'size' => 5)), 'usergroup');
-		// $form_container->output_row($lang->bam_form_url, $lang->bam_form_url_desc, $form->generate_text_box("url", html_entity_decode($data['link']), array("class" => "text_input align_right", "style" => "width: 25%;")), 'url');
-		// $form_container->output_row($lang->bam_form_pinned, $lang->bam_form_pinned_desc, $form->generate_yes_no_radio('pinned', (int)$data['pinned']));
-			// Announcement URL mode is deprecated in version 2.0 due to the fact that BBcode can easily create links. Advanced mode brings it back. 
 		
 		if ($mybb->settings['bam_advanced_mode'] == 1) {
 			$form_container->output_row($lang->bam_form_order, $lang->bam_form_order_desc, $form->generate_text_box("disporder", $data['disporder'], array("class" => "text_input align_right", "style" => "width: 25%;")), 'disporder');
@@ -352,9 +342,6 @@ error_reporting(E_ALL); */
 		$form->output_submit_wrapper($buttons);
 		$form->end();
 		echo "<br />";
-
-		// Run the form update function to ensure that the form does not display invalid fields if the announcement is set to random.
-		// echo "<script>deleteRandomElements();</script>";
 	}
 
 
@@ -413,14 +400,6 @@ error_reporting(E_ALL); */
 		}
 
 		$forumList = $mybb->input['forum_select'];
-
-		/*
-		if (($mybb->input['custom_class'] != null)) {
-			$class = $db->escape_string(htmlspecialchars($mybb->input['custom_class'], ENT_QUOTES));
-		}
-		else {
-			$class = $db->escape_string(htmlspecialchars($mybb->input['class'], ENT_QUOTES));
-		} */
 		
 		if ($mybb->input['url'] != null) {
 			$url = $db->escape_string(htmlspecialchars($mybb->input['url'], ENT_QUOTES));
@@ -493,9 +472,6 @@ error_reporting(E_ALL); */
 		}
 		$forumList = $mybb->input['forum_select'];
 
-
-
-
 		if ($mybb->input['additional_pages'] != null) {
 			$additionalPages = $db->escape_string(htmlspecialchars($mybb->input['additional_pages']), ENT_QUOTES);
 		}
@@ -510,7 +486,7 @@ error_reporting(E_ALL); */
 			$class = $db->escape_string(htmlspecialchars($mybb->input['class'], ENT_QUOTES));
 		}
 
-		// Deprecated. Still available through advanced mode. 
+		// Almost deprecated this. Functionality still exists. 
 		if ($mybb->input['url'] != null) {
 			$url = $db->escape_string(htmlspecialchars($mybb->input['url'], ENT_QUOTES));
 		}
@@ -597,7 +573,7 @@ error_reporting(E_ALL); */
 
 		// Initialize custom class variable. 
 		if (isset($mybb->input['custom_class'])) {
-			$customClass = htmlspecialchars($mybb->input['custom_class']);
+			$customClass = htmlspecialchars($mybb->input['custom_class'], ENT_QUOTES);
 		}
 		else {
 			$customClass = "";
@@ -605,17 +581,15 @@ error_reporting(E_ALL); */
 
 		// Check if advanced mode is enabled before initializing special pages. 
 		if (isset($mybb->input['additional_pages'])) {
-			$additionalPages = htmlspecialchars($mybb->input['additional_pages']);
+			$additionalPages = htmlspecialchars($mybb->input['additional_pages'], ENT_QUOTES);
 		}
 		else {
 			$additionalPages = "";
 		}
 
-		$fieldType = ""; // $mybb->input['fieldtype'] 
-		// $fieldType = $mybb->input['fieldtype']; 
+		$fieldType = ""; 
 		echo $form->generate_hidden_field("action", "submit_add");
 		
-
 		// Display a random mode selector if random mode is enabled. 
 		if ($mybb->settings['bam_random'] == 1) {
 
@@ -635,23 +609,20 @@ error_reporting(E_ALL); */
 		if ($mybb->settings['bam_advanced_mode'] == 1) {
 			$add_announcement_description = $lang->bam_form_announcement_advanced_desc; 
 		}
-		
-		//$add_announcement_description .= $lang->bam_form_tags_link;
 
-		$add_announcement_description .= $tags_button;
-		// Generate input fields. 
-		$form_container->output_row($lang->bam_form_pinned,  $lang->bam_form_pinned_desc, $form->generate_yes_no_radio('pinned', 0, array("id" => "sticky_select", "class" => "remove_on_random")), 'sticky_select_row');
+		// Generate input fields. 		
 		
+		$add_announcement_description .= $tags_button;
+		$form_container->output_row($lang->bam_form_pinned,  $lang->bam_form_pinned_desc, $form->generate_yes_no_radio('pinned', 0, array("id" => "sticky_select", "class" => "remove_on_random")), 'sticky_select_row');
 		$form_container->output_row($lang->bam_display_mode, $lang->bam_display_mode_desc, $form->generate_select_box('location', $location_select, 'index', array('id' => 'location')), 'location');
 		$form_container->output_row($lang->bam_forum_select,  $lang->bam_forum_select_desc, $form->generate_forum_select('forum_select', 0, array("id" => "forum_select", "class" => "forum_select", 'size' => 6, 'multiple' => true, 'main_option' => $lang->all_forums)), 'forum_select_row');
 		$form_container->output_row($lang->bam_additional_pages, $lang->bam_additional_pages_desc, $form->generate_text_box("additional_pages", $additionalPages, array("class" => "text_input", "style" => "width: 75%;", "id" => "additional_pages")), 'additionalPages');
-
-		// $form_container->output_row($lang->bam_make_global,  $lang->bam_make_global_desc, $form->generate_yes_no_radio('global', 0, array("id" => "global_select", "class" => "remove_on_random")), 'global_select_row');
 		$form_container->output_row($lang->bam_form_announcement, $add_announcement_description, $form->generate_text_area("announcement", '', array("class" => "text_input align_left", "style" => "width: 75%;", "id" => "announcement_text")), 'announcement');	
 		$form_container->output_row($lang->bam_form_style, $lang->bam_form_style_desc, $form->generate_select_box('class', $class_select, $fieldType, array('id' => 'style')), 'class');
 		$form_container->output_row($lang->bam_form_class_custom, $lang->bam_form_class_custom_desc, $form->generate_text_box("custom_class", $customClass, array("class" => "text_input", "style" => "width: 25%;", "id" => "custom_class")), 'custom_class');	
 
 		// Generate usergroup select box. 
+
 		$options = array();
 		$query = $db->simple_select("usergroups", "gid, title", null, array('order_by' => 'title'));
 		while($usergroup = $db->fetch_array($query))
@@ -670,7 +641,6 @@ error_reporting(E_ALL); */
 		}
 		else {
 			echo $form->generate_hidden_field("url", "");
-			// echo $form->generate_hidden_field("additional_pages", "");
 		}	
 		$form_container->output_row($lang->bam_form_order, $lang->bam_form_order_desc, $form->generate_text_box("disporder", ((int) $last['disporder'] + 1), array("class" => "text_input align_right", "style" => "width: 25%;")), 'disporder');		
 
@@ -698,8 +668,8 @@ error_reporting(E_ALL); */
 
 		// If advanced mode is enabled, HTML is allowed by the post parser. 
 		
-		$allowHTML = "no";
-		if ($mybb->settings['advanced_mode'] == 1) {
+		$allowHTML = ""; // Class parser checks if empty, not if "no"
+		if ($mybb->settings['bam_advanced_mode'] == 1) {
 			$allowHTML = "yes";
 		}
 		$parser_options = array(
@@ -707,7 +677,7 @@ error_reporting(E_ALL); */
     			'allow_mycode' => 'yes',
     			'allow_smilies' => 'yes',
     			'allow_imgcode' => 'yes',
-    			'filter_badwords' => 'no',
+    			'filter_badwords' => '',
     			'nl2br' => 'yes'
 		);
 
@@ -810,14 +780,11 @@ error_reporting(E_ALL); */
 			}
 			$prefixVal .= "</div>"; 
 
-
-			// echo "<br /><br /> announcementText" . $announcementText;
-			// $data[$count]['announcement'] = $prefixVal . $announcementText;
-			$data[$count]['announcement'] = $announcementText;
-			$data[$count]['PID'] = $querydata['PID'];
-			$data[$count]['class'] = $prefixVal . $querydata['class'];
-			$data[$count]['pinned'] = $querydata['pinned'];
-			$data[$count]['disporder'] = $querydata['disporder'];
+			$data[$count]['announcement'] = $announcementText; 
+			$data[$count]['PID'] = (int) $querydata['PID'];
+			$data[$count]['class'] = $prefixVal . htmlspecialchars($querydata['class']); // We don't run the class through the post parser. So we sanitize here. 
+			$data[$count]['pinned'] = (int) $querydata['pinned'];
+			$data[$count]['disporder'] = (int) $querydata['disporder'];
 			$count++;
 		}
 		
@@ -841,10 +808,8 @@ error_reporting(E_ALL); */
 					} else {
 						$table->output_cell("<center><input type='text' name=\"disporder[".$data[$i]['PID']."]\" value='".$data[$i]['disporder']."' /></center>");
 					}
-					// $table->output_cell("");
-
-					// Generate the options menu. 
-					
+				
+					// Generate the options menu. 	
 					$popup = generate_announcement_controls($data[$i]['PID'], $data[$i]['pinned']);
 					$table->output_cell($popup->fetch(), array("class" => "align_center"));
 					$table->construct_row();
@@ -856,8 +821,9 @@ error_reporting(E_ALL); */
 
 		$buttons = array();
 
-		// Because this form submits with post, we have issues with setting additional parameters on the add page. 
-		// We must create a link and style it like a button. 
+		// Because this form submits with POST, we have issues with setting additional parameters on the add page. 
+		// We must create a link and style it like a button. This allows us to add URL parameters for javascript to handle. 
+
 		if ($type == "random") {
 			$style = "
 				border: 1px solid #999;
@@ -916,8 +882,9 @@ function create_selectedForumArray($forums) {
 }
 
 // We need to output some javascript for the add and edit announcement pages. 
-// This removes fields that don't pertain to random mode announcements, based on the select box for announcement type. 
-// If the user re-selects "standard," the fields return. 
+// This removes fields that don't pertain to random mode announcements, or 
+// announcements with certain settings based on the select box for announcement type. 
+// MyBB's (otherwise awesome) ACP API did not make this easy... Some fields aren't even given IDs!   
 
 $form_javascript = " 
 <script>
@@ -925,6 +892,7 @@ $form_javascript = "
 	const isEmpty = str => !str.trim().length;
 
 	// Check if we are on a new announcement or edit announcement page. If so, enable some javascript for improved functionality. 
+
 	if (document.getElementById('announcementType') != null || document.getElementById('announcementTypeHidden') != null) {
 		document.getElementById('location').onchange = function() {manageDisplayModes(changed='true')}
 		manageDisplayModes();
@@ -948,6 +916,8 @@ $form_javascript = "
 		document.getElementById('announcementType').onchange = function() {deleteRandomElements()}
 		deleteRandomElements();
 	}
+
+		// Some fields don't pertain to random mode. Hide these fields if this is a random announcement. 
 
 		function deleteRandomElements() {
 			var sel = document.getElementById('announcementType');
@@ -1018,7 +988,8 @@ $form_javascript = "
 			var forumClass = document.getElementById('forum_select');
 			var specialSelect = document.getElementById('additional_pages');
 			
-			// old forumselect. remove a parent node.
+			// Display only the required fields regarding where announcements should be posted. 
+
 			forumClass.parentNode.parentNode.parentNode.style.display = displayVarForums; 
 			forumClass.parentNode.parentNode.style.display = displayVarForums; 
 			specialSelect.parentNode.parentNode.parentNode.style.display = displayVarAdditional;
@@ -1038,7 +1009,8 @@ $form_javascript = "
 			} 
 		}
 
-		// 
+		// Javascript for the custom class input field. 
+
 		function setCustomClass() {
 			var classSel = document.getElementById('style');
 			var value = classSel.options[classSel.selectedIndex].value;
@@ -1052,7 +1024,8 @@ $form_javascript = "
 			}
 			
 			var customClass = document.getElementById('custom_class');
-			// 
+			
+			// Don't let the user switch back to a built in class if the custom class field has text. 
 			if (!isEmpty(customClass.value)) {
 				var customClassContainer = customClass.parentNode.parentNode.getElementsByClassName('description')[0];
 				customClassContainer.innerHTML = '" . $lang->bam_remove_custom_class . "';
@@ -1063,13 +1036,13 @@ $form_javascript = "
 			}
 		}
 
-		// See lang file for the full alert text. 
+		// Shows a full list of tags and directives on click. 
 
 		function showAnnouncementTags() {
 			var announcement = document.getElementById('announcement_text');
 			var announcementContainer = announcement.parentNode.parentNode.getElementsByClassName('description')[0];
 			announcementContainer.innerHTML = '".$lang->bam_announcement_tags_alert."';
-			// announcementContainer.parentNode.parentNode.style.display = '';
+			
 		}
 
  </script>";
