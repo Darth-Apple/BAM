@@ -40,7 +40,6 @@ function bam_info() {
 	// BAM has an in-place upgrader, which checks whether BAM requires database updates after the new version is uploaded. 
 	// If we detect that BAM 2.0's files have been uploaded without running the upgrade script yet... 
 	// ... We display a notice to the administrator, along with a one-click link to run the upgrade.  
-	// 
 	// The upgrade link directs to /admin/modules/config/bam.php?action=upgrade. If the POST code matches ... 
 	// ... and BAM has not updated yet, the config/bam.php module launches bam_upgrade() found within /inc/plugins/bam_upgrade/bam_upgrade.php
 
@@ -57,7 +56,6 @@ function bam_info() {
 				// Output the link if BAM is activated. 
 				$desc = $lang->bam_info_upgrade_ready;
 				$desc .= "<br /><b><a href='index.php?module=config-bam&action=upgrade&post_key=".$mybb->post_code."'>".$lang->bam_upgrade_link_text_plugins_panel."</a></b>"; 
-			
 			}
 		}
 	}
@@ -111,13 +109,6 @@ function bam_install () {
   				PRIMARY KEY (PID)
 				) ENGINE=MyISAM
 				".$db->build_create_table_collation().";"
-
-				// ALTER TABLE `mybb_bam` ADD `forums` VARCHAR(256) NULL DEFAULT NULL ;
-
-				// ALTER TABLE `mybb_bam` ADD `display_mode` SET('global', 'index', 'special') NOT NULL DEFAULT 'index' //
-				// AFTER `pinned`, // 
-				// ADD `israndom` TINYINT NULL DEFAULT NULL AFTER `display_mode`, 
-				// ADD `additional_display_pages` VARCHAR(256) NULL DEFAULT NULL AFTER `israndom`;
 		);
 
 		$inserts = array(
