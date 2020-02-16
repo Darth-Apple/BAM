@@ -42,4 +42,5 @@
         // Add new templates, create new settings. Run the standard install script. 
 
         bam_install();
+        rebuild_settings();
     }

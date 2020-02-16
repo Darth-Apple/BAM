@@ -35,18 +35,29 @@ $plugins->add_hook("admin_config_action_handler", "bam_confighandler");
 function bam_info() {
 	global $lang, $mybb, $plugins, $cache;
 	$lang->load('bam');
-
-	// Generate an upgrade link, if it exists.
-
 	$desc = $lang->bam_desc;
-	if (bam_is_installed()) {
-		if (!isset($mybb->settings['bam_advanced_mode']) && !isset($mybb->settings['bam_random_dismissal'])) {
-			$desc = $lang->bam_info_upgrade . "<br />";
 
-			// Make BAM aware of whether it is activated or not.
+	// BAM has an in-place upgrader, which checks whether BAM requires database updates after the new version is uploaded. 
+	// If we detect that BAM 2.0's files have been uploaded without running the upgrade script yet... 
+	// ... We display a notice to the administrator, along with a one-click link to run the upgrade.  
+	// 
+	// The upgrade link directs to /admin/modules/config/bam.php?action=upgrade. If the POST code matches ... 
+	// ... and BAM has not updated yet, the config/bam.php module launches bam_upgrade() found within /inc/plugins/bam_upgrade/bam_upgrade.php
+
+	// No need to check if we've upgraded the DB if we're not installed. 
+	if (bam_is_installed()) {
+		// We're installed. Check if we're upgraded. 
+		if (!bam_is_updated()) {
+			// Display the upgrade message to inform the administrator that the database must be updated. 
+			$desc = $lang->bam_info_upgrade . "<br />";
 			$activePlugins = $cache->read("plugins"); 
+
+			// Because bam_upgrade() launches from within /admin/modules/config/bam.php, we must make sure we are activated first. 
 			if (in_array("bam" ,$activePlugins['active'])) {
+				// Output the link if BAM is activated. 
+				$desc = $lang->bam_info_upgrade_ready;
 				$desc .= "<br /><b><a href='index.php?module=config-bam&action=upgrade&post_key=".$mybb->post_code."'>".$lang->bam_upgrade_link_text_plugins_panel."</a></b>"; 
+			
 			}
 		}
 	}
@@ -60,6 +71,21 @@ function bam_info() {
 		'version'		=> '2.0',
 		"compatibility"	=> "18*"
 	);
+}
+
+
+// This function manually checks if its database has been updated. 
+// This is used to display the upgrade link in the plugin's description if an update is required.
+
+function bam_is_updated () {
+	global $db;
+
+	// Check for a database field that only exists in BAM 2.0 
+	$query = $db->query("SHOW COLUMNS FROM ".TABLE_PREFIX."bam LIKE 'random';");
+	if ($db->fetch_array($query)) {
+		return true; 
+	}
+	return false; 
 }
 
 function bam_install () {
