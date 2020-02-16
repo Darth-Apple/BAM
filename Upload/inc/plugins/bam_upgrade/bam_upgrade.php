@@ -5,7 +5,7 @@
         * This was required because the upgrade link is integrated directly within the ACP. Hooks that process
         * These links cannot run unless BAM is activated, so the upgrade had to be designed to be in-place and live. 
         * This was significantly simpler (hehe, hehe) than the alternatives, such as putting the upgrader 
-        * in the activate function, or using standalone scripts. (I lied. But once I wrote it, there was no going back)
+        * in the activate function, or using standalone scripts. (I lied. )
         * It also has the added bonus of allowing a BAM upgrade to run completely interuption-free. 
         *
         * BAM first checks in the bam_info() function on whether the database has been upgraded.   

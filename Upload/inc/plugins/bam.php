@@ -25,7 +25,7 @@ if(!defined("IN_MYBB")) {
 }
 
 if ($mybb->settings['bam_enabled'] == 1) {
-	$plugins->add_hook("global_end", "bam_announcements"); // don't load announcements unless the plugin is enabled. 
+	$plugins->add_hook("global_start", "bam_announcements"); // don't load announcements unless the plugin is enabled. 
 }
 
 $plugins->add_hook("admin_config_menu", "bam_config_menu");
@@ -52,7 +52,7 @@ function bam_info() {
 
 			// Because bam_upgrade() launches from within /admin/modules/config/bam.php, we must make sure we are activated first. 
 			if (in_array("bam" ,$activePlugins['active'])) {
-				// Output the link if BAM is activated. 
+				// Output the DB-upgrader link if BAM is activated. 
 				$desc = $lang->bam_info_upgrade_ready;
 				$desc .= "<br /><b><a href='index.php?module=config-bam&action=upgrade&post_key=".$mybb->post_code."'>".$lang->bam_upgrade_link_text_plugins_panel."</a></b>"; 
 			}
@@ -72,7 +72,7 @@ function bam_info() {
 
 
 // This function manually checks if its database has been updated. 
-// This is used to display the upgrade link in the plugin's description if an update is required.
+// This is used to display the upgrade script link in the plugin's description if an update is required.
 
 function bam_is_updated () {
 	global $db;
@@ -468,14 +468,12 @@ function bam_deactivate () {
 // Primary BAM announcements function. Parses announcements on forum pages. 
 function bam_announcements () {
 	global $mybb, $db, $templates, $bam_announcements, $lang, $theme;
-	// $lang->load("global");
 
 	require_once MYBB_ROOT."/inc/class_parser.php";
 	$parser = new postParser(); 
 	
 	// Set some variables that we use in the javascript to create the cookies. 
 	// Cookies are used to save dismissed announcements so that they aren't loaded again.
-	// Yes, I know. "Cookies are bad." But they work great for this. Otherwise, the forum's database would grow enourmous storing these dismissed announcements. 
 
 	$bam_cookie_expire_days = (int) $mybb->settings['bam_dismissal_days'];
 	$bam_cookie_path = $mybb->settings['cookiepath'];
@@ -1157,6 +1155,7 @@ function isAlternatePageValid($announcement) {
 // Legacy function that is not used in BAM 2.0. Only used if BAM 2.0 is uploaded to a server and the upgrade script has not run. 
 // This allows BAM 2.0 to properly display old BAM 1 announcements before they are migrated. 
 // This is necessary because BAM must be activated to run the upgrade script. This prevents unnecessary interuptions. 
+// See comments in inc/plugins/bam_upgrade/bam_upgrade.php for more info on how this works. 
 
 function global_display($pinned) {
 	global $mybb, $current_page;
