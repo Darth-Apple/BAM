@@ -219,14 +219,14 @@ $l['bam_additional_pages_too_long'] = "Error. Additional pages field cannot be m
 
 // Lang strings for BAM's built in "upgrade advisor"
 
-$l['bam_upgrade_required'] = "<b> You have successfully uploaded BAM to the server!</b> In order to use BAM 2.0, you must run BAM's upgrade script to refresh database fields and templates. This will migrate all of your existing announcements from BAM 1.0 to BAM+ 2.0. Make sure to visit BAM's settings after running your upgrade and verify that everything still looks correct!";
+$l['bam_upgrade_required'] = "<b> It looks like you have successfully uploaded BAM 2.0 to the server!</b> In order to use the new version, you must run BAM's upgrade script to refresh database fields and templates. This will migrate all of your existing announcements from BAM 1.0 to BAM+ 2.0. Make sure to visit BAM's settings after running your upgrade and verify that everything still looks correct!";
 $l['bam_upgrade_link_text'] = "Click here to run the upgrade!";
 $l['bam_upgrade_link_text_plugins_panel'] = "BAM is ready to update. Click here to finish upgrading to BAM 2.0!<br />";
-$l['bam_upgrade_success'] = "You have successfully updated BAM to BAM+ 2.0! Verify any settings are correct, as these have been refreshed and restored to defaults from the upgrade. If you have any additional issues, uninstall BAM and reinstall from the plugins page. This will resolve any remaining issues.";
+$l['bam_upgrade_success'] = "You have successfully updated BAM to BAM+ 2.0! Verify any settings are correct, as these have been refreshed and restored to defaults from the upgrade. If you have any additional issues, uninstall BAM and reinstall from the plugins page. This will resolve any remaining issues!";
 $l['bam_info_alternative_upgrade'] = "<br /><br /><i>You can alternatively uninstall the plugin, and perform a full re-install on this page! Note that this will delete your announcements.</i>";
 
 $l['bam_info_upgrade'] = "<font color='red'><b>You have uploaded BAM 2.0 to the server, but an upgrade is required to migrate your announcements to the new version! </font>
-Make sure that BAM is installed AND activated before running the built-in migrator. Once BAM has been activated, 
+Make sure that BAM is activated before running the built-in migrator. Once BAM has been activated, 
 an upgrade link will appear below. </b><br /><br />
 <i>(BAM's upgrader is specifically designed to operate in-place, meaning that it performs the migration when BAM is activated. This enables 
 BAM to load its upgrade script from directly within your Admin Control Panel. This will run seamlessly, and your announcements will display without interruptions on your forum!)</i>";
