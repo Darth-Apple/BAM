@@ -1,6 +1,32 @@
 <?php
-
-    // 
+    /* HOW THIS WORKS: 
+        *
+        * BAM's upgrader is fully in-place, meaning it runs while the plugin is activated. 
+        * This was required because the upgrade link is integrated directly within the ACP. Hooks that process
+        * These links cannot run unless BAM is activated, so the upgrade had to be designed to be in-place and live. 
+        * This was significantly simpler (hehe, hehe) than the alternatives, such as putting the upgrader 
+        * in the activate function, or using standalone scripts. (I lied. But once I wrote it, there was no going back)
+        * It also has the added bonus of allowing a BAM upgrade to run completely interuption-free. 
+        *
+        * BAM first checks in the bam_info() function on whether the database has been upgraded.   
+        * If not, it replaces the plugin's description with an upgrade link to notify the administrator.  
+        * Once the upgrade link is launched, /admin/modules/config/bam.php checks for this link and verifies the POST CODE. 
+        * If it matches, it includes this file, and calls the bam_upgrade() function below. 
+        * 
+        * bam_upgrade() removes old templates and settings, but leaves the database intact. 
+        * It adds the necessary columns for BAM 2's schema, and then runs a normal install. 
+        * Since we didn't delete the table, bam_install() will leave the database intact and only create settings and templates.
+        *
+        * Within /inc/plugins/bam.php, some legacy announcement rendering code from BAM 1 was included. This code is used
+        * if BAM 2's files have been uploaded to the server without running the upgrade script. 
+        * This allows the BAM 2 code base to operate correctly on the front end of the forum, 
+        * even if the database and templates have not been updated yet. Announcements will still display with no interruptions.  
+        *
+        * This sounds complicated, but it works seamlessly! From the administrator's perspective, 
+        * they simply upload, click the upgrade link, and they are done! 
+        *
+        */ 
+    
     function bam_upgrade () {
         global $db, $lang, $mybb;
 
@@ -28,7 +54,7 @@
         }
 
     
-        $templates = array('bam_announcement', 'bam_announcement_container'); // remove old templates. Templates
+        $templates = array('bam_announcement', 'bam_announcement_container'); // remove old templates. 
         foreach($templates as $template) {
             $db->delete_query('templates', "title = '{$template}'");
         }

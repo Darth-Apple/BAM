@@ -17,16 +17,15 @@
 
 global $mybb;
 
-global $templatelist; 
-$templatelist .= 'bam_announcement';
-$templatelist .= 'bam_announcement_container';
+$templatelist .= ',bam_announcement';
+$templatelist .= ',bam_announcement_container';
 
 if(!defined("IN_MYBB")) {
 	die("Hacking attempt detected. Server responded with 403. "); // direct access to this file not allowed. 
 }
 
 if ($mybb->settings['bam_enabled'] == 1) {
-	$plugins->add_hook("global_start", "bam_announcements"); // don't load announcements unless the plugin is enabled. 
+	$plugins->add_hook("global_end", "bam_announcements"); // don't load announcements unless the plugin is enabled. 
 }
 
 $plugins->add_hook("admin_config_menu", "bam_config_menu");
@@ -953,7 +952,10 @@ function getThreadData($threadID) {
     global $db;
     $tid = (int) $threadID; 
 
-    // Get the most recent ten posts from the database by thread ID.  
+	// Get the most recent posts from the database by thread ID.  
+	// Originally only fetched 10 posts. Changed it to 50. It seems to work better with the new value. 
+	// This isn't slower. I timed the query. It runs in about 300 microseconds!
+
     return $db->query("
     SELECT p.message, p.tid, p.dateline
     FROM ".TABLE_PREFIX."posts p WHERE p.tid='$tid'
