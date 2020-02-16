@@ -18,7 +18,8 @@
 global $mybb;
 
 global $templatelist; 
-$templatelist .= 'bam_announcement, bam_announcement_container';
+$templatelist .= 'bam_announcement';
+$templatelist .= 'bam_announcement_container';
 
 if(!defined("IN_MYBB")) {
 	die("Hacking attempt detected. Server responded with 403. "); // direct access to this file not allowed. 
@@ -518,8 +519,6 @@ function bam_announcements () {
 		// Get announcement ID for cookies. Used for saving dismissed announcements. 
 		$announcement_id = (int) $querydata['PID'];
 		$bcprefix = (int) $mybb->settings['bam_cookie_id_prefix']; // Used to reset dismissals if BAM is reinstalled.
-		
-		// Sanitize to remove XSS stuff. 
 
 		// Make the announcement a link if it has a URL field defined.  
 		if(!empty($querydata['link'])) {
@@ -671,9 +670,7 @@ function bam_announcements () {
 					eval("\$announcements .= \"".$templates->get($data[$count]['template'])."\";");
 				}
 			}
-
 		}
-
 
 		$count++; 
 	}
@@ -943,7 +940,7 @@ function getThreadData($threadID) {
     return $db->query("
     SELECT p.message, p.tid, p.dateline
     FROM ".TABLE_PREFIX."posts p WHERE p.tid='$tid'
-    ORDER BY p.dateline DESC LIMIT 0,20");
+    ORDER BY p.dateline DESC LIMIT 0,50");
 }
 
 // This function checks the user's permissions, and determines if the user's group is in $display_groups

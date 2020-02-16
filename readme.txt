@@ -8,7 +8,7 @@ BAM Announcements Manager has been updated, and is better than ever before! This
 -------------------------------------------------------
 
  - Manage unlimited announcements on ANY page of your forum. 
- - Six included colors and styles for announcements. You can create additional styles if you desire. 
+ - Seven included colors and styles for announcements. You can create additional styles if you desire. 
  - Announcements can be now be dismissed by users! Configurable on a per-announcement basis.
  - Display announcements globally, on the forum index, on specific boards, or anywhere else you desire.  
  - New: Alternatively, paste a link to any specific page (thread, profile, or otherwise) to display your announcement on. 
@@ -144,23 +144,26 @@ ADDING CUSTOM STYLES/COLORS:
 
   You will now be able to use "aqua" in the custom class field. 
 
+  Why use classes instead of a "custom CSS" field for every announcement? Because classes are re-usable! Once you design a style that you like, you can use it in as many announcements as you desire. 
+
 
 -----------------------------------------------------
 UPGRADING FROM BAM 1.0: IMPORTANT 
 -----------------------------------------------------
 
-RECOMMENDED: Uninstall the old version of BAM. Upload the new version, and install as usual. 
+1) RECOMMENDED METHOD: Uninstall the old version of BAM. Upload the new version, and install as usual. 
 
- - This is the more stable way to perform an upgrade. If you don't have many announcements currently, it is recommended to perform an upgrade with a full uninstall/reinstall. This will delete all current announcements! 
+ - This is the more stable way to perform an upgrade. If you don't have many announcements currently, it is recommended to perform an upgrade with a full uninstall/reinstall. Note that this will delete all current announcements! 
 
+----------------------
 
-ALTERNATIVE: Use the built in upgrader to keep existing announcements. Upload the new version of BAM. Make sure to leave BAM activated, and navigate to your plugins page. Click the upgrade link that appears in BAM's plugin description. This will make all of the necessary changes to upgrade you to BAM 2.0! 
+2) ALTERNATIVE METHOD: Use the built in upgrader to keep existing announcements. Upload the new version of BAM. Make sure to leave BAM activated, and navigate to your plugins page. Click the upgrade link that appears in BAM's plugin description. This will make all of the necessary changes to upgrade you to BAM 2.0! 
 
- - The upgrade script REQUIRES bam to be fully activated first. This is because BAM's upgrade script runs from straight within the BAM ACP module. Due to the way that MyBB plugins work, BAM is not able to load its own upgrade script unless it is activated. 
+  1. Note that the upgrade script REQUIRES bam to be fully activated first. This is because it runs in-place straight from within the BAM ACP module. Due to the way that MyBB plugins work, BAM is not able to load its own upgrade script unless it is activated. 
 
- - This will not break your forum or interrupt announcements, as the BAM 2.0 has been specifically designed to enable the new version of BAM to display using the old version's templates and database temporarily. Your forum announcements will remain uninterrupted.  
+  2. This will not break your forum or interrupt announcements! BAM 2.0 has been specifically designed to enable the new version of BAM to display using the old version's templates and database temporarily. Your forum announcements will remain uninterrupted.  
 
- - This script doesn't migrate general plugin settings. These have changed heavily from BAM 1 to BAM 2. Make sure to reconfigure BAM's general plugin settings once the upgrade has completed! 
+  3. This script doesn't migrate general plugin settings. These have changed heavily from BAM 1 to BAM 2. Make sure to reconfigure BAM's general plugin settings once the upgrade has completed! 
 
 
 -----------------------------------------------------
