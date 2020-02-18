@@ -1,4 +1,4 @@
-Notice: This is a beta version. If you would like to test on a live board, please report any bugs that you discover! Full release is coming soon! 
+Notice: This is a beta version. If you would like to test on a live board, please report any bugs that you discover! There are some known issues, and the original BAM 1 is recommended for download until the new release is finalized. Full release is coming soon! 
 
 WARNING: There are a few known issues with the upgrader at this time. If you choose to use this plugin on a live board, please perform an upgrade from BAM 1 with a full uninstall-reinstall. These issues will be resolved before the final release! 
 
@@ -189,6 +189,8 @@ EASTER EGGS AND EXTRAS:
  - Updated ACP interface that displays more information (with new icons) about where announcements will be posted. 
 
  - Both BAM 1.0 and 2.0 allow you to turn your announcement into a link without the use of BBcode. Simply paste a link into the URL field!
+
+ - Create a Marquee announcement (unofficial feature). Put [@marquee:left, 10] to make a marquee that scrolls towards the left, with a scroll speed of 10. 
 
 
 Copyright: 
