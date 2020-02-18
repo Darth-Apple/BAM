@@ -469,7 +469,7 @@ function bam_deactivate () {
 function bam_announcements () {
 	global $mybb, $db, $templates, $bam_announcements, $lang, $theme;
 
-	require_once MYBB_ROOT."/inc/class_parser.php";
+	require_once MYBB_ROOT.'/inc/class_parser.php';
 	$parser = new postParser(); 
 	
 	// Set some variables that we use in the javascript to create the cookies. 
@@ -480,7 +480,7 @@ function bam_announcements () {
 
 	// In advanced mode, HTML is allowed. This allows administrators to have more control over the content of their announcements. 
 
-	$allowHTML = ""; // Class parser checks if empty.  
+	$allowHTML = null; // Class parser checks if empty.  
 	if ($mybb->settings['bam_advanced_mode'] == 1) {
 		$allowHTML = "yes";
 	}
@@ -516,13 +516,15 @@ function bam_announcements () {
 	// Initialize some javascript variables. 
 	// This is set for an announcement that can be dismissed, and hides the dismiss button. 
 
-	$display_close = "dismiss-notification";
+	$display_close = 'dismiss-notification';
 
 	// This is a class that MUST be in the announcement's <p> tag for dismissal to work. On stickied announcements, this class 
 	// is not included in the <p> tag to make it harder for a CSS bug and an accidentally displayed close button to actually be able
 	// to dismiss the announcement. 
 
-	$bam_unsticky = "bam-unsticky";
+	$bam_unsticky = 'bam-unsticky';
+
+	$announcementCounter = 0; // used to cache templates. 
 
 	// Fetch announcements from database and render them. 
 	while($querydata = $db->fetch_array($query)) {
@@ -536,89 +538,101 @@ function bam_announcements () {
 
 		// Make the announcement a link if it has a URL field defined.  
 		if(!empty($querydata['link'])) {
-			$announcement = "<a href='".htmlspecialchars($querydata['link'], ENT_QUOTES)."'>".htmlspecialchars($querydata['announcement'], ENT_QUOTES)."</a>";
+			$announcement = '<a href=\''.htmlspecialchars($querydata['link'], ENT_QUOTES).'\'>'.htmlspecialchars($querydata['announcement'], ENT_QUOTES)."</a>";
 		}
-		else {
+
+		// Parse username and newmember variables. 
+		// We only need to check for variables if we have { in the announcement. Improves performance. 
+
+		if (strpos('-'.$announcement, '{')) {
 			// Parse the {$username} variable within announcements. Parses to "Guest" if the user is not logged in. 
 			if(!empty($mybb->user['uid'])) {
-			          $username = htmlspecialchars($mybb->user['username'], ENT_QUOTES); // allows {$username} to be replaced with the user's username. 
+				$username = htmlspecialchars($mybb->user['username'], ENT_QUOTES); // allows {$username} to be replaced with the user's username. 
 			}
 			else {
 				$username = $lang->guest; // user is not logged in. Parse as "Guest" instead. 
 			}
-			
+
 			if (strpos("-" . $announcement, "{newestmember")) { // Added character at beginning before searching to fix bug. (Allows strpos to return true even if the tag begins at the first character)
 				$newUser = getNewestMember(); 
 				$announcement = str_replace('{newestmember}', htmlspecialchars($newUser['username'], ENT_QUOTES), $announcement);
 				$announcement = str_replace('{newestmember_uid}', (int) $newUser['uid'], $announcement);
-				$announcement = str_replace('{newestmember_link}', "<a href='member.php?action=profile&uid=".(int) $newUser['uid']."'>".htmlspecialchars($newUser['username'])."</a>", $announcement);
+				
+				// Prevent BAM from trying to nest a link inside of a link. 
+				if (!$querydata['link']) {
+					$announcement = str_replace('{newestmember_link}', "<a href='member.php?action=profile&uid=".(int) $newUser['uid']."'>".htmlspecialchars($newUser['username'])."</a>", $announcement);
+				}
+				else {
+					$announcement = str_replace('{newestmember_link}', htmlspecialchars($newUser['username'], ENT_QUOTES), $announcement);
+				}
 			}
 
 			// Parse additional variables. 
 			$announcement = str_replace('{$username}', $username, $announcement);
-			$announcement = parseThreadVariables($announcement);	// parses {threadreplies} to thread reply count. 		
-		}
+			$announcement = parseThreadVariables($announcement);	// parses {threadreplies} to thread reply count. 
+		}		
 
 		
 		// If the announcement is not stickied and dismissals are enabled, set whether dismissal closes the announcement permanently or temporarily.  
 		// If the announcement is stickied, never allow dismissals.
 		if (($querydata['pinned'] == 0) && (int) $mybb->settings['bam_enable_dismissal'] > 0) {
-			$bam_unsticky = "bam-unsticky";
+			$bam_unsticky = 'bam-unsticky';
 
 			// Set dismissals are permanent. 
 			if ((int) $mybb->settings['bam_enable_dismissal'] == 1) {
-				$display_close = "dismiss-notification";
+				$display_close = 'dismiss-notification';
 			}
 
 			// Set dismissals as temporary. When dismissed, the announcement returns on the next page load. 
 			else if ((int) $mybb->settings['bam_enable_dismissal'] == 2){
-				$display_close = "bam-close-notification";
+				$display_close = 'bam-close-notification';
 			}
 
 			// BAM is set to dismiss with a cookie, but only if the user is logged in. This is the default setting.  
 			else if ((int) $mybb->settings['bam_enable_dismissal'] == 3){
 				if (!empty($mybb->user['uid'])) {
-					$display_close = "dismiss-notification"; // close and dismiss with cookie. 
+					$display_close = 'dismiss-notification'; // close and dismiss with cookie. 
 				}
 				else {
-					$display_close = "bam-close-notification"; // user is a guest. Close only. 
+					$display_close = 'bam-close-notification'; // user is a guest. Close only. 
 				}
 			}
 			// Invalid value defined in setting. Handle this by disabling dismissal.  
 			else {
-				$display_close = "bam_nodismiss";				
+				$display_close = 'bam_nodismiss';				
 			}
 		
 		// If the announcement is "sticky," never show the dismissal button. 
 		} else {
-			$display_close = "bam_nodismiss";
-			$bam_unsticky = "";
+			$display_close = 'bam_nodismiss';
+			$bam_unsticky = '';
 		}
+
+		$announcementTemplate = 'bam_announcement';
 
 		// New in BAM 2.0. Tags are now supported to enable announcements only for specific themes and languages. 
 		// These preg_replace statements remove the tag itself once its value has been parsed. 
+		// We only attempt to check for directives if we have [@ in an announcement. Performance optimization.  
 
-		$themesEnabled = bamExplodeThemes($announcement);
-		$languagesEnabled = bamExplodeLanguages($announcement);
-		$announcement = preg_replace('/\[@themes:([a-zA-Z0-9_]*)\]/', "", $announcement);	
-		$announcement = preg_replace('/\[@languages:([a-zA-Z0-9_]*)\]/', "", $announcement);
-		
-		// Parse a special directive that disables an announcement. Unofficial feature. 
-		if (strpos("-".$announcement, "[@disabled]")) {
-			break; 
-		}	
+		if (strpos("-".$announcement, '[@')) {
+			$themesEnabled = bamExplodeThemes($announcement);
+			$languagesEnabled = bamExplodeLanguages($announcement);
+			$announcement = preg_replace('/\[@themes:([a-zA-Z0-9_]*)\]/', "", $announcement);	
+			$announcement = preg_replace('/\[@languages:([a-zA-Z0-9_]*)\]/', "", $announcement);
+			
+			// Parse a special directive that disables an announcement. Unofficial feature. 
+			if (strpos("-".$announcement, '[@disabled]')) {
+				break; 
+			}	
 
-		// Directive allows you to define a different template for this announcement. Useful if you need javascript in announcement. 
-		if (strpos("-".$announcement, "[@template:")) { 
-			$announcementTemplate = bamExplodeTemplates($announcement); 
-			$announcement = preg_replace('/\[@template:([a-zA-Z0-9_]*)\]/', "", $announcement);	
+			// Directive allows you to define a different template for this announcement. Useful if you need javascript in announcement. 
+			if (strpos("-".$announcement, '[@template:')) { 
+				$announcementTemplate = bamExplodeTemplates($announcement); 
+				$announcement = preg_replace('/\[@template:([a-zA-Z0-9_]*)\]/', "", $announcement);	
+			}
 		}
-		else {
-			// Default template. 
-			$announcementTemplate = "bam_announcement";
-		}
 
-		$class = "bam_announcement " . htmlspecialchars($querydata['class'], ENT_QUOTES); // parse class/style
+		$class = 'bam_announcement ' . htmlspecialchars($querydata['class'], ENT_QUOTES); // parse class/style
 		$forums = $querydata['forums']; // fetch forum list, if enabled. 
 
 		if ($mybb->settings['bam_date_enable'] == 1) {
@@ -678,9 +692,16 @@ function bam_announcements () {
 
 			// New in BAM 2.0: Random announcements are no longer rendered as normal announcements if random mode is disabled. 
 			if((($querydata['random'] == 0) && (bam_display_permissions($querydata['groups']))) && (checkAnnouncementDisplay($data[$count]))) {
-				
+
 				// If the announcement isn't random, we need to check if the theme and language is enabled. If so, render. 
 				if (bamThemeEnabled($data[$count]['themesEnabled']) && bamLanguageEnabled($data[$count]['languagesEnabled'])) {
+
+					// Check if we have cached templates yet. If not, cache both templates at once. 
+					// MyBB does not cache templatelist on plugins that hook into global_start, so this is necessary instead.
+					// Even though a query is still needed to fetch the template, we save 3-4ms by fetching both at once!  
+
+					$announcementCount++; 
+					bam_cache_templates($announcementCount); 
 					eval("\$announcements .= \"".$templates->get($data[$count]['template'])."\";");
 				}
 			}
@@ -704,20 +725,40 @@ function bam_announcements () {
 			// handle whether random announcements can be closed: 
 
 			if ($mybb->settings['bam_random_dismissal'] == 1) {
-				$bam_unsticky = "bam-unsticky";
-				$display_close = "bam-close-notification"; // alternative close function used in javascript. 
+				$bam_unsticky = 'bam-unsticky';
+				$display_close = 'bam-close-notification'; // alternative close function used in javascript. 
 			} else {
 				// Dismissals of random announcements are disabled. Make sure we don't display close button. 
-				$bam_unsticky = ""; 
-				$display_close = "bam_nodismiss";
+				$bam_unsticky = ''; 
+				$display_close = 'bam_nodismiss';
 			}
+
+			// If this is the first time we are displaying an announcement, cache both templates at once. 
+			// MyBB doesn't cache templatelist for plugins that hook into global_start, so this is necessary instead. 
+			// This saves 3-4 ms of loading time! 
+			$announcementCount++; 
+			bam_cache_templates($announcementCount);
+
 			eval("\$announcements .= \"".$templates->get($data[$ID]['template'])."\";");
 			$count_unpinned++;
 		}
 	}
 
 	$bam_custom_css = $mybb->settings['bam_custom_css']; 
-	eval("\$bam_announcements = \"".$templates->get("bam_announcement_container")."\";");
+	eval("\$bam_announcements = \"".$templates->get('bam_announcement_container')."\";");
+}
+
+function bam_cache_templates ($count) {
+	global $templates; 
+
+	// MyBB, very oddly, does not allow templates to be pre-cached for plugins that hook into global_start
+	// While full pre-caching is not possible, we can still run one query instead of two by loading both at the start. 
+	// This saves approx. 3-4ms of loading time!
+
+	if ($count == 1) {
+		// Only cache on the first announcement rendered. Don't need to recache! 
+		$templates->cache('bam_announcement,bam_announcement_container');
+	}
 }
 
 // create menu link in ACP
@@ -762,8 +803,8 @@ function bamThemeEnabled($themes) {
 function bamExplodeThemes($announcementText) { 
 	$matched_themes_raw = "";
 	if(preg_match('/\[@themes:([a-zA-Z0-9_]*)\]/', $announcementText, $matched_themes_raw)) {
-		$matched_themes_raw = str_replace("[@themes:", "", $matched_themes_raw[0]);
-		$matched_themes_raw = str_replace("]", "", $matched_themes_raw);
+		$matched_themes_raw = str_replace('[@themes:', '', $matched_themes_raw[0]);
+		$matched_themes_raw = str_replace(']', '', $matched_themes_raw);
 		$explodedThemes = explode(',', $matched_themes_raw);
 		$processedThemes = array_map('trim',$explodedThemes);
 		return $processedThemes;
@@ -812,8 +853,8 @@ function bamLanguageEnabled($languages) {
 function bamExplodeLanguages($announcementText) { 
 	$matched_languages_raw = "";
 	if(preg_match('/\[@languages:([a-zA-Z0-9_]*)\]/', $announcementText, $matched_languages_raw)) {
-		$matched_languages_raw = str_replace("[@languages:", "", $matched_languages_raw[0]);
-		$matched_languages_raw = str_replace("]", "", $matched_languages_raw);
+		$matched_languages_raw = str_replace('[@languages:', '', $matched_languages_raw[0]);
+		$matched_languages_raw = str_replace(']', '', $matched_languages_raw);
 		$explodedLanguages = explode(',', $matched_languages_raw);
 		$processedLanguages = array_map('trim',$explodedLanguages);
 		return $processedLanguages;
@@ -824,10 +865,10 @@ function bamExplodeLanguages($announcementText) {
 // Search the announcement's text for a templates tag. If so, return an array with a single template. 
 
 function bamExplodeTemplates($announcementText) { 
-	$matched_template_raw = "";
+	$matched_template_raw = '';
 	if(preg_match('/\[@template:([a-zA-Z0-9_]*)\]/', $announcementText, $matched_template_raw)) {
-		$matched_template_raw = str_replace("[@template:", "", $matched_template_raw[0]);
-		$matched_template_raw = str_replace("]", "", $matched_template_raw);
+		$matched_template_raw = str_replace('[@template:', '', $matched_template_raw[0]);
+		$matched_template_raw = str_replace(']', '', $matched_template_raw);
 
 		// Remove non alphanumeric characters for security. 
 		$processedTemplate = preg_replace( '/[\W]_/', '', $matched_template_raw); 
@@ -852,19 +893,19 @@ function parseThreadVariables($announcementText) {
 	global $current_page, $mybb; 
 
 	// Check to make sure we are on showthread.php and we have a thread to display. 
-	if ($current_page == "showthread.php" && (int) $_GET['tid'] != null) {
+	if ($current_page == 'showthread.php' && (int) $_GET['tid'] != null) {
 
 		// Get the thread from the database. 
 		$threadID = (int) $mybb->input['tid'];
 		$thread = get_thread($threadID);
 		
 		// Parse number of replies in thread. Primarily useful for forum games. 
-		if (strpos("-".$announcementText, "{threadreplies}")) {
-			return str_replace("{threadreplies}", number_format((int) $thread['replies']), $announcementText); // replace variable and return. 
+		if (strpos("-".$announcementText, '{threadreplies}')) {
+			return str_replace('{threadreplies}', number_format((int) $thread['replies']), $announcementText); // replace variable and return. 
 		}
 
 		// Parse the counting thread. This is similar to above, but attempts to correct invalid counts.
-		else if (strpos("-".$announcementText, "{countingthread}")) {
+		else if (strpos("-".$announcementText, '{countingthread}')) {
 
 			// We are going to try to determine the correct count for the counting thread based on previous replies. 
 			// This is an easter egg feature! Very useful for forum games where users frequently get off count. 
@@ -899,7 +940,7 @@ function parseThreadVariables($announcementText) {
 			$leadingKey = array_search($leadingNumber, $arrayofNumbers);
 			$numPostsAway = count($arrayofNumbers) - $leadingKey; 
 			$finalValue = number_format((int) ($arrayofNumbers[$leadingKey] + $leadingKey));
-			return str_replace("{countingthread}", $finalValue, $announcementText);
+			return str_replace('{countingthread}', $finalValue, $announcementText);
 		}
 	}
 	
@@ -972,16 +1013,16 @@ function bam_display_permissions ($display_groups) {
 	}
 
 	// No need to check for permissions if all groups are allowed. 
-	if ($display_groups == "-1") {
+	if ($display_groups == '-1') {
 		return true; 
 	}
 
 	// Create an array of all usergroups that the current user is a member of. 
 	$usergroup = $mybb->user['usergroup'];
-	$allowed = explode(",", $display_groups);
+	$allowed = explode(',', $display_groups);
 	$groups = array();
 	$groups[0] = (int)$usergroup; 
-	$add_groups = explode(",", $mybb->user['additionalgroups']);
+	$add_groups = explode(',', $mybb->user['additionalgroups']);
 	$count = 1;
 	foreach($add_groups as $new_group) {
 		$groups[$count] = $new_group;
@@ -1016,7 +1057,7 @@ function checkAnnouncementDisplay($announcement) {
 	else if (($announcement['forums'] != null)  && ($announcement['global'] == 2)) {
 		
 		// Check if all forums are enabled. If so, enable the announcement. 
-		if (($announcement['forums'] == "*" || $announcement['forums'] == "-1") && ((int) $_GET['fid'] != null)) {
+		if (($announcement['forums'] == '*' || $announcement['forums'] == '-1') && ((int) $_GET['fid'] != null)) {
 			return true; 
 		}
 
@@ -1094,7 +1135,7 @@ function isAlternatePageValid($announcement) {
 		// this plugin to display on pages that it has not been designed to display on. 
 
 		$url_parameters = parse_url($additional_display_page);
-		$announcementFileName = basename($url_parameters["path"]);
+		$announcementFileName = basename($url_parameters['path']);
 
 		// First, we check to see if we are on the correct PHP file/page (e.g. index.php, forumdisplay.php, etc.)
 		if ($announcementFileName == $current_page) {
@@ -1133,7 +1174,7 @@ function isAlternatePageValid($announcement) {
 				else {
 					
 					// Scan additional_display_pages to see if the URL parameter exists in the setting. If so, reject the announcement. 
-					$unsetURLParam = $parameter . "=";
+					$unsetURLParam = $parameter . '=';
 					if (strstr($additional_display_page, $unsetURLParam, false)) {
 						$paramCheck = false; 
 					}

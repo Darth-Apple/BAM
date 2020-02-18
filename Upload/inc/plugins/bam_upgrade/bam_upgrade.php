@@ -8,8 +8,8 @@
         * in the activate function, or using standalone scripts. (I lied. )
         * It also has the added bonus of allowing a BAM upgrade to run completely interuption-free. 
         *
-        * BAM first checks in the bam_info() function on whether the database has been upgraded.   
-        * If not, it replaces the plugin's description with an upgrade link to notify the administrator.  
+        * If BAM 2 is uploaded, it first checks in bam_info() if the database has been updated  
+        * If not, it replaces the plugin's description with the upgrade script link to notify the administrator.  
         * Once the upgrade link is launched, /admin/modules/config/bam.php checks for this link and verifies the POST CODE. 
         * If it matches, it includes this file, and calls the bam_upgrade() function below. 
         * 
@@ -21,6 +21,10 @@
         * if BAM 2's files have been uploaded to the server without running the upgrade script. 
         * This allows the BAM 2 code base to operate correctly on the front end of the forum, 
         * even if the database and templates have not been updated yet. Announcements will still display with no interruptions.  
+        *
+        * So the in place upgrader, in short, can detect if BAM 2 is uploaded but it is still running
+        * on BAM 1's templates and database. It is designed for this, and will still run flawlessly
+        * until the built-in upgrader is run. 
         *
         * This sounds complicated, but it works seamlessly! From the administrator's perspective, 
         * they simply upload, click the upgrade link, and they are done! 

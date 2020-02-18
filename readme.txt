@@ -1,5 +1,8 @@
 Notice: This is a beta version. If you would like to test on a live board, please report any bugs that you discover! Full release is coming soon! 
 
+WARNING: There are a few known issues with the upgrader at this time. If you choose to use this plugin on a live board, please perform an upgrade from BAM 1 with a full uninstall-reinstall. These issues will be resolved before the final release! 
+
+---- ---- ---- ---- 
 BAM Announcements Manager has been updated, and is better than ever before! This plugin allows you to manage announcements on your forum’s header area, specific boards, or on any page of your community. These are styled based on the announcements used on the MyBB Support Forum, so if you’ve been looking for a plugin to make similar announcements, this plugin is the answer to your requests! 
 
 
