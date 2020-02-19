@@ -35,7 +35,7 @@ This is a new feature in BAM 2.0 that allows you to paste a link to a specific p
 THINGS BAM EXPLICITLY PARSES: 
 
  - Any page's .php filename. If the ONLY thing in this field is this filename (such as portal.php, forumdisplay.php, etc.), BAM will display your announcement on EVERY page that includes this filename. This, for example, is how you can display announcements only on the portal, or on all boards. 
- - any fid (forum/board ID), tid (thread ID), uid (user ID) or action (usually a page). 
+ - any fid (forum/board ID), tid (thread ID), uid (user ID), gid (usergroup ID), or action (usually a page). 
 
 EXAMPLES: 
 
@@ -181,7 +181,7 @@ INSTALLATION:
 EASTER EGGS AND EXTRAS: 
 -------------------------------------------------------
 
- - Can create a banner with the CORRECT count on your counting thread (forum games), even if the count in your thread is offset from the actual reply count. Use the {countingthread} variable to enable this functionality. To demonstrate, try posting the wrong count in your counting thread. 
+ - Can create a banner with the CORRECT count on your counting thread (forum games), even if the count in your thread is offset from the actual reply count. Use the {countingthread} variable to enable this functionality. To demonstrate, try posting the wrong count in your counting thread. To use this feature, you will need to paste the link to your counting thread in the "Custom Pages and Parameters" field. 
 
  - {newmember} and {newmember_link} parse to the username and the profile link of the newest registered member, respectively. 
 
@@ -189,8 +189,7 @@ EASTER EGGS AND EXTRAS:
 
  - Both BAM 1.0 and 2.0 allow you to turn your announcement into a link without the use of BBcode. Simply paste a link into the URL field!
 
- - Create a Marquee announcement (unofficial feature). Put [@marquee:left, 10] to make a marquee that scrolls towards the left, with a scroll speed of 10. 
-
+ - Put [@marquee:left, 10] anywhere in your announcement's text to turn it into a marquee (unofficial feature). In this case, it will scroll towards the left, with a scroll speed of 10. 
 
 Copyright: 
 
