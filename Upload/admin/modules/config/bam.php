@@ -397,20 +397,6 @@
 		$clength = 0;
 		$ulength = 0; 
 
-		// Make sure inputs aren't too long. Display error if so. 
-		if (isset($mybb->input['announcement'])) {
-			$alength = strlen($mybb->input['announcement']);
-		}
-		if (isset($mybb->input['additional_pages'])) {
-			$plength = strlen($mybb->input['additional_pages']);
-		}
-		if (isset($mybb->input['custom_class'])) {
-			$clength = strlen($mybb->input['custom_class']);
-		}
-		if (isset($mybb->input['url'])) {
-			$ulength = strlen($mybb->input['url']);
-		}
-
 		if ($alength > 1023) {
 			flash_message($lang->bam_announcement_too_long, 'error');
 			admin_redirect('index.php?module=config-bam');
@@ -430,27 +416,6 @@
 			flash_message($lang->bam_announcement_link_too_long, 'error');
 			admin_redirect('index.php?module=config-bam');
 		}
-
-		if ($alength > 1023) {
-			flash_message($lang->bam_announcement_too_long, 'error');
-			admin_redirect('index.php?module=config-bam');
-		}
-
-		if ($plength > 511) {
-			flash_message($lang->additional_pages_too_long, 'error');
-			admin_redirect('index.php?module=config-bam');
-		}
-
-		if ($clength > 39) {
-			flash_message($lang->bam_class_too_long, 'error');
-			admin_redirect('index.php?module=config-bam');
-		}
-
-		if ($ulength > 159) {
-			flash_message($lang->bam_announcement_link_too_long, 'error');
-			admin_redirect('index.php?module=config-bam');
-		}
-
 
 		// Check if we're editing a non-random-mode announcement. 
 		if ($mybb->input['announcement_type'] == "standard") {
@@ -697,7 +662,6 @@
 		admin_redirect('index.php?module=config-bam');
 	}
 		
-
 	/* This page handles the add announcement functionality... */
 
 	if ($mybb->input['action'] == "add") {

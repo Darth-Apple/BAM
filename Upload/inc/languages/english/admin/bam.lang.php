@@ -40,6 +40,8 @@ $l['bam_welcome'] = "[b]BAM+ 2.0 has successfully been installed![/b] You may no
 $l['bam_date_enable'] = "Display Announcement Date?";
 $l['bam_date_desc'] = "If enabled, BAM will display the date posted for announcements. ";
 
+$l['bam_slidedown_enable'] = "Enable Slidedown Effect?";
+$l['bam_slidedown_enable_desc'] = "When enabled, announcements will slide down on a new page load. Note that this setting gives the browser time to remove dismissed announcements before displaying them. If this setting is disabled, these announcements might briefly flash on the screen.";
 // 2.0 
 
 $l['bam_enable_dismissal'] = "Announcement Dismissals: ";
@@ -153,17 +155,17 @@ $l['bam_list_display_forums'] = "Display on specific forums/boards";
 $l['bam_list_display_special'] = "Other (advanced - define below)";
 $l['bam_make_global'] = "Make This Announcement Global?";
 $l['bam_make_global_desc'] = "Select whether this announcement will be made global. Global announcements are displayed on all pages, regardless of any other settings or constraints. ";
-$l['bam_additional_pages'] = "Define Custom Pages and Parameters (Advanced Users): ";
+$l['bam_additional_pages'] = "Custom Pages and Parameters (Advanced): ";
 $l['bam_has_additional_pages'] = "This announcement has custom display settings.";
-$l['bam_additional_pages_desc'] = "<b>Set custom pages to display your announcement on. </b>
+$l['bam_additional_pages_desc'] = "<b>Paste links to specific pages to display this announcement on. </b>
  Note that this setting overrides all other announcement settings regarding where this announcement is posted.
-<i>This announcement will only display on pages that are explicitely defined here. You can also copy/paste full links, if desired. </i><br /><br />
+<i>This announcement will only display on pages that are explicitely defined here. </i>Separate multiple pages with a comma. <br /><br />
 
 <b>Examples:</b> <br />
   - \"forumdisplay.php, index.php\" &nbsp;&nbsp;&nbsp;&nbsp; -- <i>Display on index.php and forumdisplay.php only</i><br />
   - \"forumdisplay.php?fid=2\" &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -- <i>Display this announcement on forumdisplay.php, but only if the fid is 2.</i><br /><br />
   <b>Supported pages: </b> Any .php page within your forum's directory. <br />
-  <b>URL parameters supported: </b> action, uid, tid, fid. All other URL parameters will be ignored. See documentation for details. <br />";
+  <b>URL parameters supported: </b> action, uid, tid, fid, gid. All other URL parameters will be ignored. See documentation for details. <br />";
 
 $l['bam_random_select'] = "Random Mode Announcement";
 $l['bam_standard_select'] = "Static Announcement (always display)";

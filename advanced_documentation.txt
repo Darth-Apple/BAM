@@ -70,7 +70,7 @@ THINGS BAM EXPLICITLY IGNORES:
 THINGS BAM EXPLICITLY PARSES: 
 
  - Any page's .php filename. If the ONLY thing in this field is this filename (such as portal.php, forumdisplay.php, etc.), BAM will display your announcement on EVERY page that includes this filename. This, for example, is how you can display announcements only on the portal, or on all boards. 
- - any fid (forum/board ID), tid (thread ID), uid (user ID) or action (usually a page). 
+ - any fid (forum/board ID), tid (thread ID), uid (user ID), gid (group ID), or action (usually a page). 
 
 EXAMPLES: 
 

@@ -1,4 +1,8 @@
 <?php
+
+if(!defined("IN_MYBB")) {
+	die("Standalone upgrader not supported. Please run through your ACP. "); // direct access to this file not allowed. 
+}
     /* HOW THIS WORKS: 
         *
         * BAM's upgrader is fully in-place, meaning it runs while the plugin is activated. 
@@ -21,10 +25,6 @@
         * if BAM 2's files have been uploaded to the server without running the upgrade script. 
         * This allows the BAM 2 code base to operate correctly on the front end of the forum, 
         * even if the database and templates have not been updated yet. Announcements will still display with no interruptions.  
-        *
-        * So the in place upgrader, in short, can detect if BAM 2 is uploaded but it is still running
-        * on BAM 1's templates and database. It is designed for this, and will still run flawlessly
-        * until the built-in upgrader is run. 
         *
         * This sounds complicated, but it works seamlessly! From the administrator's perspective, 
         * they simply upload, click the upgrade link, and they are done! 
