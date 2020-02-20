@@ -27,9 +27,13 @@ if(!defined("IN_MYBB")) {
 	die("Hacking attempt detected. Server responded with 403. "); // direct access to this file not allowed. 
 }
 
+// Create hooks. 
 if ($mybb->settings['bam_enabled'] == 1) {
-	// old: start
-	$plugins->add_hook("global_intermediate", "bam_announcements"); // don't load announcements unless the plugin is enabled. 
+	if ($mybb->settings['bam_compatibility_mode'] != 1) {
+		$plugins->add_hook("global_intermediate", "bam_announcements"); // don't load announcements unless the plugin is enabled. 
+	} else {
+		$plugins->add_hook("pre_output_page", "bam_announcements_compatibility"); 
+	}
 }
 
 $plugins->add_hook("admin_config_menu", "bam_config_menu");
@@ -190,6 +194,12 @@ function bam_install () {
 	.bam_slidedown {
 		display: none;
 	}
+
+	.bam_wrapper {
+		width: 100%; 
+		display: inline-block;
+		margin-bottom: 10px;
+	}
 	
 	{$bam_custom_css}
 </style>
@@ -237,7 +247,7 @@ function bam_install () {
 	}
 	});
 </script>
-<div class="bam_announcements {$slidedown}">{$announcements}</div>';
+<div class="bam_wrapper"><div class="bam_announcements {$slidedown}">{$announcements}</div></div>';
 		
 		// Create the BAM announcement template used for each individual announcement. 
 		$template['bam_announcement'] = '<p class="{$bam_unsticky} {$class}" id="announcement-{$bcprefix}{$announcement_id}">{$announcement} <span class="bam_date">{$date}</span>
@@ -405,6 +415,17 @@ function bam_install () {
 			'gid' => $group['gid']
 		);
 
+		$new_config[] = array(
+			'name' => 'bam_compatibility_mode',
+			'title' => $db->escape_string($lang->bam_compatibility_mode),
+			'description' => $db->escape_string($lang->bam_compatibility_mode_desc),
+			'optionscode' => 'onoff',
+			'value' => '0',
+			'disporder' => 15,
+			'isdefault' => 1,
+			'gid' => $group['gid']
+		);
+
 		// insert settings to the database. 
 
 		foreach($new_config as $array => $setting) {
@@ -482,7 +503,7 @@ function bam_is_updated_noquery () {
 
 // Primary BAM announcements function. Parses announcements on forum pages. 
 
-function bam_announcements () {
+function bam_announcements ($compatibility = null) {
 	global $mybb, $db, $templates, $bam_announcements, $lang; //, $theme; //, $bam_announcement_container;
 
 	require_once MYBB_ROOT.'/inc/class_parser.php';
@@ -547,7 +568,6 @@ function bam_announcements () {
 
 			$announcement = bam_parse_user_variables($announcement, $querydata['link']);
 			$dismissClass = bam_build_dismiss_class($querydata);
-			$announcement = parseMarquee($announcement);
 
 			$display_close = $dismissClass[0];
 			$bam_unsticky = $dismissClass[1];
@@ -591,15 +611,10 @@ function bam_announcements () {
 			else {
 				// Are we trying to render a random mode announcement? 
 				if(($mybb->settings['bam_random'] == 1) && ($querydata['random'] == 1)) {
-					$unpinned_ids[] = $count;
-					// $total_unpinned++;	
+					$unpinned_ids[] = $count;	
 				}
 				// Are we rendering a normal announcement? 
 				else {
-						$announcementCount++; 
-						// Cache both templates at once if this is our first announcement. Performance optimization. 
-						bam_cache_templates($announcementCount); 
-						// echo "<br />announcement: " . $announcement;
 						eval("\$announcements .= \"".$templates->get($tagParser[1]['template'])."\";");
 				}
 			}
@@ -632,10 +647,6 @@ function bam_announcements () {
 				$bam_unsticky = ''; 
 				$display_close = 'bam_nodismiss';
 			}
-
-			// Handle template caching if required. 
-			$announcementCount++; 
-			bam_cache_templates($announcementCount);
 			
 			eval("\$announcements .= \"".$templates->get($data[$ID]['template'])."\";");
 			
@@ -652,21 +663,29 @@ function bam_announcements () {
 	$bam_custom_css = $mybb->settings['bam_custom_css']; 
 	
 	eval('$bam_announcements = "'.$templates->get('bam_announcement_container').'";');
-}
-
-// MyBB, very oddly, does not allow templates to be pre-cached for plugins that hook into global_start
-// While full pre-caching is not possible, we can still run one query instead of two by loading both at the start. 
-// This saves approx. 3-4ms of loading time!
-
-function bam_cache_templates ($count) {
-	global $templates;
-	return; 
-	if ($count == 1) {
-		// Only cache on the first announcement rendered. Don't need to recache! 
-		$templates->cache('bam_announcement,bam_announcement_container');
+	
+	// Check if we are using the pre_output_page hook instead. 
+	// This forces announcements into the page and guesses if it can't find the variable. 
+	// This gives less control on where announcements get posted, but can get BAM working without further template modifications on themes where the activation modifications fail.
+	if ($compatibility != null) {
+		return $bam_announcements;
 	}
 }
 
+// Compatibility function that uses pre_output_page hook. 
+
+function bam_announcements_compatibility (&$page) {
+
+	// Replace page's final output and add announcements. 
+	$announcements = bam_announcements(1);
+	$bam_page = strtr($page, array('<!-- BAM -->' => $announcements));
+	
+	// Check if the replacement failed. If so, try to guess on where to put announcements. 
+	if ($bam_page == $page) {
+		$bam_page = strtr($page, array('<!-- start: nav -->' => $announcements . ' <!-- start: nav -->')); 
+	}
+	return $bam_page; 
+}
 
 function bam_parse_date($querydata) {
 	global $mybb; 
@@ -1023,11 +1042,7 @@ function bamExplodeThemes($announcementText) {
 	$matched_themes_raw = "";
 	if(preg_match('/\[@themes:([a-zA-Z0-9 ,_]*)\]/', $announcementText, $matched_themes_raw)) {
 		$matched_themes_raw = strtr($matched_themes_raw[0], array('[@themes:' => '', ']' => ''));
-		// $explodedThemes = explode(',', $matched_themes_raw);
-		// $processedThemes = array_map('trim',$explodedThemes);
-		// return $processedThemes;
 		return array_map('trim',explode(',', $matched_themes_raw));
-		// return $processedThemes;
 	}
 	return null;
 }
@@ -1080,10 +1095,6 @@ function bamExplodeTemplates($announcementText) {
 	
 	if(preg_match('/\[@template:([a-zA-Z0-9 _]*)\]/', $announcementText, $matched_template_raw)) {
 		$matched_template = strtr($matched_template_raw[0], array('[@template:' => '', ']' => ''));
-		// $matched_template_raw = str_replace('[@template:', '', $matched_template_raw[0]);
-		// $matched_template_raw = str_replace(']', '', $matched_template_raw);
-		// $explodedTemplate = explode(',', $matched_template_raw);
-		// $processedTemplate = array_map('trim',$explodedTemplate);
 
 		// Remove non alphanumeric characters for security. 
 		return trim(preg_replace( '/[\W]/', '', $matched_template));
@@ -1247,29 +1258,6 @@ function getThreadData($threadID) {
     ORDER BY p.dateline DESC LIMIT 0,50");
 }
 
-// Parses Marquee tag. Unofficial feature. 
-
-function parseMarquee($announcementText) { 
-	$marquee_raw = "";
-	if(preg_match('/\[@marquee:([a-zA-Z0-9_, ]*)\]/', $announcementText, $marquee_raw)) {
-		$marquee_raw = strtr($marquee_raw[0], array('[@marquee' => '', ']' => ''));
-		$marquee_exploded = explode(',', $marquee_raw);
-		$processedMarquee = array_map('trim',$marquee_exploded);
-		$processedMarquee = htmlspecialchars($processedMarquee[0], ENT_QUOTES);
-
-		// $processedMarquee = htmlspecialchars(array_map('trim',$marquee_exploded), ENT_QUOTES);
-		
-		if (!isset($marquee_exploded[1])) {
-			$speed = 5; 	
-		}
-		else {
-			$speed = (int) $marquee_exploded[1];
-		}
-		$announcementText = preg_replace('/\[@marquee:([a-zA-Z0-9_, ]*)\]/', "", $announcementText);
-		return '<marquee direction="'.$processedMarquee.'" scrollamount="'.$speed.'" style="text-align: center;">'.$announcementText.'</marquee>'; 
-	}
-	return $announcementText;
-}
 
 /* ADMIN CP HOOKS */
 

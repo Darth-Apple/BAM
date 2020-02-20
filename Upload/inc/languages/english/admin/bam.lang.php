@@ -119,7 +119,7 @@ $l['bam_custom'] = "Custom (Define Below)";
 $l['bam_form_style'] = "Style/Color Class: ";
 $l['bam_form_style_desc'] = "Select the color and style for your announcement. ";
 $l['bam_form_class_custom'] = "Custom CSS Classes: ";
-$l['bam_form_class_custom_desc'] = "Enter custom CSS classes to be used instead of BAM's built in styles. You can enter multiple values separated by a space. ";
+$l['bam_form_class_custom_desc'] = "Enter custom CSS classes to be used instead of BAM's built in styles (you can separate multiple values with a space). <i>You must define these classes either in your theme's CSS, or in BAM's plugin settings. </i> See documentation for details.";
 
 // This is entered into javascript, so make sure there are no new lines in the string that is generated if you translate this. 
 $l['bam_remove_custom_class'] = "<i><font color=\'red\'>You must remove custom classes before setting a predefined color style. ";
@@ -159,7 +159,7 @@ $l['bam_additional_pages'] = "Custom Pages and Parameters (Advanced): ";
 $l['bam_has_additional_pages'] = "This announcement has custom display settings.";
 $l['bam_additional_pages_desc'] = "<b>Paste links to specific pages to display this announcement on. </b>
  Note that this setting overrides all other announcement settings regarding where this announcement is posted.
-<i>This announcement will only display on pages that are explicitely defined here. </i>Separate multiple pages with a comma. <br /><br />
+<i>This announcement will only display on pages that are explicitely defined here. </i>You may paste full links or partial links (as shown below). Separate multiple pages with a comma. <br /><br />
 
 <b>Examples:</b> <br />
   - \"forumdisplay.php, index.php\" &nbsp;&nbsp;&nbsp;&nbsp; -- <i>Display on index.php and forumdisplay.php only</i><br />
@@ -206,7 +206,7 @@ $l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; {threadrepl
 $l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; {countingthread} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Experimental. Parses to current count in forum games/counting threads. Attempts to resolve and determine actual count if a user posts the wrong count. </i>";
 
 $l['bam_announcement_tags_alert'] .= "<br /><br /><b>Announcement Directives: </b><br />";
-$l['bam_announcement_tags_alert'] .= "&nbsp;&nbsp;&nbsp;&nbsp;These directives give BAM additional information on where to display announcements. These are experimental. <br />";
+$l['bam_announcement_tags_alert'] .= "&nbsp;&nbsp;&nbsp;&nbsp;These directives give BAM additional information on where to display announcements. These are experimental. See readme for examples. <br />";
 $l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; [@themes:1,2] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Display announcement only on theme IDs 1 and 2. </i>";
 $l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; [@languages:espanol] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Show announcement only in Spanish (or any language you choose). </i>";
 $l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; [@template:custom] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Use an alternative global template for this announcement (Advanced - use if you need javascript).</i>";
@@ -239,3 +239,16 @@ You may launch the upgrader below. </font>
 <i>(BAM's upgrader is specifically designed to operate in-place, meaning that it performs the migration when BAM is activated. 
 This enables BAM to load its upgrade script from directly within your Admin Control Panel. 
 This will run seamlessly, and your announcements will display without interruptions on your forum!)</i><br />";
+
+$l['bam_compatibility_mode'] = "Compatibility Mode (Advanced): ";
+$l['bam_compatibility_mode_desc'] = "<b>Leave this setting at its default if unsure. </b>BAM's default template variables and plugin hooks are designed to ensure 
+the best possible compatibility with the majority of MyBB forums. Occasionally, there will be compatibility issues with
+different plugins, untested versions of PHP, or heavily modified themes. If this setting is enabled, 
+BAM will attempt to render announcements using the \"pre_output_page\" hook instead of the standard global.php hook. 
+It is recommended to leave this setting at its default unless you experience issues. If compatibility issues persist even 
+in compatibility mode, request support on the MyBB community forums.";
+
+$l['bam_compatibility_mode_desc'] = "<b><u>Leave this at its default if unsure.</u></b> If enabled, this setting will force 
+BAM to render announcements when outputting the page, rather than during forum-header generation. This may occasionally resolve
+certain compatibility issues that may occur with untested versions of PHP or with conflicting plugins. This feature is considered experimental. Leave this setting at its default
+unless you experience issues.";

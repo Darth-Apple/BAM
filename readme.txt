@@ -130,7 +130,6 @@ I INSTALLED BAM, BUT THE ANNOUNCEMENTS DON'T DISPLAY.
 
     - BAM, (must like most other MyBB plugins), makes template modifications in order to display on your forum. The vast majority of themes can be modified by BAM's installer without issues. However, if your announcements don't display, see the installation instructions (below) for instructions on how to manually modify your template!
 
-
 ----------------------------------------------------
 ADDING CUSTOM STYLES/COLORS:
 ----------------------------------------------------
@@ -176,6 +175,18 @@ INSTALLATION:
  
   - This plugin adds a variable in your header template after the {$awaitingusers} variable on installation. On the default theme, this causes announcements to display before the page breadcrumbs. While this method seems to ensure the best compatibility of this plugin with various themes, some users may wish you have the announcements display after the breadcrumbs. To do this, simply find "<!-- BAM -->{$bam_announcements}<!-- /BAM -->" in your templates, and copy/paste this text to a new line after "<navigation>" in your header template. 
 
+-----------------------------------------------------
+COMPATIBILITY MODE (ADVANCED):  
+-----------------------------------------------------
+Leave this setting off unless you are unsure! 
+
+BAM's default variables, template modifications, and hooks (how BAM interacts with MyBB) have been designed to ensure the best possible compatibility with a wide variety of MyBB forums. Occasionally, these default values may cause compatibility issues with other plugins, themes, or specific versions of PHP. 
+
+This setting forces BAM to generate and render announcements at the end of page generation, immediately before sending to the browser. It will look for the normal BAM variable and replace it with the generated announcements container as usual. If this variable cannot be found (usually because of heavily modified themes), it will force the announcements above the navigation bar, even without the template variable. 
+
+This method can improve compatibility with heavily modified themes where BAM cannot appropriately modify the templates during activation. Additionally, it can occasionally resolve certain compatibility issues between some untested plugins that might conflict with BAM, and can resolve unexpected issues and bugs related to posting issues on your forum. 
+
+This setting is experimental. It may not work in all cases, and it is recommended to leave this setting off unless you have issues related to themes, plugins, or otherwise. In the vast majority of cases, standard mode can render announcements properly, and will generally be more stable than compatibility mode. 
 
 -------------------------------------------------------
 EASTER EGGS AND EXTRAS: 
@@ -188,8 +199,6 @@ EASTER EGGS AND EXTRAS:
  - Updated ACP interface that displays more information (with new icons) about where announcements will be posted. 
 
  - Both BAM 1.0 and 2.0 allow you to turn your announcement into a link without the use of BBcode. Simply paste a link into the URL field!
-
- - Put [@marquee:left, 10] anywhere in your announcement's text to turn it into a marquee (unofficial feature). In this case, it will scroll towards the left, with a scroll speed of 10. 
 
 Copyright: 
 
