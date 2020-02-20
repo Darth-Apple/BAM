@@ -182,7 +182,7 @@ Leave this setting off unless you are unsure!
 
 BAM's default variables, template modifications, and hooks (how BAM interacts with MyBB) have been designed to ensure the best possible compatibility with a wide variety of MyBB forums. Occasionally, these default values may cause compatibility issues with other plugins, themes, or specific versions of PHP. 
 
-This setting forces BAM to generate and render announcements at the end of page generation, immediately before sending to the browser. It will look for the normal BAM variable and replace it with the generated announcements container as usual. If this variable cannot be found (usually because of heavily modified themes), it will force the announcements above the navigation bar, even without the template variable. 
+This setting forces BAM to generate and render announcements at the end of page generation, immediately before sending to the browser. BAM will attempt to replace the standard BAM variable with your parsed announcements. If this variable cannot be found (usually because of heavily modified themes), it will force the announcements above the navigation bar, even without the template variable. 
 
 This method can improve compatibility with heavily modified themes where BAM cannot appropriately modify the templates during activation. Additionally, it can occasionally resolve certain compatibility issues between some untested plugins that might conflict with BAM, and can resolve unexpected issues and bugs related to posting issues on your forum. 
 

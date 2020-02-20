@@ -320,9 +320,9 @@ function bam_install () {
 		);
 
 		$new_config[] = array(
-			'name' => 'bam_date_enable',
-			'title' => $db->escape_string($lang->bam_date_enable),
-			'description' => $db->escape_string($lang->bam_date_desc),
+			'name' => 'bam_slidedown_enable',
+			'title' => $db->escape_string($lang->bam_slidedown_enable),
+			'description' => $db->escape_string($lang->bam_slidedown_enable_desc),
 			'optionscode' => 'yesno',
 			'value' => '1',
 			'disporder' => 6,
@@ -331,9 +331,9 @@ function bam_install () {
 		);
 
 		$new_config[] = array(
-			'name' => 'bam_slidedown_enable',
-			'title' => $db->escape_string($lang->bam_slidedown_enable),
-			'description' => $db->escape_string($lang->bam_slidedown_enable_desc),
+			'name' => 'bam_date_enable',
+			'title' => $db->escape_string($lang->bam_date_enable),
+			'description' => $db->escape_string($lang->bam_date_desc),
 			'optionscode' => 'yesno',
 			'value' => '1',
 			'disporder' => 7,

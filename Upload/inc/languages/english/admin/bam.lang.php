@@ -48,9 +48,7 @@ $l['bam_enable_dismissal'] = "Announcement Dismissals: ";
 $l['bam_enable_dismissal_desc'] = "Set how BAM should handle announcement dismissals.  
 If set to \"Close Only,\" announcements will return when the user revisits. \"Close and dismiss\" prevents the announcement from being displayed again. ";
 $l['bam_dismissal_days'] = "Dismissed Announcements Expiration: ";
-$l['bam_dismissal_days_desc'] = "Defines how many days a BAM announcement dismissal should last. Default value is 30.";
-$l['bam_guest_dismissal_enable'] = "Enable Guests to Dismiss Announcements?";
-$l['bam_guest_dismissal_enable_desc'] = "By default, guests cannot dismiss announcements, even if the announcement's settings allow it. Enable this setting if you want to allow guests to close announcements anyway. ";
+$l['bam_dismissal_days_desc'] = "Defines how many days a new BAM announcement dismissal should last. Default value is 30.";
 $l['bam_random_dismissal'] = "Enable Random Mode announcements to be dismissed?";
 $l['bam_random_dismissal_desc'] =  "Random mode handles announcement dismissals differently than standard mode. When an announcement is dismissed, it is simply removed from the page, and a new announcement will be loaded on the next page. This setting defines whether this behavior should be enabled, or whether dismissals should be completely disabled. <b> This setting only affects announcements that are created under random mode. Standard announcements follow normal settings. </b>";
 $l['bam_manage_popupmenu'] = "Manage";
@@ -195,8 +193,6 @@ $l['bam_manage_null'] = "No announcements found. ";
 $l['bam_manage_order_submit'] = "Update Display Orders";
 $l['bam_invalid_post_code'] = "Invalid post code detected. Please try again. ";
 
-$l['bam_cookie_notice'] = "This forum uses cookies. By browsing this forum, you are agreeing and consenting to the use of cookies. ";
-
 $l['bam_announcement_tags_alert'] = "<b>BAM supports additional tags and directives within announcements. </b> These will be parsed when your announcement is displayed. </b><br /><br />";
 $l['bam_announcement_tags_alert'] .= "<b>Variables: </b><br />";
 $l['bam_announcement_tags_alert'] .= "&nbsp;&nbsp;&nbsp;&nbsp; {username} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Parses to user\'s username (or Guest if they are not logged in).</i>";
@@ -250,5 +246,5 @@ in compatibility mode, request support on the MyBB community forums.";
 
 $l['bam_compatibility_mode_desc'] = "<b><u>Leave this at its default if unsure.</u></b> If enabled, this setting will force 
 BAM to render announcements when outputting the page, rather than during forum-header generation. This may occasionally resolve
-certain compatibility issues that may occur with untested versions of PHP or with conflicting plugins. This feature is considered experimental. Leave this setting at its default
+certain compatibility issues that may occur with untested versions of PHP, conflicting plugins, or highly modified themes. This feature is considered experimental. It is currently recommended to leave this setting off
 unless you experience issues.";
