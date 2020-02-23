@@ -16,7 +16,7 @@
      */
 
 
-	/*ini_set('display_errors', 1); ini_set('display_startup_errors', 1); error_reporting(E_ALL);*/
+	/*ini_set('display_errors', 1); ini_set('display_startup_errors', 1); error_reporting(E_ALL); */
 global $mybb;
 
 global $templatelist;
@@ -28,7 +28,7 @@ if(!defined("IN_MYBB")) {
 }
 
 // Create hooks. 
-if ($mybb->settings['bam_enabled'] == 1) {
+if (isset($mybb->settings['bam_enabled']) && $mybb->settings['bam_enabled'] == 1) {
 	if ($mybb->settings['bam_compatibility_mode'] != 1) {
 		$plugins->add_hook("global_intermediate", "bam_announcements"); // don't load announcements unless the plugin is enabled. 
 	} else {
@@ -38,6 +38,11 @@ if ($mybb->settings['bam_enabled'] == 1) {
 
 $plugins->add_hook("admin_config_menu", "bam_config_menu");
 $plugins->add_hook("admin_config_action_handler", "bam_confighandler");
+$plugins->add_hook("admin_config_permissions", "bam_admin_config_permissions");
+
+// BAM is incompatibile with the Google SEO function at this time. A stub function is included
+// if experienced developers would like to help extend BAM's functionality. Uncomment this hook to enable this. 
+// $plugins->add_hook("bam_replace_urls", "bam_google_SEO_rewrites"); 
 
 function bam_info() {
 	global $lang, $mybb, $plugins, $cache;
@@ -195,6 +200,12 @@ function bam_install () {
 		display: none;
 	}
 
+	.bam_round {
+		-webkit-border-radius: 20px;
+		-moz-border-radius: 20px;
+		border-radius: 20px;
+	}
+
 	.bam_wrapper {
 		width: 100%; 
 		display: inline-block;
@@ -279,7 +290,7 @@ function bam_install () {
 			'optionscode' => 'yesno',
 			'value' => '1',
 			'disporder' => 1,
-			'isdefault' => 1,
+			'isdefault' => 0,
 			'gid' => $group['gid']
 		);
 
@@ -290,6 +301,18 @@ function bam_install () {
 			'optionscode' => 'onoff',
 			'value' => '0',
 			'disporder' => 2,
+			'isdefault' => 0,
+			'gid' => $group['gid']
+		);
+
+
+		$new_config[] = array(
+			'name' => 'bam_round_announcements',
+			'title' => $db->escape_string($lang->bam_round),
+			'description' => $db->escape_string($lang->bam_round_desc),
+			'optionscode' => 'yesno',
+			'value' => '0',
+			'disporder' => 3,
 			'isdefault' => 1,
 			'gid' => $group['gid']
 		);
@@ -304,8 +327,8 @@ function bam_install () {
 2= '.$lang->bam_dismissal_closeonly.'
 0= '.$lang->bam_dismissal_disable,
 			'value' => '1',
-			'disporder' => 3,
-			'isdefault' => 1,
+			'disporder' => 4,
+			'isdefault' => 0,
 			'gid' => $group['gid']
 		); // bad indentation intentional
 
@@ -316,6 +339,7 @@ function bam_install () {
 			'optionscode' => 'text',
 			'value' => '30',
 			'disporder' => 5,
+			'isdefault' => 0,
 			'gid' => $group['gid']
 		);
 
@@ -326,7 +350,7 @@ function bam_install () {
 			'optionscode' => 'yesno',
 			'value' => '1',
 			'disporder' => 6,
-			'isdefault' => 1,
+			'isdefault' => 0,
 			'gid' => $group['gid']
 		);
 
@@ -337,7 +361,7 @@ function bam_install () {
 			'optionscode' => 'yesno',
 			'value' => '1',
 			'disporder' => 7,
-			'isdefault' => 1,
+			'isdefault' => 0,
 			'gid' => $group['gid']
 		);
 
@@ -348,7 +372,7 @@ function bam_install () {
 			'optionscode' => 'onoff',
 			'value' => '1',
 			'disporder' => 8,
-			'isdefault' => 1,
+			'isdefault' => 0,
 			'gid' => $group['gid']
 		);
 
@@ -359,7 +383,7 @@ function bam_install () {
 			'optionscode' => 'onoff',
 			'value' => '0',
 			'disporder' => 9,
-			'isdefault' => 1,
+			'isdefault' => 0,
 			'gid' => $group['gid']
 		);
 				
@@ -370,6 +394,7 @@ function bam_install () {
 			'optionscode' => 'text',
 			'value' => '1',
 			'disporder' => 10,
+			'isdefault' => 0,
 			'gid' => $group['gid']
 		);
 
@@ -379,8 +404,8 @@ function bam_install () {
 			'description' => $db->escape_string($lang->bam_random_group_desc),
 			'optionscode' => 'groupselect',
 			'value' => '-1',
-			'disporder' => 11,
-			'isdefault' => 1,
+			'disporder' => 12,
+			'isdefault' => 0,
 			'gid' => $group['gid']
 		);
 
@@ -390,7 +415,8 @@ function bam_install () {
 			'description' => $db->escape_string($lang->bam_index_page_desc),
 			'optionscode' => 'text',
 			'value' => 'index.php',
-			'disporder' => 12,
+			'disporder' => 13,
+			'isdefault' => 0,
 			'gid' => $group['gid']
 		);
 
@@ -400,7 +426,8 @@ function bam_install () {
 			'description' => $db->escape_string($lang->bam_custom_css_desc),
 			'optionscode' => 'textarea',
 			'value' => '/* Replace this field with any custom CSS classes. */',
-			'disporder' => 13,
+			'disporder' => 14,
+			'isdefault' => 0,
 			'gid' => $group['gid']
 		);
 
@@ -411,7 +438,8 @@ function bam_install () {
 			'description' => $db->escape_string($lang->bam_cookie_id_prefix_desc),
 			'optionscode' => 'numeric',
 			'value' => $cookiePrefix,
-			'disporder' => 14,
+			'disporder' => 15,
+			'isdefault' => 0,
 			'gid' => $group['gid']
 		);
 
@@ -421,8 +449,8 @@ function bam_install () {
 			'description' => $db->escape_string($lang->bam_compatibility_mode_desc),
 			'optionscode' => 'onoff',
 			'value' => '0',
-			'disporder' => 15,
-			'isdefault' => 1,
+			'disporder' => 16,
+			'isdefault' => 0,
 			'gid' => $group['gid']
 		);
 
@@ -472,6 +500,7 @@ function bam_activate () {
 	global $db;
 	require MYBB_ROOT.'/inc/adminfunctions_templates.php';
 	find_replace_templatesets('header', '#{\$awaitingusers}#', '{$awaitingusers} <!-- BAM -->{$bam_announcements}<!-- /BAM -->');
+	change_admin_permission("config", "bam_announcements_admin_permissions", 1);
 }
 
 // Reverse template modifications. 
@@ -479,9 +508,10 @@ function bam_deactivate () {
 	global $db;
 	require MYBB_ROOT.'/inc/adminfunctions_templates.php';
 	find_replace_templatesets('header', '#\<!--\sBAM\s--\>(.+)\<!--\s/BAM\s--\>#is', '', 0);
+	change_admin_permission("config", "bam_announcements_admin_permissions", -1);
 }
 
-// This function manually checks if its database has been updated. 
+// This function manually checks if its database has been updated. Use bam_is_updated_noquery() for most cases. 
 // This is used to display the upgrade script link in the plugin's description if an update is required.
 
 function bam_is_updated () {
@@ -495,16 +525,23 @@ function bam_is_updated () {
 
 // This function checks if BAM is updated without the use of an additional query. 
 // This does not work on the plugin info page, but saves a query everywhere else! 
+
 function bam_is_updated_noquery () {
 	global $mybb; 
 	return (isset($mybb->settings['bam_advanced_mode']) && isset($mybb->settings['bam_enable_dismissal']));
+}
+
+// Manage admin permissions (new in BAM 2.0)! 
+function bam_admin_config_permissions(&$admin_permissions) {
+	global $lang;
+	$admin_permissions['bam_announcements_admin_permissions'] = $lang->bam_admin_permissions;
 }
 
 
 // Primary BAM announcements function. Parses announcements on forum pages. 
 
 function bam_announcements ($compatibility = null) {
-	global $mybb, $db, $templates, $bam_announcements, $lang; //, $theme; //, $bam_announcement_container;
+	global $mybb, $db, $templates, $bam_announcements, $lang, $plugins; //, $theme; //, $bam_announcement_container;
 
 	require_once MYBB_ROOT.'/inc/class_parser.php';
 	$parser = new postParser(); 
@@ -531,10 +568,12 @@ function bam_announcements ($compatibility = null) {
 	);
 
 	$class_select = array('green', 'yellow', 'red', 'blue', 'silver', 'magenta', 'orange'); // list of programmed BAM classes. 
+	// OLD: ORDER BY pinned DESC, disporder ASC, PID ASC
 	$query = $db->query("
 		SELECT *
 		FROM ".TABLE_PREFIX."bam
-		ORDER BY pinned DESC, disporder ASC, PID ASC");
+		WHERE `active` = 1
+		ORDER BY pinned DESC, PID ASC");
 
 	
 	$data = array();
@@ -543,6 +582,8 @@ function bam_announcements ($compatibility = null) {
 	$announcements = '';
 	$unpinned_ids = array();
 	$announcementCount = 0; // used to cache templates. 
+
+	$class_select = $plugins->run_hooks("bam_announcements_begin_classes", $class_select);
 
 	// Fetch announcements from database and render them. 
 	while($querydata = $db->fetch_array($query)) {
@@ -574,6 +615,10 @@ function bam_announcements ($compatibility = null) {
 			$announcementTemplate = 'bam_announcement';
 
 			$class = 'bam_announcement ' . htmlspecialchars($querydata['class'], ENT_QUOTES); // parse class/style
+			if ($mybb->settings['bam_round_announcements']) {
+				$class = $class . " bam_round";
+			}
+
 			$forums = $querydata['forums']; // fetch forum list, if enabled. 
 
 			$date = bam_parse_date($querydata); 
@@ -615,6 +660,7 @@ function bam_announcements ($compatibility = null) {
 				}
 				// Are we rendering a normal announcement? 
 				else {
+						$data[$count] = $plugins->run_hooks("bam_announcements_render", $data[$count]);
 						eval("\$announcements .= \"".$templates->get($tagParser[1]['template'])."\";");
 				}
 			}
@@ -647,7 +693,6 @@ function bam_announcements ($compatibility = null) {
 				$bam_unsticky = ''; 
 				$display_close = 'bam_nodismiss';
 			}
-			
 			eval("\$announcements .= \"".$templates->get($data[$ID]['template'])."\";");
 			
 			$count_unpinned++;
@@ -663,7 +708,7 @@ function bam_announcements ($compatibility = null) {
 	$bam_custom_css = $mybb->settings['bam_custom_css']; 
 	
 	eval('$bam_announcements = "'.$templates->get('bam_announcement_container').'";');
-	
+	$bam_announcements = $plugins->run_hooks("bam_announcements_end", $bam_announcements);
 	// Check if we are using the pre_output_page hook instead. 
 	// This forces announcements into the page and guesses if it can't find the variable. 
 	// This gives less control on where announcements get posted, but can get BAM working without further template modifications on themes where the activation modifications fail.
@@ -706,7 +751,7 @@ function bam_parse_date($querydata) {
 
 
 function bam_build_dismiss_class ($querydata) {
-	global $mybb;
+	global $mybb, $plugins;
 	// If the announcement is not stickied and dismissals are enabled, set whether dismissal closes the announcement permanently or temporarily.  
 	// If the announcement is stickied, never allow dismissals.
 	if (($querydata['pinned'] == 0) && (int) $mybb->settings['bam_enable_dismissal'] > 0) {
@@ -741,8 +786,9 @@ function bam_build_dismiss_class ($querydata) {
 		$display_close = 'bam_nodismiss';
 		$bam_unsticky = '';
 	}	
-
-	return array($display_close, $bam_unsticky);
+	$bundleDismissals = array($display_close, $bam_unsticky);
+	$bundleDismissals = $plugins->run_hooks("bam_build_dismissal", $bundleDismissals);
+	return $bundleDismissals;
 }
 
 // This function checks the user's permissions, and determines if the user's group is in $display_groups
@@ -750,7 +796,7 @@ function bam_build_dismiss_class ($querydata) {
 
 function bam_display_permissions ($display_groups) {
 	global $mybb;
-	
+
 	// No need to check for permissions if no groups are allowed. 
 	if (empty($display_groups)) {
 		return false; 
@@ -787,7 +833,7 @@ function bam_display_permissions ($display_groups) {
 // This calls checkAnnouncementDisplay for global/index/special page checks, and also checks usergroup permissions and directives
 
 function bam_display_conditions ($querydata, $directives) {
-	global $mybb;
+	global $mybb, $plugins;
 
 	// We are running on BAM 1's database and templates. Do a legacy check for whether to display the announcement. 
 	if (!bam_is_updated_noquery()) {
@@ -801,7 +847,20 @@ function bam_display_conditions ($querydata, $directives) {
 	else {
 		if ($directives['disabled']) {
 			return false;  
-		}	
+		}
+			 
+		// Plugin hooks: Set the $query['returnFalse'] element to create your own conditions. 
+		// Use standard BAM display checks for returning true. Create artificial return false conditions here. 
+		// If you need special return true conditions, modify other data within $querydata so that the announcement 
+		// is guaranteed to return true. Note that this isn't advisable unless you absolutely need to do this, 
+		// as it could potentially cause compatibility issues between multiple BAM plugins. 
+
+		$querydata = $plugins->run_hooks("bam_announcements_display_conditions", $querydata);
+		if (isset($querydata['returnFalse'])) {
+			echo "returning false";
+			return false; 
+		} 
+
 		// New in BAM 2.0: Random announcements are no longer rendered as normal announcements if random mode is disabled. 
 		if(bam_display_permissions($querydata['groups']) && checkAnnouncementDisplay($querydata)) {
 			// Check if there are theme tags or langage tags. 
@@ -856,8 +915,19 @@ function bam_build_directives ($announcement) {
 // Checks if a specific announcement is enabled on the current page that the user is browsing. 
 
 function checkAnnouncementDisplay($announcement) {
-	global $mybb, $current_page;
- 
+	global $mybb, $current_page, $plugins;
+	
+	// Run plugin hooks. 
+	
+	// Plugins: Set $announcement['returnFalse] to any value to force this function to deny displaying an announcement. 
+	// If you need to force this function to return true, modify $announcement such that this function is guaranteed to return true. 
+	// Announcement is not returned. Only a true or false value to determine whether the announcement displays. You can do as you please here. 
+	
+	$announcement = $plugins->run_hooks("bam_checkAnnouncementDisplay", $announcement);
+	if (isset($announcement['returnFalse'])) {
+		return false; 
+	} 
+
 	// Handle random mode announcements, which only display on the index page. 
 	if ($announcement['random'] == 1) {
 		if (isIndexPage($announcement)) {
@@ -933,17 +1003,19 @@ function isIndexPage($otherPage=null) {
 
 
 // New in BAM 2.0: Determines if an announcement is set to display on the current page that the user has visited. 
-// Only called if BAM is in advanced mode and the additional_url_parameters setting is set with a value.
+// Only called if the additional_url_parameters setting is set with a value.
+// Note that there is an alternative parser for specific showthread.php links involving a PID. See bam_parsePIDURLs()
 
 function isAlternatePageValid($announcement) { 
 	global $mybb, $current_page, $additional_page_parameters;
 
+	// $startTime = microtime(TRUE);
 	// Developers: If you are using this plugin and your URL settings are not being accepted, you can add
 	// new acceptable parameteres here. However, please be aware that this is a whitelist that is intended
 	// to prevent unexpected or insecure behavior. This setting was explicitely ommitted on the ACP for 
 	// this reason. Please be mindful and add parameters as needed, but do not remove the whitelist for your forum. 
 	$additional_page_parameters = array('fid', 'action', 'uid', 'tid', 'gid');
-	
+
 	$explodedPages = explode(',', $announcement['additional_display_pages']);
 	$processedPages = array_map('trim',$explodedPages);
 	$acceptPage = false;
@@ -951,12 +1023,38 @@ function isAlternatePageValid($announcement) {
 	// This parameter allows multiple URLs to be set. Check for each URL that is given. 
 	foreach ($processedPages as $additional_display_page) {
 
+		// Handle search engine friendly URLs. We rewrite the URLs in PHP with regex! 
+		// Note that this only supports MyBB's default htaccess settings, and unofficially, the Google SEO plugin. 
+		// Custom SEO plugins require regex to be updated in bam_reverse_rewrite(); 
+		$additional_display_page = bam_reverse_rewrite($additional_display_page);
+
+		// Explicitely block improperly formatted URLs (e.g. forumdisplay.php?action=something?tid=somethingelse)
+		if (substr_count($additional_display_page, '?') > 1) {
+			break; 
+		}
+
 		// This plugin explicitely parses the URL given by the announcement's settings to extract only the file name. 
 		// This functionality should not be reverted. Otherwise, rogue URLs (index.php?fid=forumdisplay.php) could cause
 		// this plugin to display on pages that it has not been designed to display on. 
 
 		$url_parameters = parse_url($additional_display_page);
 		$announcementFileName = basename($url_parameters['path']);
+
+		// MyBB handles PIDs strangely and sometimes links to them instead of TIDs. Handle this specifically. 
+		// This calls an alternative URL parser ONLY when PIDs are detected instead of TIDs to handle this.  
+
+		if ($announcementFileName == "showthread.php" && $current_page == "showthread.php") {
+			if ((isset($mybb->input['pid']) && ($mybb->input['pid'] != 0)) || (strpos($additional_display_page, "pid="))) {
+			// if (true) {
+				if (!bam_parsePIDURLs($additional_display_page)) {
+					break; // Explicitely reject. 
+				}
+				else {
+					$acceptPage = true; 
+					break; 
+				}
+			}
+		}
 
 		// First, we check to see if we are on the correct PHP file/page (e.g. index.php, forumdisplay.php, etc.)
 		if ($announcementFileName == $current_page) {
@@ -981,9 +1079,12 @@ function isAlternatePageValid($announcement) {
 					// If it is not found, the announcement does not care about additional parameters that may exist. We ignore it.
 
 					if (strpos($additional_display_page, $parameter)) {
-						$paramSearchString = "$parameter=" . $paramValue;
-						 
-						if (!strpos($additional_display_page, $paramSearchString)) {
+						
+						// Block out rogue URLs (e.g. forumdisplay.php?action=index.php_tid=3)
+						$paramSearchString1 = "?$parameter=" . $paramValue;
+						$paramSearchString2 = "&$parameter=" . $paramValue; 
+						
+						if (strpos($additional_display_page, $paramSearchString1) === false && strpos($additional_display_page, $paramSearchString2) === false) {
 							$paramCheck = false; 
 						}
 					}
@@ -1008,7 +1109,78 @@ function isAlternatePageValid($announcement) {
 		}
 	} // End loop for URLs. 
 
+	// $endTime = microTime(TRUE);
+
+	// echo "Execution time: " . ($endTime - $startTime);
 	return $acceptPage;
+}
+
+// MyBB will occasionally (very oddly) link to the PID instead of the TID for specific showthread links.
+// MyBB parses these normally and fetches the TID from within. BAM must do the same for these links. 
+// This parser runs INSTEAD of the normal parser if this is detected, and manually fixes this behavior. 
+
+function bam_parsePIDURLs($additional_display_page) {
+	global $db, $mybb; 
+
+	// *** First, we must get the PID/TID data from the announcement itself. ***
+
+	// Check if additional_display_page has a TID set. If so, use this directly instead. 
+	if (strpos($additional_display_page, "tid=")) {
+		$matches = array();
+		preg_match('/tid=[0-9]*/', $additional_display_page, $matches);
+		if (isset($matches[0])) {
+			$matches = strtr($matches[0], array('tid=' => ''));
+			$displayTID = (int) $matches;
+		}
+	}
+
+	// Additional_display_page provides a PID instead. Use this and convert to TID. 
+	else if (strpos($additional_display_page, "pid=")) {
+		$matches = array();
+		preg_match('/pid=[0-9]*/', $additional_display_page, $matches);
+		if (isset($matches[0])) {
+			$matches = strtr($matches[0], array('pid=' => ''));
+			$displayPID = (int) $matches;
+		}
+		$displayTID = bam_getTIDfromPID($displayPID);
+	} 
+	
+	// additional_display_page provides neither. In such cases, announcement should display on all threads. 
+	// (additional_display_page is likely showthread.php. No further details are provided to check against).
+	else { 
+		return true;
+	}
+
+	// *** Next, we must check the URL itself and get TID/PID information from the current page. ***
+
+	// Check if the URL provides a TID. If so, we use this directly instead. 
+	if (isset($mybb->input['tid']) && $mybb->input['tid'] != 0) {
+		$tid = (int) $mybb->input['tid'];
+	}
+	
+	// URL contains a PID and no TID. we must convert any URL parameters to TIDs. 
+	else if (isset($mybb->input['pid']) && $mybb->input['pid']) {
+		$pid = (int) $mybb->input['pid']; 
+		$tid = (int) bam_getTIDfromPID($pid);
+	} 
+	
+	// MyBB never generates URLs in showthread.php without either a PID or a TID. 
+	// Reject announcement if such an invalid page is reached. 
+	else {
+		return false; 
+	}
+
+	// URL provided a PID or TID, but we couldn't find a valid thread associated with it. 
+	// Reject this announcement. Invalid URL. 
+	if ($tid == 0) {
+		return false; 
+	}
+
+	// Check if the TID we generated from the URL matches the TID we generated from the announcement. 
+	if ($tid == $displayTID) {
+		return true; 
+	}
+	return false; 
 }
 
 /* VARIABLES, THEMES, DIRECTIVES, LANGUAGES */ 
@@ -1105,7 +1277,7 @@ function bamExplodeTemplates($announcementText) {
 // Parses {username} and {newmember*} variables. 
 
 function bam_parse_user_variables ($announcement, $link) {
-	global $lang, $mybb;
+	global $lang, $mybb, $plugins;
 
 	// Parse username and newmember variables. 
 	// We only need to check for variables if we have { in the announcement. Performance optimizaiton.  
@@ -1135,6 +1307,7 @@ function bam_parse_user_variables ($announcement, $link) {
 		$announcement = strtr($announcement, array('{username}' => $username));
 		$announcement = parseThreadVariables($announcement);	// parses {threadreplies} to thread reply count. 
 	}	
+	$announcement = $plugins->run_hooks("bam_parse_user_variables", $announcement);
 	return $announcement;	
 }
 
@@ -1142,22 +1315,31 @@ function bam_parse_user_variables ($announcement, $link) {
 // Currently, {threadreplies} and {countingthread} are parsed. These are experimental, but work as expected.  
 
 function parseThreadVariables($announcementText) {
-	global $current_page, $mybb; 
+	global $current_page, $mybb, $plugins; 
 
-	// Check to make sure we are on showthread.php and we have a thread to display. 
-	if ($current_page == 'showthread.php' && (int) $_GET['tid'] != null) {
+	// Check to make sure we are on showthread.php and we have a thread to display.
+	
+	if ($current_page == 'showthread.php' && (((int) $mybb->input['tid'] != 0) || ($mybb->input['pid'] != 0))) {
 
 		// Get the thread from the database. 
-		$threadID = (int) $mybb->input['tid'];
+		if (isset($mybb->input['tid']) && $mybb->input['tid'] != 0) {
+			$threadID = (int) $mybb->input['tid'];
+		} 
+		
+		// URL is a PID instead of a TID. Parse this correctly. 
+		else if (isset($mybb->input['pid']) && $mybb->input['pid'] != 0) {
+			$threadID = (int) bam_getTIDfromPID($mybb->input['pid']);
+		}
+		
 		$thread = get_thread($threadID);
 		
 		// Parse number of replies in thread. Primarily useful for forum games. 
 		if (strpos("-".$announcementText, '{threadreplies}')) {
-			return strtr($announcementText, array('{threadreplies}' => number_format((int) $thread['replies'])));
+			$announcementText = strtr($announcementText, array('{threadreplies}' => number_format((int) $thread['replies'])));
 		}
 
 		// Parse the counting thread. This is similar to above, but attempts to correct invalid counts.
-		else if (strpos("-".$announcementText, '{countingthread}')) {
+		if (strpos("-".$announcementText, '{countingthread}')) {
 
 			// We are going to try to determine the correct count for the counting thread based on previous replies. 
 			// This is an easter egg feature! Very useful for forum games where users frequently get off count. 
@@ -1190,11 +1372,12 @@ function parseThreadVariables($announcementText) {
 			$leadingKey = array_search($leadingRow[0], $arrayofNumbers);
 			$numPostsAway = count($arrayofNumbers) - $leadingKey; 
 			$finalValue = number_format((int) ($arrayofNumbers[$leadingKey] + $leadingKey));
-			return strtr($announcementText, array('{countingthread}' => $finalValue));
+			$announcementText = strtr($announcementText, array('{countingthread}' => $finalValue));
 		}
 	}
 	
-	// No replacements. Return the announcement unchanged. 
+	// Return the announcement with changes or return it unchanged. 
+	$announcementText = $plugins->run_hooks("bam_parse_user_variables", $announcementText);
 	return $announcementText;
 }
 
@@ -1244,20 +1427,35 @@ function parseForumGameCounter($post) {
 	return 0;
 }
 
-
 // Helper function that returns the thread data. Used for parseThreadVariables (above)
 function getThreadData($threadID) {
     global $db;
     $tid = (int) $threadID; 
 
 	// Get the most recent posts from the database by thread ID.  
-
     return $db->query("
     SELECT p.message, p.tid, p.dateline
     FROM ".TABLE_PREFIX."posts p WHERE p.tid='$tid'
     ORDER BY p.dateline DESC LIMIT 0,50");
 }
 
+// This function queries the database to get the associated thread ID with a particular post ID. 
+// Used only in rare cases when the URL specifies a PID instead of a TID. 
+// MyBB parses these like normal (and very oddly so). BAM must do the same to prevent unusual behavior. 
+
+function bam_getTIDfromPID($pid) {
+	global $db;
+
+	// First, we must convert any URL parameters to TIDs. 
+	if ($pid != 0) {
+		$pid = (int) $pid; 
+		$querydata = $db->query('SELECT tid FROM '.TABLE_PREFIX.'posts WHERE PID = '.$pid.';');
+		$tid = $db->fetch_array($querydata); 
+		$tid = (int) $tid; 
+		return $tid; 
+	} 
+	return false;
+}
 
 /* ADMIN CP HOOKS */
 
@@ -1299,6 +1497,95 @@ function global_display($pinned) {
 	}
 }
 
+// BAM only officially supports MyBB's built-in rewrites with its included htaccess file. 
+// This rewrites SEO friendly URLs back into native URLs, which are usable by the built in 
+// parser. This was done so that URL parsing can be extended more easily without fully rewriting 
+// the URL parser. See the comments below on how to use custom HTACCESS settings. 
+
+// Note: Google SEO plugin is NOT supported at this time. A future release may expand upon this! 
+
+function bam_reverse_rewrite ($url) {
+	global $plugins; 
+
+	// How to use custom HTACCESS settings: 
+	// Apache's htaccess directives can (almost) be copy/pasted into the array below. 
+
+	// 1. Remove the RewriteRule directive at the beginning.
+	// 2. Replace '^' with '/' at the beginning.
+	// 3. Remove the $ at the end of the pattern, replace it with '/'
+	// 4. Remove [L,QSA] (and any other directives) from the replacement string. 
+	// 5. Add to the array below. 
+
+	$replacements = array(
+		'/forum-([0-9]+)\.html/' => 'forumdisplay.php?fid=$1',
+		'/forum-([0-9]+)-page-([0-9]+)\.html/' => 'forumdisplay.php?fid=$1&page=$2',
+		'/thread-([0-9]+)\.html/' => 'showthread.php?tid=$1 [L,QSA]', 
+		'/thread-([0-9]+)-page-([0-9]+)\.html/' =>  'showthread.php?tid=$1&page=$2',
+		'/thread-([0-9]+)-lastpost\.html/' => 'showthread.php?tid=$1&action=lastpost',
+		'/thread-([0-9]+)-nextnewest\.html/' => 'showthread.php?tid=$1&action=nextnewest',
+		'/thread-([0-9]+)-nextoldest\.html/' => 'showthread.php?tid=$1&action=nextoldest',
+		'/thread-([0-9]+)-newpost\.html/' => 'showthread.php?tid=$1&action=newpost',
+		'/thread-([0-9]+)-post-([0-9]+)\.html/' => 'showthread.php?tid=$1&pid=$2',
+		'/post-([0-9]+)\.html/' => 'showthread.php?pid=$1',
+		'/announcement-([0-9]+)\.html/' => 'announcements.php?aid=$1',
+		'/user-([0-9]+)\.html/' => 'member.php?action=profile&uid=$1', 
+		'/calendar-([0-9]+)\.html/' => 'calendar.php?calendar=$1',
+		'/calendar-([0-9]+)-year-([0-9]+)\.html/' => 'calendar.php?action=yearview&calendar=$1&year=$2',
+		'/calendar-([0-9]+)-year-([0-9]+)-month-([0-9]+)\.html/' => 'calendar.php?calendar=$1&year=$2&month=$3',
+		'/calendar-([0-9]+)-year-([0-9]+)-month-([0-9]+)-day-([0-9]+)\.html/' => 'calendar.php?action=dayview&calendar=$1&year=$2&month=$3&day=$4',
+		'/calendar-([0-9]+)-week-(n?[0-9]+)\.html/' => 'calendar.php?action=weekview&calendar=$1&week=$2',
+		'/event-([0-9]+)\.html/' => 'calendar.php?action=event&eid=$1'
+	); 
+	
+	$plugins->run_hooks("bam_replace_urls", $replacements);
+	$url_preg = $url;
+	foreach ($replacements as $key => $value_raw) {
+		$value = $value_raw; 
+		$url_preg = preg_replace($key, $value, $url);
+		
+		// We only need to do one replacement, as ALL htaccess directives are L,QSA
+		if (strlen($url_preg) != strlen($url)) {
+			break;
+		}
+	}
+	return $url_preg; 
+}
+
+// Note: This is completely unsupported! This does not work in the current version of BAM. This is 
+// included so that administrators can more easily modify their forums with custom rewrite rules. 
+// For your convenience, The URL rewrites in (plugin) Google SEO's HTACCESS file have already been converted to 
+// PHP's preg_replace regex below. If you would like further support, please reach out to me via PM
+// on MyBB's community support forums (Darth Apple) or at http://makestation.net (Darth-Apple). 
+// I will be happy to provide pointers on how to further extend BAM's URL rewriting functionality!
+
+function bam_google_SEO_rewrites ($replacements) {
+	global $mybb, $plugins, $cache;
+	// Stub function that can be extended to enable compatibility with the Google SEO MyBB Plugin. 
+	
+	$activate_this_hook = false; // disabled at this time. 
+
+	// Check if the Google SEO plugin is activated. 
+	if ($activate_this_hook) {
+		$activePlugins = $cache->read("plugins"); 
+
+		if (in_array("google_seo", $activePlugins['active'])) {
+			$additionalReplacements = array(
+				/*'^([^&]*)&(.*)$' => 'http://yoursite/MyBB/$1?$2', */ // From the HTaccess file. Add back in if needed.  
+				'/sitemap-([^./]+)\.xml/' => 'misc.php?google_seo_sitemap=$1',
+				'/Forum-([^./]+)/' => 'forumdisplay.php?google_seo_forum=$1',
+				'/Thread-([^./]+)/' => 'showthread.php?google_seo_thread=$1',
+				'/Announcement-([^./]+)/' => 'announcements.php?google_seo_announcement=$1',
+				'/User-([^./]+)/' => 'member.php?action=profile&google_seo_user=$1',
+				'/Calendar-([^./]+)/' => 'calendar.php?google_seo_calendar=$1',
+				'/Event-([^./]+)/' => 'calendar.php?action=event&google_seo_event=$1',
+			);
+
+			// This is not functional at this time, and must be extended. A future release may expand upon this!
+			$replacements = array_merge($additionalReplacements, $replacements); 
+		}
+	}
+	return $replacements; 
+}
 
 // Thank you for using, developing for, and viewing BAM's source. If you have any questions or would like to contribute,
 // please send me (Darth-Apple) a message on github or on the MyBB community forums!

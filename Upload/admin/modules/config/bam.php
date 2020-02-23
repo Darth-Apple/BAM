@@ -2,7 +2,7 @@
 
 
 
-		/*    This program is free software: you can redistribute it and/or modify
+/*    This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
@@ -15,12 +15,15 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
-     */
-	if(!defined("IN_MYBB")) {
+*/
+
+if(!defined("IN_MYBB")) {
 		die("You're wonderful. Hacking attempt."); // direct access to this file not allowed. 
 	}
 	
 	$lang->load('bam');
+	global $plugins; 
+	$plugins->run_hooks("bam_admin_begin");
 
 	// list of programmed classes for BAM announcements. This list may expand in future versions of this plugin. 
 	$class_select = array(
@@ -33,6 +36,7 @@
 		"silver" => $lang->bam_silver,
 		"bam_custom" => $lang->bam_custom
 	); 
+	$class_select = $plugins->run_hooks("bam_admin_classes", $class_select);
 
 	// list of locations for location selector. 
 	$location_select = array(
@@ -41,18 +45,22 @@
 		"forums" => $lang->bam_list_display_forums,
 		"special" => $lang->bam_list_display_special
 	); 
+	$location_select = $plugins->run_hooks("bam_admin_locations", $location_select);
 	
 	// list of programmed announcement types.
 	$announcement_type = array(
 		"standard" => $lang->bam_standard_select,
 		"random" => $lang->bam_random_select
 	); 
+
+	$announcementType = $plugins->run_hooks("bam_admin_types", $announcementType);
 	
 
 	// Check for upgrade. This checks for settings that only exist in BAM 2.0. 
 	// If these settings don't exist, BAM knows it's running on the old version and prompts for an upgrade.
 
-	if (!isset($mybb->settings['bam_advanced_mode']) || $mybb->settings['bam_advanced_mode'] == null) {
+	// if (!isset($mybb->settings['bam_advanced_mode']) || $mybb->settings['bam_advanced_mode'] == null) {
+	if (!bam_is_updated()) {
 		if (!isset($mybb->settings['bam_random_dismissal'])) {
 
 			// Flash the upgrade notification. 
@@ -76,6 +84,22 @@
 	$tags_button = " <button id='showtags_link' onclick='showAnnouncementTags();'>".$lang->bam_form_tags_link." </button>";
 	global $class_select;
 
+	$css = "<style>
+	.bam_border_deactivated {
+		border-top: 1px solid #326267 !important;
+    	border-bottom: 1px solid #000 !important;
+		background: #d6ffff !important;
+		border-right: none !important;
+    	border-left: none !important;
+	}
+	.bam_border_activated { 
+		border-bottom: 1px solid #000 !important;
+		background: #d6ffff !important; 
+		border-right: none !important;
+    	border-left: none !important;
+	}</style>
+	";
+	echo $css; 
 	/***** Add breadcrumbs and tabs *****/
 	
 	if($mybb->input['action'] == "edit") {
@@ -104,11 +128,17 @@
 	}
 	// Create tabs that always display. 
 
+	$gid = $db->query("SELECT gid FROM ".TABLE_PREFIX."settings WHERE `name` = 'bam_enabled';");
+	$gid = $db->fetch_array($gid);
+	$gid = (int)$gid['gid'];
+	$settingLink = " <a style='color: blue;' href='index.php?module=config-settings&action=change&gid=".(int) $gid."'>".$lang->bam_settings_link.". </a>";
+
 	$sub_tabs['bam_manage'] = array(
 		'title' => $lang->bam_manage,
 		'link' => "index.php?module=config-bam",
-		'description' => $normal_manage_description
+		'description' => $normal_manage_description . $settingLink
 	);
+	
 		if ($bam_random) {
 			$sub_tabs['bam_manage_random'] = array(
 				'title' => $lang->bam_manage_random,
@@ -128,7 +158,8 @@
 		'link' => "index.php?module=config-bam&action=add",
 		'description' => $bam_add_description
 	);
-
+	
+	$page = $plugins->run_hooks("bam_admin_header", $page);
 	$page->output_header($lang->bam_title);
 
 	// create tabs that display only under certain conditions (such as edit), and set highlighted tab. 
@@ -196,6 +227,60 @@
 		admin_redirect('index.php?module=config-bam');
 	}
 
+	if(($mybb->input['action'] == 'unpin') && ($mybb->request_method=="get") && !empty($mybb->input['id'])) {
+		// Process unpin announcement request
+		$key = verify_post_check($mybb->input['my_post_key'], true); 
+		if ($key == false) {
+			flash_message($lang->bam_invalid_post_code, 'error');
+			admin_redirect("index.php?module=config-bam");
+		}
+		
+		$id = (int)$mybb->input['id'];
+		$db->update_query("bam", array('pinned' => 0), "PID='$id'");
+		flash_message($lang->bam_unpin_success, 'success');
+		admin_redirect('index.php?module=config-bam');
+	}
+
+	if(($mybb->input['action'] == 'activate') && ($mybb->request_method=="get") && !empty($mybb->input['id'])) {
+		// Process pin announcement request
+		$key = verify_post_check($mybb->input['my_post_key'], true); 
+		if ($key == false) {
+			flash_message($lang->bam_invalid_post_code, 'error');
+			admin_redirect("index.php?module=config-bam");
+		}
+		
+		$id = (int)$mybb->input['id'];
+		$db->update_query("bam", array('active' => 1), "PID='$id'");
+		flash_message($lang->bam_activate_success, 'success');
+
+		// Redirect to proper page. 
+		if ($mybb->input['r']=="random") {
+			admin_redirect('index.php?module=config-bam&action=manage_random');
+		} else {
+			admin_redirect('index.php?module=config-bam');
+		}
+	}
+
+	if(($mybb->input['action'] == 'deactivate') && ($mybb->request_method=="get") && !empty($mybb->input['id'])) {
+		// Process unpin announcement request
+		$key = verify_post_check($mybb->input['my_post_key'], true); 
+		if ($key == false) {
+			flash_message($lang->bam_invalid_post_code, 'error');
+			admin_redirect("index.php?module=config-bam");
+		}
+		
+		$id = (int)$mybb->input['id'];
+		$db->update_query("bam", array('active' => 0), "PID='$id'");
+		flash_message($lang->bam_deactivate_success, 'success');
+
+		// Redirect to proper page. 
+		if ($mybb->input['r']=="random") {
+			admin_redirect('index.php?module=config-bam&action=manage_random');
+		} else {
+			admin_redirect('index.php?module=config-bam');
+		}
+	}
+
 	// Turns this announcement into a random mode announcement. Redirects to the edit page afterwards. 
 	if(($mybb->input['action'] == 'make_random') && ($mybb->request_method=="get") && !empty($mybb->input['id'])) {
 		$key = verify_post_check($mybb->input['my_post_key'], true); 
@@ -224,22 +309,41 @@
 		admin_redirect('index.php?module=config-bam&action=edit&id='.(int) $id);
 	}
 
-
-	if(($mybb->input['action'] == 'unpin') && ($mybb->request_method=="get") && !empty($mybb->input['id'])) {
-		// Process unpin announcement request
+	if($mybb->input['action'] == 'delete' && $mybb->request_method=="get") {
+		// process delete announcement
 		$key = verify_post_check($mybb->input['my_post_key'], true); 
 		if ($key == false) {
 			flash_message($lang->bam_invalid_post_code, 'error');
 			admin_redirect("index.php?module=config-bam");
+		}		
+
+		// Fetch the announcement ID from the user's input. 
+		$PID = (int) $mybb->input['id'];
+		if($PID == null) {
+			// no announcement was defined. 
+			flash_message($lang->bam_delete_error, 'error');
+			admin_redirect('index.php?module=config-bam');
+		}
+	
+		// Check to make sure that the announcement exists before attempting to delete it. 
+		$query = $db->simple_select('bam', '*', "PID='{$PID}'");
+		$querydata = $db->fetch_array($query);
+	
+		if(!$querydata['PID']) {
+			// The announcement was defined, but did not exist. 
+			flash_message($lang->bam_delete_error, 'error');
+			admin_redirect('index.php?module=config-bam');
 		}
 		
-		$id = (int)$mybb->input['id'];
-		$db->update_query("bam", array('pinned' => 0), "PID='$id'");
-		flash_message($lang->bam_unpin_success, 'success');
-		admin_redirect('index.php?module=config-bam');
+		$db->delete_query('bam', "PID='{$PID}'");		
+		flash_message($lang->bam_delete_success, 'success');
+		
+		if ($mybb->input['r']=="random") {
+			admin_redirect('index.php?module=config-bam&action=manage_random');
+		} else {
+			admin_redirect('index.php?module=config-bam');
+		}
 	}
-
-
 
 	if($mybb->input['action'] == "edit") {
 		// generate the announcement edit page. 
@@ -272,11 +376,18 @@
 			$data['additional_pages'] = $querydata['additional_display_pages'];
 			$data['usergroup'] = $querydata['groups'];
 			$data['usergroup'] = explode(',', $querydata['groups']);
+			$data['bam_activated'] = (int) $querydata['active'];
 			$data['usergroup'] = sanitize_a_bam_array_to_int($data['usergroup']);
+			$data = $plugins->run_hooks("bam_edit_querydata", $data);
 		}
 
 		$form = new Form("index.php?module=config-bam", "post");
-		$form_container = new FormContainer($lang->bam_edit_announcement);
+
+		$checkbox = "<div style='float: right;'>";
+		$checkbox .= $form->generate_check_box('bam_activated', 1, $lang->bam_announcement_activated, array('checked' => $data['bam_activated'], 'id' => 'bam_activated'));
+		$checkbox .= "</div>";
+
+		$form_container = new FormContainer($lang->bam_edit_announcement . $checkbox);
 
 		// Used to enable javascript for announcement add/edit forms. 
 		echo $form->generate_hidden_field("announcementPageFlag", "true", array("id"=>"announcementPageFlag"));
@@ -293,6 +404,7 @@
 		else {
 			$announcementLocation = "special"; // Set to other. 3 in MyBB selector element. 
 		}
+		$announcementLocation = $plugins->run_hooks("bam_edit_announcementLocation", $announcementLocation);
 
 		// Display a random mode selector if random mode is enabled. 
 
@@ -302,7 +414,7 @@
 			} else {
 				$currentType = "standard";
 			}
-
+			$currentType = $plugins->run_hooks("bam_edit_currentType", $currentType);
 			$form_container->output_row($lang->bam_announcement_type, $lang->bam_announcement_type_desc, $form->generate_select_box('announcement_type', $announcement_type, $currentType, array('id' => 'announcementType')), 'announcement_type');
 		} else {
 			echo $form->generate_hidden_field("announcement_type", "standard", array("id"=>"announcementTypeHidden"));
@@ -349,9 +461,10 @@
 		}
 
 		$form_container->output_row($lang->bam_form_groups, $lang->bam_form_groups_desc, $form->generate_select_box('usergroup[]', $options, $data['usergroup'], array('id' => 'usergroup', 'multiple' => true, 'size' => 5)), 'usergroup');
-		$form_container->output_row($lang->bam_form_order, $lang->bam_form_order_desc, $form->generate_text_box("disporder", $data['disporder'], array("class" => "text_input align_right", "style" => "width: 25%;")), 'disporder');
+		$form_container->output_row($lang->bam_form_order, $lang->bam_form_order_desc, $form->generate_numeric_field("disporder", $data['disporder'], array("class" => "text_input align_right", "style" => "width: 25%;")), 'disporder');
 		$form_container->output_row($lang->bam_form_url, $lang->bam_form_url_desc, $form->generate_text_box("url", html_entity_decode($data['link']), array("class" => "text_input align_right", "style" => "width: 25%;")), 'url');
-
+		
+		$plugins->run_hooks("bam_edit_end", $form_container);
 		$buttons[] = $form->generate_submit_button($lang->bam_form_edit_submit);
 		$form_container->end();
 		$form->output_submit_wrapper($buttons);
@@ -481,11 +594,15 @@
 		else {
 			$mybb->input['usergroup'] = implode(',', array_map('intval', $mybb->input['usergroup']));
 		}
+		$bam_activated = (int) $mybb->input['bam_activated'];
+
 		$usergroups = $db->escape_string($mybb->input['usergroup']);
 		$disporder = (int)$mybb->input['disporder'];
 		$announcement = $db->escape_string(htmlspecialchars($mybb->input['announcement'], ENT_QUOTES));
-
-		$db->update_query("bam", array('pinned' => $pinned, 'disporder' => $disporder, 'random' => $isRandom, 'global' => $isGlobal, 'additional_display_pages' => $additionalPages, 'announcement' => $announcement, 'groups' => $usergroups, 'link' => $url, 'class' => $class, 'forums' => $forumList), "PID='$id'");
+		
+		$updateArray = array('pinned' => $pinned, 'disporder' => $disporder, 'random' => $isRandom, 'global' => $isGlobal, 'additional_display_pages' => $additionalPages, 'announcement' => $announcement, 'groups' => $usergroups, 'link' => $url, 'class' => $class, 'forums' => $forumList, 'active' => $bam_activated);
+		$updateArray = $plugins->run_hooks("bam_submit_edit_inserts", $updateArray);
+		$db->update_query("bam", $updateArray, "PID='$id'");
 
 		flash_message($lang->bam_edit_success, 'success');
 		if ($isRandom == 0) {
@@ -611,6 +728,7 @@
 			'announcement' => $db->escape_string(htmlentities($mybb->input['announcement'])),
 			'class' => $class,
 			'link' => $url,
+			'active' => (int) $mybb->input['bam_activated'],
 			'pinned' => $pinned,
 			'global' => $isGlobal,
 			'random' => $isRandom,
@@ -620,7 +738,10 @@
 			'disporder' => (int)$mybb->input['disporder'],
 			'groups' => $db->escape_string($mybb->input['usergroup'])
 			);
+		
+		$inserts = $plugins->run_hooks("bam_add_inserts", $inserts);
 		$db->insert_query('bam', $inserts);
+
 		flash_message($lang->bam_add_success, 'success');
 		if ($isRandom == 0) {
 			admin_redirect('index.php?module=config-bam');
@@ -629,38 +750,6 @@
 		}
 	}
 
-
-	
-	if($mybb->input['action'] == 'delete' && $mybb->request_method=="get") {
-		// process delete announcement
-		$key = verify_post_check($mybb->input['my_post_key'], true); 
-		if ($key == false) {
-			flash_message($lang->bam_invalid_post_code, 'error');
-			admin_redirect("index.php?module=config-bam");
-		}		
-
-		// Fetch the announcement ID from the user's input. 
-		$PID = (int) $mybb->input['id'];
-		if($PID == null) {
-			// no announcement was defined. 
-			flash_message($lang->bam_delete_error, 'error');
-			admin_redirect('index.php?module=config-bam');
-		}
-	
-		// Check to make sure that the announcement exists before attempting to delete it. 
-		$query = $db->simple_select('bam', '*', "PID='{$PID}'");
-		$querydata = $db->fetch_array($query);
-	
-		if(!$querydata['PID']) {
-			// The announcement was defined, but did not exist. 
-			flash_message($lang->bam_delete_error, 'error');
-			admin_redirect('index.php?module=config-bam');
-		}
-		
-		$db->delete_query('bam', "PID='{$PID}'");		
-		flash_message($lang->bam_delete_success, 'success');
-		admin_redirect('index.php?module=config-bam');
-	}
 		
 	/* This page handles the add announcement functionality... */
 
@@ -668,7 +757,12 @@
 		// generate add announcement form. 
 
 		$form = new Form("index.php?module=config-bam", "post");
-		$form_container = new FormContainer($lang->bam_form_add);
+
+		$checkbox = "<div style='float: right;'>";
+		$checkbox .= $form->generate_check_box('bam_activated', 1, $lang->bam_announcement_activated, array('checked' => 1, 'id' => 'bam_activated'));
+		$checkbox .= "</div>";
+
+		$form_container = new FormContainer($lang->bam_form_add . $checkbox);
 
 		// Used to enable javascript for announcement add/edit forms. 
 		echo $form->generate_hidden_field("announcementPageFlag", "true", array("id"=>"announcementPageFlag"));
@@ -739,8 +833,8 @@
 		$last = $db->fetch_array($query);
 		
 		$form_container->output_row($lang->bam_form_url, $lang->bam_form_url_desc, $form->generate_text_box("url", $mybb->input['url'], array("class" => "text_input align_right", "style" => "width: 25%;")), 'url');
-		$form_container->output_row($lang->bam_form_order, $lang->bam_form_order_desc, $form->generate_text_box("disporder", ((int) $last['disporder'] + 1), array("class" => "text_input align_right", "style" => "width: 25%;")), 'disporder');		
-
+		$form_container->output_row($lang->bam_form_order, $lang->bam_form_order_desc, $form->generate_numeric_field("disporder", ((int) $last['disporder'] + 1), array("class" => "text_input align_right", "style" => "width: 25%;")), 'disporder');		
+		$plugins->run_hooks("bam_add_end", $form_container);
 		$buttons[] = $form->generate_submit_button($lang->bam_form_add_submit);
 		$form_container->end();
 		$form->output_submit_wrapper($buttons);
@@ -758,7 +852,7 @@
 
 		// list announcements for management. 
 	function generate_manage_page($type) {
-		global $mybb, $db, $page, $lang;
+		global $mybb, $db, $page, $lang, $plugins, $class_select;
 
 		require_once MYBB_ROOT."/inc/class_parser.php";
 		$parser = new postParser(); 
@@ -800,30 +894,35 @@
 		if ($type == "random") {
 			$table->output_row_header($lang->bam_make_standard_header, array('width' => '9%')); 
 		} else {
-			$table->output_row_header($lang->bam_manage_order, array('width' => '8%')); 
+			$table->output_row_header($lang->bam_manage_order, array('width' => '9%')); 
 		}
 		$table->output_row_header($lang->bam_manage_actions, array('width' => '10%', 'text-align' => 'center')); 
 		
+		// OLD WHERE random = 1 ORDER BY active DESC, pinned DESC, disporder ASC, PID ASC
 		if ($type == "random") {
+			$redirectActivated = "random";
 			$query = $db->query("
 			SELECT *
 			FROM ".TABLE_PREFIX."bam
-			WHERE random = 1 ORDER BY pinned DESC, disporder ASC, PID ASC
+			WHERE random = 1 ORDER BY active DESC, disporder ASC, PID ASC
 		");
 		} else {
+			$redirectActivated = "standard";
 			$query = $db->query("
 			SELECT *
 			FROM ".TABLE_PREFIX."bam
-			WHERE random = 0 ORDER BY pinned DESC, disporder ASC, PID ASC
+			WHERE random = 0 ORDER BY active DESC, disporder ASC, PID ASC
 		");
 		}
 	
 		$data = array();
 		$count = 0;
 		$prefixVal = "";
-		while($querydata = $db->fetch_array($query))
-		{
-
+		$countInactive = 0;
+		while($querydata = $db->fetch_array($query)) {
+			if ($querydata['active'] == 0) {
+				$countInactive++;
+			}
 			// Parse announcement so that BBcode and HTML display (full preview).
 			if ($querydata['link'] != null) {
 				$announcementText = $parser->parse_message("[url=".$querydata['link']."]".html_entity_decode($querydata['announcement'])."[/url]", $parser_options);
@@ -837,31 +936,37 @@
 			// Get indicator icons for management page. 
 			$prefixVal = "<div class=\"float_right\" style='padding-left: 3px;'>";	
 
-			// Special pages icon
-			if (($querydata['additional_display_pages'] != null) && $querydata['global'] == 3) {
-				$prefixVal .= "<img src='styles/default/images/icons/custom.png' title='{$lang->bam_has_additional_pages}'alt='{$lang->bam_has_additional_pages}' />";
+			// Custom class icon
+			if (!isset($class_select[$querydata['class']])) {
+				$prefixVal .= "<img src='../images/icons/pencil.png' title='{$lang->bam_announcement_is_custom_class}'alt='{$lang->bam_announcement_is_custom_class}' />";
 			}
-			
+
 			// Random mode icon
-			else if ($querydata['random'] != 0) {
+			if ($querydata['random'] != 0) {
 				$prefixVal .= "<img src='styles/default/images/icons/run_task.png' title='{$lang->bam_announcement_is_random}'alt='{$lang->bam_announcement_is_random}' />";
 			}
-			
-			// Global icon
-			else if ($querydata['global'] == 1) {
-				$prefixVal .= "<img src='styles/default/images/icons/world.png' title='{$lang->bam_announcement_is_global}'alt='{$lang->bam_announcement_is_global}' />";
-			}
-			
-			// Index icon
-			else if ($querydata['global'] == 0) {
-				$style = "padding: 1px 0 1px 16px; background-image: url(../images/usercp_sprite.png); background-repeat: no-repeat; background-position: 0 -400px;";
-				$prefixVal .= "<span style='$style' title='$lang->bam_announcement_is_index'></span>";
-			}
-			
-			// Displayed on specific forums. 
 			else {
-				$style = "padding: 1px 0 1px 16px; background-image: url(../images/headerlinks_sprite.png); background-repeat: no-repeat; background-position: 0 -140px;";
-				$prefixVal .= "<span style='$style' title='$lang->bam_announcement_is_forums'></span>";
+				// Special pages icon
+				if (($querydata['additional_display_pages'] != null) && $querydata['global'] == 3) {
+					$prefixVal .= "<img src='styles/default/images/icons/custom.png' title='{$lang->bam_has_additional_pages}'alt='{$lang->bam_has_additional_pages}' />";
+				}
+				
+				// Global icon
+				else if ($querydata['global'] == 1) {
+					$prefixVal .= "<img src='styles/default/images/icons/world.png' title='{$lang->bam_announcement_is_global}'alt='{$lang->bam_announcement_is_global}' />";
+				}
+				
+				// Index icon
+				else if ($querydata['global'] == 0) {
+					$style = "padding: 1px 0 1px 16px; background-image: url(../images/usercp_sprite.png); background-repeat: no-repeat; background-position: 0 -400px;";
+					$prefixVal .= "<span style='$style' title='$lang->bam_announcement_is_index'></span>";
+				}
+				
+				// Displayed on specific forums. 
+				else {
+					$style = "padding: 1px 0 1px 16px; background-image: url(../images/headerlinks_sprite.png); background-repeat: no-repeat; background-position: 0 -140px;";
+					$prefixVal .= "<span style='$style' title='$lang->bam_announcement_is_forums'></span>";
+				}
 			}
 			
 			// If announcement is stickied. 
@@ -876,44 +981,80 @@
 				$prefixVal .= "<img src='../images/jump.png' title='{$lang->bam_announcement_has_directives}'alt='{$lang->bam_announcement_has_directives}' />";				
 			}
 			$prefixVal .= "</div>"; 
+			$prefixVal = $plugins->run_hooks("bam_manage_icons", $prefixVal);
 
 			$data[$count]['announcement'] = $announcementText; 
 			$data[$count]['PID'] = (int) $querydata['PID'];
+			$data[$count]['active'] = (int) $querydata['active'];
 			$data[$count]['class'] = $prefixVal . htmlspecialchars($querydata['class']); // We don't run the class through the post parser. So we sanitize here. 
 			$data[$count]['pinned'] = (int) $querydata['pinned'];
 			$data[$count]['disporder'] = (int) $querydata['disporder'];
 			$count++;
 		}
 		
-	
+		$deactivatedRowFlag = 0;
+		$activatedRowFlag = 0; 
+
 		if ($count==0) {
 			$table->output_cell($lang->bam_manage_null); // no announcements found
 			$table->output_cell("");
 			$table->output_cell("");
 			$table->output_row("");
 		}
+
 		else {
 			$i = 0;
 			while ($i <= $count) {
 				if ((isset($data[$i]['PID'])) && ($data[$i]['PID'] != null)) {
+
+					if (($data[$i]['active'] == 1 && $activatedRowFlag == 0)) {
+						// Output a header for activated announcements. 
+						$rowClasses = "bam_border_activated";
+						$activatedImage .= "<img src='styles/default/images/icons/tick.png' style='position:absolute;' title='{$lang->bam_activated_announcements}'/>";
+						$table->output_cell("<div style='vertical-align: middle; padding-bottom: 5px; padding-top: 3px; display: inline-block;'>".$activatedImage." <b><div style='display:inline-block; margin-left: 25px;'>".$lang->bam_activated_announcements."</b></div></div>", array('class' => $rowClasses)); 
+						$table->output_cell(" ", array('class' => $rowClasses));
+						$table->output_cell(" ", array('class' => $rowClasses));
+						$table->output_row("", "", "", "", array('class' => $rowClasses)); // Welcome to PHP...  
+						$activatedRowFlag = 1; 
+					}
+
+					// Print a row for deactivated announcements. 
+					if ($data[$i]['active'] == 0 && $deactivatedRowFlag == 0) {
+						$rowClasses = "bam_border_deactivated";
+						$deactivatedImage .= "<img src='styles/default/images/icons/cross.png' style='position:absolute;' title='{$lang->bam_deactivated_announcements}'/>";
+						$table->output_cell("<div style='vertical-align: middle; padding-bottom: 5px; padding-top: 3px; display: inline-block;'>".$deactivatedImage." <b><div style='display:inline-block; margin-left: 25px;'>".$lang->bam_deactivated_announcements."</b></div></div>", array('class' => $rowClasses)); 
+						$table->output_cell(" ", array('class' => $rowClasses));
+						$table->output_cell(" ", array('class' => $rowClasses));
+						$table->output_row("", "", "", "", array('class' => $rowClasses)); // *sigh*
+						$deactivatedRowFlag = 1; 
+					}
+
 					$table->output_cell($data[$i]['announcement']);
 					$table->output_cell($data[$i]['class']);
 
 					// Output either the "make standard" link or the display order field, depending on which mode this page displays. 
 					if ($type == "random") {
-						$table->output_cell("<center><a href=\"index.php?module=config-bam&action=make_standard&id=".(int) $data[$i]['PID']. "&my_post_key=".$mybb->post_code . "\" onclick=\"confirm('".$lang->bam_make_standard_confirm."');\">" . $lang->bam_make_standard . "</a></center>");
+						$table->output_cell("<center><a href=\"index.php?module=config-bam&action=make_standard&id=".(int) $data[$i]['PID']. "&my_post_key=".$mybb->post_code . "\" onclick=\"return confirm('".$lang->bam_make_standard_confirm."');\">" . $lang->bam_make_standard . "</a></center>");
 					} else {
-						$table->output_cell("<center><input type='text' name=\"disporder[".$data[$i]['PID']."]\" value='".$data[$i]['disporder']."' /></center>");
+						$table->output_cell("<center><input type='number' name=\"disporder[".$data[$i]['PID']."]\" value='".$data[$i]['disporder']."' /></center>");
 					}
 				
 					// Generate the options menu. 	
-					$popup = generate_announcement_controls($data[$i]['PID'], $data[$i]['pinned']);
+					$popup = generate_announcement_controls($data[$i]['PID'], $data[$i]['pinned'], $data[$i]['active']);
 					$table->output_cell($popup->fetch(), array("class" => "align_center"));
+					$plugins->run_hooks("bam_manage_outputrow", $table);
 					$table->construct_row();
 				}	
 				$i++;		
 			}
-		
+		}
+
+
+		if ($count_deactivated > 0) {
+			$table->output_cell("<i><b>".$lang->bam_deactivated_announcements."</b></i>"); 
+			$table->output_cell("");
+			$table->output_cell("");
+			$table->output_row("");
 		}
 
 		$buttons = array();
@@ -947,20 +1088,25 @@
 	}
 
 
-function generate_announcement_controls ($id, $ispinned) {
-	global $mybb, $lang; 
-
+function generate_announcement_controls ($id, $ispinned, $isactive) {
+	global $mybb, $lang, $plugins; 
+	$r = "standard";
 	$id = (int) $id;
-
-	$popup = new PopupMenu("announcement_{$id}", $lang->bam_manage_popupmenu);
-	$popup->add_item($lang->bam_manage_edit, 'index.php?module=config-bam&action=edit&id=' . $id);
-	$popup->add_item($lang->bam_manage_delete,  "index.php?module=config-bam&action=delete&id=" . $id . "&my_post_key=".$mybb->post_code, "return confirm('".$lang->bam_manage_delete_confirm."');");
 	
-	// Add the link to make an announcement random if random mode is enabled and we are on the standard page. 
-	if (($_GET['action'] != "manage_random") && $mybb->settings['bam_random'] != 0) {
-		$popup->add_item($lang->bam_make_random,  "index.php?module=config-bam&action=make_random&id=" . $id . "&my_post_key=".$mybb->post_code, "return confirm('".$lang->bam_make_random_confirm."');");
+	$popup = new PopupMenu("announcement_{$id}", $lang->bam_manage_popupmenu);
+	
+	// Pass a value to properly redirect activated/deactivated link. 
+	if ($_GET['action'] == "manage_random") {
+		$r = "random";
 	}
+	// Create activate/deactivate controls. 
+	if ($isactive) {
+		$popup->add_item($lang->bam_set_deactivated,  "index.php?module=config-bam&action=deactivate&id=" . $id . "&my_post_key=".$mybb->post_code."&r=$r");
+	} else {
+		$popup->add_item($lang->bam_set_activated,  "index.php?module=config-bam&action=activate&id=" . $id . "&my_post_key=".$mybb->post_code."&r=$r");
+	}	
 
+	// Generate sticky announcement controls. 
 	if ($_GET['action'] != "manage_random") {
 		if ($ispinned) {
 			$popup->add_item($lang->bam_manage_unpin,  "index.php?module=config-bam&action=unpin&id=" . $id . "&my_post_key=".$mybb->post_code);
@@ -969,6 +1115,15 @@ function generate_announcement_controls ($id, $ispinned) {
 		}	
 	}
 
+	$popup->add_item($lang->bam_manage_edit, 'index.php?module=config-bam&action=edit&id=' . $id);
+	$popup->add_item($lang->bam_manage_delete,  "index.php?module=config-bam&action=delete&id=" . $id . "&my_post_key=".$mybb->post_code."&r=$r", "return confirm('".$lang->bam_manage_delete_confirm."');");
+	
+	// Add the link to make an announcement random if random mode is enabled and we are on the standard page. 
+	if (($_GET['action'] != "manage_random") && $mybb->settings['bam_random'] != 0) {
+		$popup->add_item($lang->bam_make_random,  "index.php?module=config-bam&action=make_random&id=" . $id . "&my_post_key=".$mybb->post_code, "return confirm('".$lang->bam_make_random_confirm."');");
+	}
+
+	$popup = $plugins->run_hooks("bam_generate_controls", $popup);
 	return $popup;
 }
 

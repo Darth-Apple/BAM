@@ -50,6 +50,10 @@ EXAMPLES:
 
 More documentation is available in advanced_documentation.txt. This is an advanced feature that is very powerful, but that has specific parameters that must be met in order to work properly. 
 
+URL REWRITES: This plugin supports search engine friendly URLs as defined by MyBB's built-in htaccess file. You may paste these in exactly the same manner as native URLs, and BAM will convert these internally. 
+
+THIRD PARTY SEO PLUGINS: BAM does not have support for third party SEO plugins, such as Google SEO. You must paste native URLs into this field for them to be properly parsed if you are using such plugins. If you would like to help extend BAM, please reach out, and I will be happy to collaborate with you to help bring third-party SEO plugin support to BAM. 
+
 
 --------------------------------------------------
 FREQUENTLY ASKED QUESTIONS:  

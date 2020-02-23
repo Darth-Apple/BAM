@@ -1,51 +1,23 @@
 BAM Announcements Manager — Version 2.0 - BETA VERSION: 
 
-VERY EARLY BETA VERSION OF THIS PLUGIN. USE AT YOUR OWN RISK. 
+This document contains additional technical documentation on some of BAM's internal functionality. Refer to this documentation if you experience specific compatibility issues other plugins, or experience issues with the URL parser functionality. 
 
-   — New and updated! Please read this document fully, as some features have changed. Please be aware that this is a beta version. There is no warranty with this version, and there WILL be various issues that pop up. If you would like to contribute, please report these issues as you discover them, and I will make sure to fix them before the plugin’s release. Otherwise, hang tight. The official release will be out shortly!
-
-————————————————————————————————
-BAM Announcements Manager is a plugin that allows you to manage announcements in the header area of your forum without any need for modifications to the templates. BAM+ adds several new features, and creates an improved announcement interface and manager for your forum. 
-
-NEW IN BAM 2.0
-   - Dismissible announcements (finally)! 
-   - Random mode is completely redesigned, and is now much easier to use.  
-   - The "index page" setting now takes multiple pages. Non global announcements can be displayed on multiple pages without being displayed forum-wide.  
-   - Global announcements are now handled on a per-announcement basis. Pinned announcements deprecated (and are no longer the method of making announcements global). This gives much more granularity for where announcements are displayed.
-   - New Advanced Mode. Please read the remainder of this documentation for more details.
-   - HTML, as well as the image tag are now enabled when using advanced mode. 
-   - New ability to set announcements to display only on specific pages, on a per-announcement basis (see advanced mode section). 
-   - “Unofficial” feature to display announcements only on specific themes and languages (see the section on theme tags). 
-   - New variables for announcements
-
-STANDARD FEATURES (BAM 1.0): 
-   - Support for an unlimited number of header announcements, with the ability to order and reorder announcements. 
-   - Four included color classes, with the ability to define additional custom classes by announcement. 
-   - Usergroup permissions for announcements
-   - Support for BBcode and emoticons (and now HTML — advanced mode) in announcements. 
-   - Ability to optionally display the date posted on announcements.
-   - Ability to display announcements globally. 
-   - Ability to parse the username if {$username} is placed in an announcement. (Parses to "Guest" if the user is not logged in. )
-   - Optional "random mode" functionality. 
-   - Ability to turn an announcement into a link without the use of BBcode. 
-
-
------------------------------------------
-
-
-
+----------------------------------------------------
 MAKING ANNOUNCEMENTS DISPLAY ON SPECIFIC PAGES: 
+----------------------------------------------------
 
    - This is a brand new feature in BAM 2.0! This gives quite a bit of granularity on where announcements will be posted. You can make them display only on a specific user’s profile, or on a specific forum board, or on a specific thread, for example. 
    - When this setting is used, your announcement will ONLY display on these pages. Global announcement settings are ignored. 
    - The vast majority of pages on your forum will work simply by pasting the URL into the "Additional display pages" setting. Although this is a beta feature, it works very well for most common pages on the forum, and has been tested extensively. 
    - There are certain pages where announcements won't display, or where the URL won't parse quite like you might expect. Many very obscure pages (such as the login redirect page) will not display announcements, for example. Most of these situations are documented below. If you have any issues with this setting, please refer to the steps below. 
 
+---------------------------------------------------------------------------------
 TECHNICAL DETAILS ON THE ADVANCED MODE PARSER (READ IF YOU ENCOUNTER ANY ISSUES): 
+---------------------------------------------------------------------------------
 
-The URL parser works differently than it might seem at first glance. MyBB does not necessarily "see" your page's URL when you visit a page. Instead, it sees building blocks that tell it what to do and what to display. Some of these building blocks are very important. Others are much more minor or extraneous altogether. In any case, MyBB creates your page by displaying and executing the correct code, depending on which parameters (or building blocks) are present in your URL. 
+The URL parser works differently than it might seem at first glance. It does considerable work under-the-hood to make sure that it blocks out rogue URLs, properly converts PIDs to TIDs, etc. 
 
-BAM+ does not look at the entire URL as a single link to check against the user's current page. Instead, it looks for these building blocks in the URL, and tries to determine whether it should display the page based on the parameters it is given. This was necessary for a number of reasons. BAM+ would act very strangely otherwise! 
+As such, MyBB does not necessarily "see" your page's URL when you visit a page as a full URL. Instead, it sees individual parameters that tell it what to do and what to display. Some of these parameters are very important. Others are much more minor or extraneous altogether. In any case, MyBB creates your page by displaying and executing the correct code, depending on which parameters (or building blocks) are present in your URL. 
 
 In general, this improves functionality rather than introducing bugs. If, for example, you give a URL of http://makestation.net/member.php?action=profile&uid=3, BAM will know that you need the announcement to display specifically, and exclusively, on a single user's profile. However, if you give BAM the URL of http://makestation.net/member.php?action=profile, BAM will see that a user ID is not in the URL, and then display the announcement on all user profiles. 
 
@@ -53,23 +25,34 @@ This functionality works in exactly the same manner on almost every section of y
 
 In general, this works exactly like you would expect. Simply paste the link to the page that you need the announcement to display on, and BAM will do the rest. 
 
+----------------------------------------------------
 WHEN THE LINK FUNCTIONALITY WORKS DIFFERENTLY: 
+----------------------------------------------------
 
-- Because of the way that BAM parses the links that it is given, it may see certain links differently than you, as a user, would. A perfect example of this would be displaying an announcement on "forumdisplay.php." If you were to visit this page on your forum without any additional parameters, you would get an error. MyBB refuses to display a forum/board if it doesn't know what board to display. 
+Because of the way that BAM parses the links that it is given, it may see certain links differently than might be expected. A perfect example of this would be displaying an announcement on "forumdisplay.php". If this page were to be visited without any additional URL parameters, MyBB would return an error page. MyBB refuses to display a forum/board if it doesn't know what board to display. 
 
-- BAM sees this page differently. It will see that there are no parameters, and will conclude that it should display the announcement on ALL forums/boards. This might seem like a bug, but this is explicitly not a bug, and is exactly how BAM was designed to see these URLs. If BAM saw URLs "literally" rather than by parsing them as it does, there would be a lot of functionality that would be lost. It would, for example, be impossible to display announcements on all boards. 
+BAM sees this page differently. It will see that there are no parameters, and will conclude that it should display the announcement on ALL forums/boards. This might seem like a bug, but this is explicitly not a bug, and is exactly how BAM was designed to see these URLs. If BAM parsed these URLs literally as a full-text match link (rather than by parsing them as it does), there would be some general functionality that would be lost. 
 
+----------------------------------------------------
 THINGS BAM EXPLICITLY IGNORES: 
+----------------------------------------------------
 
- - There are specific parameters that BAM explicitly does not parse. These omissions are not bugs, and they serve to make BAM behave in a way that is more consistent with how it would be expected to operate. Some of these fields include: 
+There are specific parameters that BAM explicitly does not parse. These omissions are not bugs, and they serve to make BAM behave in a way that is more consistent with how it would be expected to operate. Some of these fields include: 
 
- - Page numbers. You can display an announcement on a specific thread, but you cannot make an announcement display only on a certain page of that thread. (If this functionality was enabled, users would, by accident, copy/paste a thread's URL that included a page number, and mistakenly disable announcements for every page except this particular page number.)
- - Login and redirect pages. (Not supported at all)
+ - Page numbers. You can display an announcement on a specific thread, but you cannot make an announcement display only on a certain page of that thread. (If this functionality was enabled, extraneous, unnecessary page numbers that sometimes end up in the URL would confuse BAM and cause it to parse only on a specific page in some cases, even when this behavior is unintended.)
+
+ - Login and redirect pages. (Not supported at all, as the templates don't allow it)
+
  - Specific search queries. (You can put announcements on the search page, but they will display for all search queries.) 
 
-THINGS BAM EXPLICITLY PARSES: 
+ - Post IDs (pid). (These are technically supported, but BAM will convert them to the thread ID that they represent and parse them as normal. BAM does some under-the-hood work to handle these, as MyBB sometimes links to PIDs instead of thread IDs. ) 
 
- - Any page's .php filename. If the ONLY thing in this field is this filename (such as portal.php, forumdisplay.php, etc.), BAM will display your announcement on EVERY page that includes this filename. This, for example, is how you can display announcements only on the portal, or on all boards. 
+----------------------------------------------------
+THINGS BAM EXPLICITLY PARSES: 
+----------------------------------------------------
+
+ - Any page's .php filename. If the ONLY thing in this field is this filename (such as portal.php, forumdisplay.php, etc.), BAM will display your announcement on EVERY page that includes this filename. This, for example, is how you can display announcements only on the portal, or on all boards.
+ 
  - any fid (forum/board ID), tid (thread ID), uid (user ID), gid (group ID), or action (usually a page). 
 
 EXAMPLES: 
@@ -85,10 +68,26 @@ EXAMPLES:
 
 In general, you can simply copy/paste a link to the page, and BAM will parse it correctly. These are just a few examples of some that are tested, and many others will work! If you have any issues with this setting, please refer to the documentation above, and report the issue if you feel that there is a bug! 
 
+Handling PIDs: MyBB sometimes contains thread URLs that lack a TID, containing only a PID instead. When this occurs, MyBB directs the user to a specific post in a thread, but otherwise generates the entire thread as normal and internally converts the PID to the associated TID. BAM converts these similarly, and will display your announcement on the corresponding thread as normal, even if the URL lacks a thread ID parameter.
+
+
+----------------------------------------------------
 DISPLAYING ON MULTIPLE PAGES: 
+----------------------------------------------------
 
-If you need to define more than one page, you can do so by separating URLs with a comma. The URL parser will display your announcement on all pages that are valid. 
+If you need to define more than one page, this is possible by separating URLs with a comma. The URL parser will display the announcement on all pages that are valid. 
 
+----------------------------------------------------
+GOOGLE SEO PLUGIN SUPPORT: 
+----------------------------------------------------
+
+This is currently unsupported in this release. This is a known omission because supporting SEO URLs would require a complete, ground-up rewrite of the entire BAM URL parser. This is somewhat beyond my technical expertise at this time, and will be time-consuming to implement in a future release. 
+
+However, this is a planned feature, and if anyone has some technical knowledge or guidance on how to get this working, please reach out! BAM is fully open-source, and as such, I am fully interested and willing to collaborate with the MyBB developer community as a whole in order to bring Google SEO support to BAM. 
+
+In the meantime, if you need to get this working, you can manually put in the non-rewritten URLs into this field to get it working with this plugin. The best way to do this is to look at how the URLs are structured on a forum that does not have this plugin installed. If you can provide the UID (user ID), TID (thread ID), action, or other parameter values and create a proper, un-rewritten URL, BAM will see these properly and parse them as normal. 
+
+I will provide support on http://makestation.net, or on the MyBB community support forums if you absolutely need to get this working. I cannot guarantee that this will work for all cases, as this is entirely unsupported in this release of BAM. Please stay tuned for a future release!
 
 -----------------------------
 
@@ -127,6 +126,8 @@ OTHER DIRECTIVES:
 
 If you use custom templates, you must define this template in your forum's global templates. Please note that using custom templates may break features such as announcement dismissals and date functionality. 
 
+It is strongly recommended to copy/paste the normal bam_announcement template (in global templates) into a new template, and to modify this template accordingly. This will preserve all of the standard variables required for handling normal announcement dismissals. 
+
 ---------------------------------
 
 RANDOM MODE:
@@ -157,7 +158,6 @@ ADDING CUSTOM STYLES/COLORS:
     }
 
   You will now be able to use "aqua" in the custom class field. 
-
 
 
 Copyright: 

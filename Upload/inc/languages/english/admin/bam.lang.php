@@ -20,7 +20,7 @@ $l['bam_title_acronym'] = "BAM+ Announcements Manager (Updated and Improved!)";
 $l['bam_desc'] = "Allows you to create and manage announcements in your forum header.";
 $l['bam_announcements_menu'] = "BAM+ Announcements";
 $l['bam_enable'] = "Activate BAM Announcements Manager?";
-$l['bam_enable_desc'] = "Enable or disable BAM Announcements Manager without the need to uninstall this plugin.";
+$l['bam_enable_desc'] = "Enable or disable BAM Announcements Manager without the need to uninstall this plugin. ";
 $l['bam_random_enable'] = "Enable/Disable Random Mode";
 $l['bam_random_desc'] = "Enables the <i>random mode</i> tab, along with automatically refreshing announcements. This feature does not affect your standard announcements!";
 $l['bam_random_max'] = "Random Results Generated";
@@ -39,10 +39,13 @@ $l['bam_custom_css_desc'] = "Add any custom CSS classes here. ";
 $l['bam_welcome'] = "[b]BAM+ 2.0 has successfully been installed![/b] You may now manage your announcements via the ACP. ";
 $l['bam_date_enable'] = "Display Announcement Date?";
 $l['bam_date_desc'] = "If enabled, BAM will display the date posted for announcements. ";
-
+$l['bam_settings_link'] = "Click here for BAM's general plugin settings";
 $l['bam_slidedown_enable'] = "Enable Slidedown Effect?";
 $l['bam_slidedown_enable_desc'] = "When enabled, announcements will slide down on a new page load. Note that this setting gives the browser time to remove dismissed announcements before displaying them. If this setting is disabled, these announcements might briefly flash on the screen.";
 // 2.0 
+
+$l['bam_round'] = "Use Soft Borders for Announcements?";
+$l['bam_round_desc'] = "Soft borders give announcements a rounded appearance. If disabled, BAM will use the same style that is used on the MyBB support forum. ";
 
 $l['bam_enable_dismissal'] = "Announcement Dismissals: ";
 $l['bam_enable_dismissal_desc'] = "Set how BAM should handle announcement dismissals.  
@@ -97,12 +100,21 @@ $l['bam_make_standard_success'] = "Successfully reset your announcement to stand
 $l['bam_make_standard_header'] = "Manage Type";
 $l['bam_add_new_random'] = "Create Random Announcement";
 
+$l['bam_activate_success'] = "Successfully activated announcement. ";
+$l['bam_deactivate_success'] = "Successfully deactivated announcement. ";
+$l['bam_set_activated'] = "Activate";
+$l['bam_set_deactivated'] = "Deactivate";
+$l['bam_announcement_activated'] = "Activated?";
+$l['bam_deactivated_announcements'] = "Deactivated announcements: ";
+$l['bam_activated_announcements'] = "Activated announcements: ";
+
 $l['bam_announcement_is_global'] = "This announcement is global (displayed on all pages).";
 $l['bam_announcement_is_index'] = "This announcement is displayed on the default homepage.";
 $l['bam_announcement_is_sticky'] = "This announcement is sticky (cannot be dismissed).";
 $l['bam_announcement_is_forums'] = "This announcement is displayed on specific forums.";
 $l['bam_announcement_is_random'] = "This is a random mode announcement.";
 $l['bam_announcement_has_directives'] = "This announcement has special directives. ";
+$l['bam_announcement_is_custom_class'] = "This announcement uses a custom style.";
 
 $l['bam_green'] = "Green/Success";
 $l['bam_blue'] = "Blue/Notice";
@@ -144,7 +156,7 @@ $l['bam_form_edit_submit'] = "Edit Announcement";
 
 // 2.0
 $l['bam_announcement_type'] = "Announcement Type: ";
-$l['bam_announcement_type_desc'] = "Select whether this announcement will be added under random mode or standard mode. Note that BAM handles Random Mode announcements differently than standard mode announcements. Please see documentation for details. ";
+$l['bam_announcement_type_desc'] = "Select whether this announcement will be added under random mode or standard mode. ";
 $l['bam_display_mode'] = "Pages to Display Announcement"; // no longer used
 $l['bam_display_mode_desc'] = "Select where this announcement should be displayed. By default, it is displayed on the index page only.";
 $l['bam_list_display_global'] = "Global (display on all pages)";
@@ -206,7 +218,7 @@ $l['bam_announcement_tags_alert'] .= "&nbsp;&nbsp;&nbsp;&nbsp;These directives g
 $l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; [@themes:1,2] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Display announcement only on theme IDs 1 and 2. </i>";
 $l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; [@languages:espanol] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Show announcement only in Spanish (or any language you choose). </i>";
 $l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; [@template:custom] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Use an alternative global template for this announcement (Advanced - use if you need javascript).</i>";
-$l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; [@disabled] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Ghost mode (disables announcement).</i>";
+// $l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; [@disabled] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Ghost mode (disables announcement).</i>";
 
 $l['bam_announcement_tags_alert'] .= "<br /><br />These directives can be placed anywhere in your announcement\'s text, and will be removed before your announcement is displayed on your forum. These features are considered experimental. Please request support or visit the documentation with any questions!<br /><br />";
 
@@ -217,24 +229,21 @@ $l['bam_additional_pages_too_long'] = "Error. Additional pages field cannot be m
 
 // Lang strings for BAM's built in "upgrade advisor"
 
-$l['bam_upgrade_required'] = "<b> It looks like you have successfully uploaded BAM 2.0 to the server!</b> In order to use the new version, you must run BAM's upgrade script to refresh database fields and templates. This will migrate all of your existing announcements from BAM 1.0 to BAM+ 2.0. Make sure to visit BAM's settings after running your upgrade and verify that everything still looks correct!";
+$l['bam_upgrade_required'] = "<b> It looks like you have successfully uploaded BAM 2.0 to the server!</b> In order to use the new version, you must run BAM's upgrade script to refresh database fields and templates. This will migrate all of your existing announcements from BAM 1.0 to BAM+ 2.0. Make sure to visit BAM's settings after running your upgrade and verify that everything still looks correct.";
 $l['bam_upgrade_link_text'] = "Click here to run the upgrade!";
 $l['bam_upgrade_link_text_plugins_panel'] = "BAM is ready to update. Click here to finish upgrading to BAM 2.0!<br />";
 $l['bam_upgrade_success'] = "You have successfully updated BAM to BAM+ 2.0! Verify any settings are correct, as these have been refreshed and restored to defaults from the upgrade. If you have any additional issues, uninstall BAM and reinstall from the plugins page. This will resolve any remaining issues!";
 $l['bam_info_alternative_upgrade'] = "<br /><br /><i>You can alternatively uninstall the plugin, and perform a full re-install on this page! Note that this will delete your announcements.</i>";
 
-$l['bam_info_upgrade'] = "<font color='red'><b>You have uploaded BAM 2.0 to the server, but an upgrade is required to migrate your announcements to the new version! </font>
+$l['bam_info_upgrade'] = "<font color='red'><b>You have uploaded BAM 2.0 to the server, but an upgrade is required to migrate your announcements to the new version. </font>
 Make sure that BAM is activated before running the built-in migrator. Once BAM has been activated, 
 an upgrade link will appear below. </b><br /><br />
-<i>(BAM's upgrader is specifically designed to operate in-place, meaning that it performs the migration when BAM is activated. This enables 
-BAM to load its upgrade script from directly within your Admin Control Panel. This will run seamlessly, and your announcements will display without interruptions on your forum!)</i>";
+<i>(BAM's upgrader is specifically designed to operate in-place, and runs while the plugin is activated. There will be no interruptions on the announcements for your forum.)</i>";
 
-$l['bam_info_upgrade_ready'] = "<font color='red'><b>You have uploaded BAM 2.0 to the server, but an upgrade is required to migrate your announcements to the new version!</b> 
+$l['bam_info_upgrade_ready'] = "<font color='red'><b>You have uploaded BAM 2.0 to the server, but an upgrade is required to migrate your announcements to the new version.</b> 
 You may launch the upgrader below. </font> 
 <br /><br />
-<i>(BAM's upgrader is specifically designed to operate in-place, meaning that it performs the migration when BAM is activated. 
-This enables BAM to load its upgrade script from directly within your Admin Control Panel. 
-This will run seamlessly, and your announcements will display without interruptions on your forum!)</i><br />";
+<i>(BAM's upgrader is specifically designed to operate in-place, and runs while the plugin is activated. There will be no interruptions on the announcements for your forum.)</i><br />";
 
 $l['bam_compatibility_mode'] = "Compatibility Mode (Advanced): ";
 $l['bam_compatibility_mode_desc'] = "<b>Leave this setting at its default if unsure. </b>BAM's default template variables and plugin hooks are designed to ensure 
@@ -248,3 +257,9 @@ $l['bam_compatibility_mode_desc'] = "<b><u>Leave this at its default if unsure.<
 BAM to render announcements when outputting the page, rather than during forum-header generation. This may occasionally resolve
 certain compatibility issues that may occur with untested versions of PHP, conflicting plugins, or highly modified themes. This feature is considered experimental. It is currently recommended to leave this setting off
 unless you experience issues.";
+
+$l['bam_admin_permissions'] = "Can manage BAM announcements";
+
+// Future release? Teaser :)
+// $l['bam_spotlight_interval'] = "Bam Spotlight Interval: ";
+// $l['bam_spotlight_interval'] = "How many minutes should BAM wait before refreshing a spotlight announcement? This only applies to random mode announcements when spotlight mode is enabled!";
