@@ -88,12 +88,12 @@ function bam_install () {
 
 		$db->query("CREATE TABLE ".TABLE_PREFIX."bam (
 				PID int unsigned NOT NULL auto_increment,
-  				announcement varchar(1024) NOT NULL default '',				
-				class varchar(40) NOT NULL default 'yellow',
-				link varchar(160) default '',
-				active int unsigned NOT NULL default 1,
-				disporder int NOT NULL default 1,
-				groups varchar(128) default '1, 2, 3, 4, 5, 6',
+  				announcement varchar(1024) NOT NULL DEFAULT '',				
+				class varchar(40) NOT NULL DEFAULT 'yellow',
+				link varchar(160) DEFAULT '',
+				active int unsigned NOT NULL DEFAULT 1,
+				disporder INT NOT NULL DEFAULT 1,
+				`groups` varchar(128) DEFAULT '1, 2, 3, 4, 5, 6',
 				date int(10) NOT NULL,
 				pinned INT UNSIGNED DEFAULT 0,
 				`global` INT UNSIGNED DEFAULT 0, 
