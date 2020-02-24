@@ -81,15 +81,15 @@ $l['bam_manage_desc'] = "This page allows you to manage, edit, delete, and re-or
 $l['bam_edit'] = 'Edit';
 $l['bam_edit_desc'] = "This page allows you to edit an existing announcement. ";
 $l['bam_add_announcement_desc'] = "Add new announcements here. You may add HTML in your announcements. ";
-$l['bam_add_announcement_noadvance_desc'] = "Add new announcements here. You may use BBcode in your announcements. If you need to use full HTML, you can enable this in BAM's settings. ";
+$l['bam_add_announcement_noadvance_desc'] = "Add new announcements here. You may use MyCode in your announcements.";
 $l['bam_order_success'] = "Announcement orders updated successfully. ";
 $l['bam_no_announcement'] = "Error: no announcement to update. ";
 $l['bam_pin_success'] = "Successfully set announcement as sticky. It is now undismissable. ";
 $l['bam_unpin_success'] = 'Successfully set this announcement as unsticky. It can now be dismissed by users. ';
 $l['bam_error'] = "Error. ";
 $l['bam_form_announcement'] = 'Announcement: ';
-$l['bam_form_announcement_desc'] = 'You may use BBcode in your announcements. Up to 1024 characters are allowed.';
-$l['bam_form_announcement_advanced_desc'] = "You may use BBcode and HTML in your announcements. Up to 1024 characters are allowed. ";
+$l['bam_form_announcement_desc'] = 'You may use MyCode in your announcements. Up to 1024 characters are allowed.';
+$l['bam_form_announcement_advanced_desc'] = "You may use MyCode and HTML in your announcements. Up to 1024 characters are allowed. ";
 $l['bam_form_tags_link'] = "Show Available Tags.";
 $l['bam_make_standard'] = "Make Static";
 $l['bam_make_standard_confirm'] = "Set your announcement as a standard announcement?";
@@ -166,9 +166,7 @@ $l['bam_make_global'] = "Make This Announcement Global?";
 $l['bam_make_global_desc'] = "Select whether this announcement will be made global. Global announcements are displayed on all pages, regardless of any other settings or constraints. ";
 $l['bam_additional_pages'] = "Custom Pages and Parameters (Advanced): ";
 $l['bam_has_additional_pages'] = "This announcement has custom display settings.";
-$l['bam_additional_pages_desc'] = "<b>Paste links to specific pages to display this announcement on. </b>
- Note that this setting overrides all other announcement settings regarding where this announcement is posted.
-<i>This announcement will only display on pages that are explicitely defined here. </i>You may paste full links or partial links (as shown below). Separate multiple pages with a comma. <br /><br />
+$l['bam_additional_pages_desc'] = "<b>Paste links to specific pages to display this announcement on. </b> <i>You may paste full links or partial links (as shown below), or SEO-friendly links compatible with MyBB's included .htaccess file. </i>Separate multiple pages with a comma. <br /><br />
 
 <b>Examples:</b> <br />
   - \"forumdisplay.php, index.php\" &nbsp;&nbsp;&nbsp;&nbsp; -- <i>Display on index.php and forumdisplay.php only</i><br />
@@ -179,7 +177,7 @@ $l['bam_additional_pages_desc'] = "<b>Paste links to specific pages to display t
 $l['bam_random_select'] = "Random Mode Announcement";
 $l['bam_standard_select'] = "Static Announcement (always display)";
 $l['bam_advanced_mode'] = "Allow HTML in announcements?";
-$l['bam_advanced_mode_desc'] = "By default, BAM parses BBcode in announcements. If you need full HTML, enable this setting.";
+$l['bam_advanced_mode_desc'] = "By default, BAM parses MyCode in announcements. If you need full HTML, enable this setting.";
 $l['bam_manage_random_form_container'] = "Manage Random Mode Announcements";
 $l['bam_forum_select'] = "Boards to Display Announcement On: ";
 $l['bam_forum_select_desc'] = "Select which boards/forums BAM should display this announcement on. Hold CTRL to select multiple forums.";
