@@ -1,4 +1,4 @@
-Notice: This is a beta version. If you would like to test on a live board, please report any bugs that you discover! There are some known issues, and the original BAM 1 is recommended for download until the new release is finalized. Full release is coming soon! 
+Notice: You are viewing BAM 2.0's final beta release. BAM 2.0 will be released once it is finalized and ready, with a tentative date of February 28, 2020. Please report any bugs, issues, or suggestions that you encounter so that fixes can be implemented into the final release!
 
 ---- ---- ---- ---- 
 
@@ -20,6 +20,7 @@ BAM Announcements Manager has been updated, and is better than ever before! This
  - Full support for BBCode, HTML, {username} tags, and several other new variables
  - Optional Random Mode: Make a new announcement appear on each page refresh.
  - Sticky announcements: Select which announcements are undismissable by users. 
+ - Announcements can be activated and deactivated (new!)
 
 
 This plugin is supported on all MyBB 1.8.X forums, and has been tested extensively. If you used BAM 1.0 before, it is strongly recommended to update to the new version of this plugin, as it is significantly more advanced and more powerful than the initial version. Many thanks to @Guardian (Sawedoff) and @Eldenroot for many ideas and for feedback on the new version of this mod! 
@@ -60,29 +61,15 @@ FREQUENTLY ASKED QUESTIONS:
 --------------------------------------------------
 
 
-CAN I DISABLE AN ANNOUNCEMENT WITHOUT DELETING IT? 
-
-    - There are two ways you can do this. 
-
-1) Disable all usergroups for the announcement. 
-2) Put the [@disabled] tag in the announcement. Both will disable the announcement without deleting it! 
-
-
-HOW DOES THE FORUM GAMES COUNTING THREAD VARIABLE WORK? 
- 
-    - It works by looking for a group of posts with consecutive numbers. It determines that a relatively large group of consecutive posts must have the correct count, and therefore corrects itself if a user posts the wrong count. It will reset itself if you post a new count for 3-4 posts in a row. 
-    - {threadreplies} does the same thing, but bases itself on the reply count. If your forum game is not offset from your reply count, use this variable instead. 
-
-
 WHAT IS RANDOM MODE? 
 
-    - Random mode allows announcements to be refreshed on each page visit. BAM will select an announcement randomly from the random mode tab, and will display a different announcement each time your forum's index is visited. 
-    - Due to the complexity of how BAM manages different types of announcements, you can’t put random mode announcements on other pages in this version. (Maybe a future release will expand upon this). They display on the forum’s index, below standard announcements. There are certain settings that work differently in random mode, so make sure to double check your announcement’s settings if you convert your announcement from standard to random mode. 
+ - Random mode allows announcements to be refreshed on each page visit. BAM will select an announcement randomly from the random mode tab, and will display a different announcement each time your forum's index is visited. 
+ - Due to the complexity of how BAM manages different types of announcements, you can’t put random mode announcements on other pages in this version. (Maybe a future release will expand upon this). They display on the forum’s index, below standard announcements. There are certain settings that work differently in random mode, so make sure to double check your announcement’s settings if you convert your announcement from standard to random mode. 
 
 
 CAN I USE HTML IN ANNOUNCEMENTS? 
 
- - Yes. Ordinarily, only BBcode is supported. However, you may enable the HTML setting in BAM's plugin settings to allow HTML. Please note that, by design, this does not work for javascript, which is purposefully removed before rendering announcements. If you need javascript, see below. 
+ - Yes. Ordinarily, only MyCode is supported. However, you may enable the HTML setting in BAM's plugin settings to allow HTML. Please note that, by design, this does not work for javascript, which is purposefully removed before rendering announcements. If you need javascript, see below. 
 
 
 CAN I PUT JAVASCRIPT IN AN ANNOUNCEMENT? 
@@ -128,6 +115,17 @@ CAN I DISPLAY ANNOUNCEMENTS ON SPECIFIC PAGES OF MY FORUM?
     - Yes! When creating an announcement, select (Other - Advanced) in the drop down menu. Paste a link to specific pages to display your announcement on. This field can take multiple values, separated by a comma. 
 
     - Note that while this works for most pages, there are certain pages that cannot display announcements. See the the "custom pages" section of this readme (above) for more information. 
+
+
+CAN I ADD MODERATOR CP ACCESS? 
+
+ - BAM does not have moderator control panel access at this time. Adding this would require a ground-up rewrite of the ACP module that BAM currently implements. However, administrator permissions are implemented in BAM 2.0. You may create customized administrator groups that only have access to BAM's announcement management panel. 
+
+
+HOW DOES THE FORUM GAMES COUNTING THREAD VARIABLE WORK? 
+ 
+    - It works by looking for a group of posts with consecutive numbers. It determines that a relatively large group of consecutive posts must have the correct count, and therefore corrects itself if a user posts the wrong count. It will reset itself if you post a new count for 3-4 posts in a row. 
+    - {threadreplies} does the same thing, but bases itself on the reply count. If your forum game is not offset from your reply count, use this variable instead. 
 
 
 I INSTALLED BAM, BUT THE ANNOUNCEMENTS DON'T DISPLAY. 
@@ -202,7 +200,7 @@ EASTER EGGS AND EXTRAS:
 
  - Updated ACP interface that displays more information (with new icons) about where announcements will be posted. 
 
- - Both BAM 1.0 and 2.0 allow you to turn your announcement into a link without the use of BBcode. Simply paste a link into the URL field!
+ - Both BAM 1.0 and 2.0 allow you to turn your announcement into a link without the use of MyCode. Simply paste a link into the URL field!
 
 Copyright: 
 

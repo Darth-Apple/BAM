@@ -97,7 +97,7 @@ $l['bam_make_random_confirm'] = "Set your announcement as a random mode announce
 $l['bam_make_random'] = "Make Announcement Random";
 $l['bam_make_random_success'] = "Successfully made your announcement a <i>random mode</i> announcement. Please make sure all settings look correct. ";
 $l['bam_make_standard_success'] = "Successfully reset your announcement to standard mode. Please edit any additional settings and make sure they look correct!";
-$l['bam_make_standard_header'] = "Manage Type";
+$l['bam_make_standard_header'] = "Manage";
 $l['bam_add_new_random'] = "Create Random Announcement";
 
 $l['bam_activate_success'] = "Successfully activated announcement. ";
@@ -116,14 +116,13 @@ $l['bam_announcement_is_random'] = "This is a random mode announcement.";
 $l['bam_announcement_has_directives'] = "This announcement has special directives. ";
 $l['bam_announcement_is_custom_class'] = "This announcement uses a custom style.";
 
-$l['bam_green'] = "Green/Success";
-$l['bam_blue'] = "Blue/Notice";
-$l['bam_yellow'] = 'Yellow/Alert';
-$l['bam_orange'] = 'Orange/Alert';
-$l['bam_red'] = "Red/Alert";
-$l['bam_silver'] = 'Silver/Info';
-$l['bam_magenta'] = "Magenta/Info";
-$l['guest_notice'] = "Guest Notice"; // Not implemented. 
+$l['bam_green'] = "Green";
+$l['bam_blue'] = "Blue";
+$l['bam_yellow'] = 'Yellow';
+$l['bam_orange'] = 'Orange';
+$l['bam_red'] = "Red";
+$l['bam_silver'] = 'Silver';
+$l['bam_magenta'] = "Magenta"; 
 $l['bam_custom'] = "Custom (Define Below)";
 
 $l['bam_form_style'] = "Style/Color Class: ";
@@ -193,7 +192,7 @@ $l['bam_delete_error'] = "Error deleting announcement: announcement not found. "
 
 $l['bam_manage_announcement'] = "Announcement";
 $l['bam_manage_class'] = "Style/Class";
-$l['bam_manage_order'] = "Display Order";
+$l['bam_manage_order'] = "Order";
 $l['bam_manage_actions'] = "Actions";
 $l['bam_manage_edit'] = "Edit";
 $l['bam_manage_delete'] = "Delete";
@@ -258,7 +257,7 @@ BAM to render announcements when outputting the page, rather than during forum-h
 certain compatibility issues that may occur with untested versions of PHP, conflicting plugins, or highly modified themes. This feature is considered experimental. It is currently recommended to leave this setting off
 unless you experience issues.";
 
-$l['bam_admin_permissions'] = "Can manage BAM announcements";
+$l['bam_admin_permissions'] = "Can manage BAM announcements?";
 
 // Future release? Teaser :)
 // $l['bam_spotlight_interval'] = "Bam Spotlight Interval: ";

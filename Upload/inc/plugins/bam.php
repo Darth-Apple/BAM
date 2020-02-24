@@ -1009,7 +1009,6 @@ function isIndexPage($otherPage=null) {
 function isAlternatePageValid($announcement) { 
 	global $mybb, $current_page, $additional_page_parameters;
 
-	// $startTime = microtime(TRUE);
 	// Developers: If you are using this plugin and your URL settings are not being accepted, you can add
 	// new acceptable parameteres here. However, please be aware that this is a whitelist that is intended
 	// to prevent unexpected or insecure behavior. This setting was explicitely ommitted on the ACP for 
@@ -1108,10 +1107,6 @@ function isAlternatePageValid($announcement) {
 			}
 		}
 	} // End loop for URLs. 
-
-	// $endTime = microTime(TRUE);
-
-	// echo "Execution time: " . ($endTime - $startTime);
 	return $acceptPage;
 }
 
@@ -1497,10 +1492,10 @@ function global_display($pinned) {
 	}
 }
 
-// BAM only officially supports MyBB's built-in rewrites with its included htaccess file. 
-// This rewrites SEO friendly URLs back into native URLs, which are usable by the built in 
-// parser. This was done so that URL parsing can be extended more easily without fully rewriting 
-// the URL parser. See the comments below on how to use custom HTACCESS settings. 
+// This function rewrites SEO-friendly URLs from MyBB's included HTACCESS file. 
+// These links are converted internally to native URLs and parsed as such. 
+// BAM includes plguin hooks to add additional directives. A stub function has been provided to 
+// demonstrate extensibility with additional URL rewrites. 
 
 // Note: Google SEO plugin is NOT supported at this time. A future release may expand upon this! 
 

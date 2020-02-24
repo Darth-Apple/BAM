@@ -887,16 +887,17 @@ if(!defined("IN_MYBB")) {
 
 		echo $form_t->generate_hidden_field("action", "order");
 		
-		$table->output_row_header($lang->bam_manage_announcement, array('width' => '68%'));
+		// $table->output_row_header($lang->bam_manage_announcement, array('width' => '69%'));
+		$table->output_row_header($lang->bam_manage_announcement, array('width' => (isset($mybb->input['action']) && $mybb->input['action'] == "manage_random") ? '68%' : '71%'));
 		$table->output_row_header($lang->bam_manage_class, array('width' => '14%'));
 		
 		// Output the correct table header depending on the announcement's type. 
 		if ($type == "random") {
 			$table->output_row_header($lang->bam_make_standard_header, array('width' => '9%')); 
 		} else {
-			$table->output_row_header($lang->bam_manage_order, array('width' => '9%')); 
+			$table->output_row_header($lang->bam_manage_order, array('width' => '6%')); 
 		}
-		$table->output_row_header($lang->bam_manage_actions, array('width' => '10%', 'text-align' => 'center')); 
+		$table->output_row_header($lang->bam_manage_actions, array('width' => '9%', 'text-align' => 'center')); 
 		
 		// OLD WHERE random = 1 ORDER BY active DESC, pinned DESC, disporder ASC, PID ASC
 		if ($type == "random") {
