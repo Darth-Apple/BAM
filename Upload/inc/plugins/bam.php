@@ -29,9 +29,11 @@ if(!defined("IN_MYBB")) {
 
 // Create hooks. 
 if (isset($mybb->settings['bam_enabled']) && $mybb->settings['bam_enabled'] == 1) {
+	// Add hooks if BAM is enabled. 
 	if ($mybb->settings['bam_compatibility_mode'] != 1) {
-		$plugins->add_hook("global_intermediate", "bam_announcements"); // don't load announcements unless the plugin is enabled. 
+		$plugins->add_hook("global_intermediate", "bam_announcements"); 
 	} else {
+		$plugins->add_hook("global_intermediate", "compatibility_BAM_announcements_setvariable"); // Bug fix for servers that display PHP notices. 
 		$plugins->add_hook("pre_output_page", "bam_announcements_compatibility"); 
 	}
 }
@@ -218,7 +220,7 @@ function bam_install () {
 	<!-- Don\'t remove this. Needed for handling announcement dismissals. --> 
 <script>
 		$(document).ready(function(){
-			$(\'.bam_slidedown\').delay(125).slideDown(350);
+			$(\'.bam_slidedown\').delay(100).slideDown(325);
 		});	
 		// Allow me to give credit. This was great:  https://lifeofadesigner.com/javascript/hide-dismissed-notifications-with-jquery-and-cookies
 	
@@ -551,7 +553,7 @@ function bam_announcements ($compatibility = null) {
 	$bam_cookie_path = $mybb->settings['cookiepath'];
 
 	// Determine whether BAM's settings allow HTML. New setting in BAM 2.0. Bug fix from BAM 1. 
-	$allowHTML = null; 
+	$allowHTML = 0; 
 	if ($mybb->settings['bam_advanced_mode'] == 1) {
 		$allowHTML = "yes";
 	}
@@ -707,6 +709,8 @@ function bam_announcements ($compatibility = null) {
 	}
 	$bam_custom_css = $mybb->settings['bam_custom_css']; 
 	
+	$bam_announcements = ""; // Bug fix for weird servers. 
+
 	eval('$bam_announcements = "'.$templates->get('bam_announcement_container').'";');
 	$bam_announcements = $plugins->run_hooks("bam_announcements_end", $bam_announcements);
 	// Check if we are using the pre_output_page hook instead. 
@@ -724,12 +728,20 @@ function bam_announcements_compatibility (&$page) {
 	// Replace page's final output and add announcements. 
 	$announcements = bam_announcements(1);
 	$bam_page = strtr($page, array('<!-- BAM -->' => $announcements));
-	
+
 	// Check if the replacement failed. If so, try to guess on where to put announcements. 
 	if ($bam_page == $page) {
 		$bam_page = strtr($page, array('<!-- start: nav -->' => $announcements . ' <!-- start: nav -->')); 
 	}
 	return $bam_page; 
+}
+
+// This is a bug fix for servers that display notices. In compatibility mode, the template variable
+// $bam_announcements is unset. We set it explicitely here to avoid the notice. 
+function compatibility_BAM_announcements_setvariable () {
+	global $bam_announcements; 
+	$bam_announcements = "";
+	return;
 }
 
 function bam_parse_date($querydata) {
@@ -955,10 +967,47 @@ function checkAnnouncementDisplay($announcement) {
 		// User hasn't enabled announcement for every board. Check if the board we are on is in the list of enabled boards. 
 		else {
 			$explodedForums = explode(',', $announcement['forums']);
-			if (in_array((int) $_GET['fid'], $explodedForums)) {
+
+			if (isset($mybb->input['fid']) && (in_array((int) $_GET['fid'], $explodedForums))) {
 				return true; // This board is enabled.
 			}
 			else {
+				// User is browsing a thread. Get FID and see if it matches. 
+				if (isset($mybb->input['tid']) && $mybb->input['tid'] != 0) {
+					$tid = (int) $mybb->input['tid']; 
+					$fid = bam_getFIDfromTID($tid); 
+
+					if (in_array($fid, $explodedForums)) {
+						return true;
+					} else {
+						return false; 
+					} 
+				} 
+
+				// MyBB sometimes links to specific posts instead of threads. Get the TID and FID, and see if it matches. 
+				else if (isset($mybb->input['pid']) && $mybb->input['pid'] != null) {
+					$pid = (int) $mybb->input['pid'];
+					$tid = bam_getTIDfromPID($pid);
+					$fid = bam_getFIDfromTID($tid); 
+
+					if (in_array($fid, $explodedForums)) {
+						return true;
+					} else {
+						return false; 
+					} 
+				}
+
+				// Support announcements explicitely as well. 
+				else if (isset($mybb->input['aid']) && $mybb->input['aid'] != null) {
+					$aid = (int) $mybb->input['aid'];
+					$fid = bam_getFIDfromAID($aid); 
+
+					if (in_array($fid, $explodedForums)) {
+						return true; // need to complete.
+					} else {
+						return false; 
+					} 
+				}
 				return false; // This board isn't enabled. Return false. 
 			}
 		}
@@ -1450,6 +1499,26 @@ function bam_getTIDfromPID($pid) {
 		return $tid; 
 	} 
 	return false;
+}
+
+// This function takes a TID as an input, and returns the associated FID. 
+// This is used for forum display for announcements, and allows announcements to display on threads as well. 
+function bam_getFIDfromTID ($tid) {
+	global $db; 
+	$tid = (int) $tid; 
+	$fidDB = $db->query('SELECT `fid` FROM '.TABLE_PREFIX.'threads WHERE `tid` = '.$tid.';');
+	$fid = $db->fetch_array($fidDB);
+	return (int) $fid['fid']; 
+}
+
+// This function takes an AID (announcement ID, standard MyBB core announcements) as an input, and returns the associated FID. 
+// This is used for forum display for announcements, and allows announcements to display on forum announcements as well. 
+function bam_getFIDfromAID ($aid) {
+	global $db; 
+	$aid = (int) $aid; 
+	$fidDB = $db->query('SELECT fid FROM '.TABLE_PREFIX.'announcements WHERE `aid` = '.$aid.';');
+	$fid = $db->fetch_array($fidDB);
+	return (int) $fid['fid']; 
 }
 
 /* ADMIN CP HOOKS */

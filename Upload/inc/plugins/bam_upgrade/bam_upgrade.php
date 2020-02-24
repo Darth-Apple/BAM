@@ -59,7 +59,7 @@ if(!defined("IN_MYBB")) {
         
         // Unpinned announcements used to be random mode announcements. Convert these. 
         if ($mybb->settings['bam_random'] == 1 || $mybb->settings['bam_random'] == '1') {
-            $db->query("UPDATE ".TABLE_PREFIX."bam SET `random` = 1 WHERE pinned = 0;");
+            $db->query("UPDATE ".TABLE_PREFIX."bam SET `random` = 1 WHERE `pinned` = 0;");
         }
 
         // Properly set global announcements based on the previous settings for BAM 1.0 

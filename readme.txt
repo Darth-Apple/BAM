@@ -23,7 +23,7 @@ BAM Announcements Manager has been updated, and is better than ever before! This
  - Announcements can be activated and deactivated (new!)
 
 
-This plugin is supported on all MyBB 1.8.X forums, and has been tested extensively. If you used BAM 1.0 before, it is strongly recommended to update to the new version of this plugin, as it is significantly more advanced and more powerful than the initial version. Many thanks to @Guardian (Sawedoff) and @Eldenroot for many ideas and for feedback on the new version of this mod! 
+This plugin is supported on all MyBB 1.8.X forums, and has been tested extensively. If you used BAM 1.0 before, it is strongly recommended to update to the new version of this plugin, as it is significantly more advanced and more powerful than the initial version. Many thanks to @Guardian (Sawedoff), @VintageDaddyo and @Eldenroot for many ideas, contributions, testing, and for feedback on the new version of this mod! You guys have made BAM 2.0 possible. 
  
 
 -------------------------------------------------------
