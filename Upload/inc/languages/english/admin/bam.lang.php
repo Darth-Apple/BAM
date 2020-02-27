@@ -172,7 +172,7 @@ $l['bam_additional_pages_desc'] = "<b>Paste links to specific pages to display t
   - \"forumdisplay.php, index.php\" &nbsp;&nbsp;&nbsp;&nbsp; -- <i>Display on index.php and forumdisplay.php only</i><br />
   - \"forumdisplay.php?fid=2\" &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -- <i>Display this announcement on forumdisplay.php, but only if the fid is 2.</i><br /><br />
   <b>Supported pages: </b> Any .php page within your forum's directory. <br />
-  <b>URL parameters supported: </b> action, uid, tid, fid, gid. All other URL parameters will be ignored. See documentation for details. <br />";
+  <b>URL parameters supported: </b> action, uid, tid, fid, gid, aid. All other URL parameters will be ignored. See documentation for details. <br />";
 
 $l['bam_random_select'] = "Random Mode Announcement";
 $l['bam_standard_select'] = "Static Announcement (always display)";

@@ -44,18 +44,18 @@ if(!defined("IN_MYBB")) {
 
         // Add new columns to database. 
         $db->query("ALTER TABLE ".TABLE_PREFIX."bam
-                ADD `global` INT UNSIGNED DEFAULT 0 AFTER pinned;");
+                ADD `global` INT UNSIGNED DEFAULT 0 AFTER `pinned`;");
 
         $db->query("ALTER TABLE ".TABLE_PREFIX."bam
-                ADD `random` INT UNSIGNED DEFAULT 0 AFTER global;");
+                ADD `random` INT UNSIGNED DEFAULT 0 AFTER `global`;");
 
         $db->query("ALTER TABLE ".TABLE_PREFIX."bam
-                ADD `additional_display_pages` VARCHAR(512) DEFAULT NULL AFTER random;");
+                ADD `additional_display_pages` VARCHAR(512) DEFAULT NULL AFTER `random`;");
 
         $db->query("ALTER TABLE ".TABLE_PREFIX."bam
-                ADD `forums` VARCHAR(256) DEFAULT NULL AFTER additional_display_pages;");
+                ADD `forums` VARCHAR(256) DEFAULT NULL AFTER `additional_display_pages`;");
 
-        $db->query("ALTER TABLE ".TABLE_PREFIX."bam MODIFY announcement VARCHAR(1024);");
+        $db->query("ALTER TABLE ".TABLE_PREFIX."bam MODIFY `announcement` VARCHAR(1024);");
         
         // Unpinned announcements used to be random mode announcements. Convert these. 
         if ($mybb->settings['bam_random'] == 1 || $mybb->settings['bam_random'] == '1') {

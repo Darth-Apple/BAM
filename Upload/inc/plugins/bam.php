@@ -87,19 +87,19 @@ function bam_install () {
 	if(!$db->table_exists($prefix.'bam')) {
 
 		$db->query("CREATE TABLE ".TABLE_PREFIX."bam (
-				PID int unsigned NOT NULL auto_increment,
-  				announcement varchar(1024) NOT NULL DEFAULT '',				
-				class varchar(40) NOT NULL DEFAULT 'yellow',
-				link varchar(160) DEFAULT '',
-				active int unsigned NOT NULL DEFAULT 1,
-				disporder INT NOT NULL DEFAULT 1,
+				`PID` int unsigned NOT NULL auto_increment,
+  				`announcement` varchar(1024) NOT NULL DEFAULT '',				
+				`class` varchar(40) NOT NULL DEFAULT 'yellow',
+				`link` varchar(160) DEFAULT '',
+				`active` int unsigned NOT NULL DEFAULT 1,
+				`disporder` INT NOT NULL DEFAULT 1,
 				`groups` varchar(128) DEFAULT '1, 2, 3, 4, 5, 6',
-				date int(10) NOT NULL,
-				pinned INT UNSIGNED DEFAULT 0,
+				`date` int(10) NOT NULL,
+				`pinned` INT UNSIGNED DEFAULT 0,
 				`global` INT UNSIGNED DEFAULT 0, 
 				`random` INT UNSIGNED DEFAULT 0,
-				additional_display_pages VARCHAR(512) DEFAULT NULL,
-				forums VARCHAR(256) DEFAULT NULL,
+				`additional_display_pages` VARCHAR(512) DEFAULT NULL,
+				`forums` VARCHAR(256) DEFAULT NULL,
   				PRIMARY KEY (PID)
 				) ENGINE=MyISAM
 				".$db->build_create_table_collation().";"
@@ -721,16 +721,17 @@ function bam_announcements ($compatibility = null) {
 	}
 }
 
-// Compatibility function that uses pre_output_page hook. 
-
+// Compatibility function that uses pre_output_page hook instead. This may work better for certain 
+// forums or themes, but is disabled by default as it imposes a slight performance penalty. 
 function bam_announcements_compatibility (&$page) {
 
-	// Replace page's final output and add announcements. 
-	$announcements = bam_announcements(1);
-	$bam_page = strtr($page, array('<!-- BAM -->' => $announcements));
+	$announcements = bam_announcements(1); // fetch announcements as normal. 
+	$bam_page = strtr($page, array('<!-- BAM -->' => $announcements)); // add to page output
 
 	// Check if the replacement failed. If so, try to guess on where to put announcements. 
 	if ($bam_page == $page) {
+		// MyBB, by default, adds comments to the output page at template start/ends. Unless this setting
+		// is disabled, BAM will always be able to guess on where to put announcements (even without the variable). 
 		$bam_page = strtr($page, array('<!-- start: nav -->' => $announcements . ' <!-- start: nav -->')); 
 	}
 	return $bam_page; 
@@ -975,7 +976,7 @@ function checkAnnouncementDisplay($announcement) {
 				// User is browsing a thread. Get FID and see if it matches. 
 				if (isset($mybb->input['tid']) && $mybb->input['tid'] != 0) {
 					$tid = (int) $mybb->input['tid']; 
-					$fid = bam_getFIDfromTID($tid); 
+					$fid = bam_TIDManager::bam_getFIDfromTID($tid); 
 
 					if (in_array($fid, $explodedForums)) {
 						return true;
@@ -987,8 +988,8 @@ function checkAnnouncementDisplay($announcement) {
 				// MyBB sometimes links to specific posts instead of threads. Get the TID and FID, and see if it matches. 
 				else if (isset($mybb->input['pid']) && $mybb->input['pid'] != null) {
 					$pid = (int) $mybb->input['pid'];
-					$tid = bam_getTIDfromPID($pid);
-					$fid = bam_getFIDfromTID($tid); 
+					$tid = bam_TIDManager::bam_getTIDfromPID($pid);
+					$fid = bam_TIDManager::bam_getFIDfromTID($tid); 
 
 					if (in_array($fid, $explodedForums)) {
 						return true;
@@ -1000,7 +1001,7 @@ function checkAnnouncementDisplay($announcement) {
 				// Support announcements explicitely as well. 
 				else if (isset($mybb->input['aid']) && $mybb->input['aid'] != null) {
 					$aid = (int) $mybb->input['aid'];
-					$fid = bam_getFIDfromAID($aid); 
+					$fid = bam_TIDManager::bam_getFIDfromAID($aid); 
 
 					if (in_array($fid, $explodedForums)) {
 						return true; // need to complete.
@@ -1062,7 +1063,7 @@ function isAlternatePageValid($announcement) {
 	// new acceptable parameteres here. However, please be aware that this is a whitelist that is intended
 	// to prevent unexpected or insecure behavior. This setting was explicitely ommitted on the ACP for 
 	// this reason. Please be mindful and add parameters as needed, but do not remove the whitelist for your forum. 
-	$additional_page_parameters = array('fid', 'action', 'uid', 'tid', 'gid');
+	$additional_page_parameters = array('fid', 'action', 'uid', 'tid', 'gid', 'aid');
 
 	$explodedPages = explode(',', $announcement['additional_display_pages']);
 	$processedPages = array_map('trim',$explodedPages);
@@ -1072,7 +1073,7 @@ function isAlternatePageValid($announcement) {
 	foreach ($processedPages as $additional_display_page) {
 
 		// Handle search engine friendly URLs. We rewrite the URLs in PHP with regex! 
-		// Note that this only supports MyBB's default htaccess settings, and unofficially, the Google SEO plugin. 
+		// Note that this only supports MyBB's default htaccess settings. 
 		// Custom SEO plugins require regex to be updated in bam_reverse_rewrite(); 
 		$additional_display_page = bam_reverse_rewrite($additional_display_page);
 
@@ -1186,7 +1187,7 @@ function bam_parsePIDURLs($additional_display_page) {
 			$matches = strtr($matches[0], array('pid=' => ''));
 			$displayPID = (int) $matches;
 		}
-		$displayTID = bam_getTIDfromPID($displayPID);
+		$displayTID = bam_TIDManager::bam_getTIDfromPID($displayPID);
 	} 
 	
 	// additional_display_page provides neither. In such cases, announcement should display on all threads. 
@@ -1205,7 +1206,7 @@ function bam_parsePIDURLs($additional_display_page) {
 	// URL contains a PID and no TID. we must convert any URL parameters to TIDs. 
 	else if (isset($mybb->input['pid']) && $mybb->input['pid']) {
 		$pid = (int) $mybb->input['pid']; 
-		$tid = (int) bam_getTIDfromPID($pid);
+		$tid = (int) bam_TIDManager::bam_getTIDfromPID($pid);
 	} 
 	
 	// MyBB never generates URLs in showthread.php without either a PID or a TID. 
@@ -1372,7 +1373,7 @@ function parseThreadVariables($announcementText) {
 		
 		// URL is a PID instead of a TID. Parse this correctly. 
 		else if (isset($mybb->input['pid']) && $mybb->input['pid'] != 0) {
-			$threadID = (int) bam_getTIDfromPID($mybb->input['pid']);
+			$threadID = (int) bam_TIDManager::bam_getTIDfromPID($mybb->input['pid']);
 		}
 		
 		$thread = get_thread($threadID);
@@ -1387,7 +1388,6 @@ function parseThreadVariables($announcementText) {
 
 			// We are going to try to determine the correct count for the counting thread based on previous replies. 
 			// This is an easter egg feature! Very useful for forum games where users frequently get off count. 
-
 			$threadData = getThreadData($threadID);
 			$arrayofNumbers = array();
 			$maxLen = 0;
@@ -1395,8 +1395,7 @@ function parseThreadVariables($announcementText) {
 
 			// We need to extract the number from each post generated from the getThreadData query. 
 			// If a number doesn't exist, it simply gets put in as a 0 in the array. 
-			// This function depends on counts being in every post. It can handle one missing count, but behaves unpredictably if more are missing. 
-
+			// This function depends on counts being in every post. It can handle a few missing counts, but behaves unpredictably if more are missing. 
 			foreach ($threadData as $post) { 
 				$arrayofNumbers[] = parseForumGameCounter($post);
 			}
@@ -1404,7 +1403,6 @@ function parseThreadVariables($announcementText) {
 			// Next, we must explode these into arrays of consecutive numbers. 
 			$results = getConsecutiveNumbers($arrayofNumbers);
 			foreach ($results as $row) {
-
 				// We must fetch the largest set of consecutive numbers from recent posts. This will serve as the basis for the correct count. 
 				if (count($row) > $maxLen) {
 					$maxLen = count($row);
@@ -1480,13 +1478,68 @@ function getThreadData($threadID) {
     return $db->query("
     SELECT p.message, p.tid, p.dateline
     FROM ".TABLE_PREFIX."posts p WHERE p.tid='$tid'
-    ORDER BY p.dateline DESC LIMIT 0,50");
+    ORDER BY p.dateline DESC LIMIT 0,50"); // Timed this query. Runs in about 300 microseconds! 
 }
 
 // This function queries the database to get the associated thread ID with a particular post ID. 
 // Used only in rare cases when the URL specifies a PID instead of a TID. 
 // MyBB parses these like normal (and very oddly so). BAM must do the same to prevent unusual behavior. 
 
+// This class caches results from fetching TIDs, FIDs, etc. 
+
+class bam_TIDManager {
+
+	public static $fid; 
+	public static $tid; 
+
+	public static function bam_getTIDfromPID($pid) {
+		global $db;
+		if (isset(self::$tid) && self::$tid != 0) {
+			return self::$tid; 
+		}
+		// First, we must convert any URL parameters to TIDs. 
+		if ($pid != 0) {
+			$pid = (int) $pid; 
+			$querydata = $db->query('SELECT tid FROM '.TABLE_PREFIX.'posts WHERE PID = '.$pid.';');
+			$tid = $db->fetch_array($querydata); 
+			$tid = (int) $tid; 
+			self::$tid = $tid; 
+			return $tid; 
+		} 
+		return false;
+	}
+
+	// This function takes a TID as an input, and returns the associated FID. 
+	// This is used for forum display for announcements, and allows announcements to display on threads as well. 
+	public static function bam_getFIDfromTID ($tid) {
+		global $db; 
+
+		if (isset(self::$fid) && self::$fid != 0) {
+			return self::$fid; 
+		}
+		$tid = (int) $tid; 
+		$fidDB = $db->query('SELECT `fid` FROM '.TABLE_PREFIX.'threads WHERE `tid` = '.$tid.';');
+		$fid = $db->fetch_array($fidDB);
+		self::$fid = $fid; 
+		return (int) $fid['fid']; 
+	}
+
+	// This function takes an AID (announcement ID, standard MyBB core announcements) as an input, and returns the associated FID. 
+	// This is used for forum display for announcements, and allows announcements to display on forum announcements as well. 
+	public static function bam_getFIDfromAID ($aid) {
+		global $db; 
+		if (isset(self::$fid) && self::$fid != 0) {
+			return self::$fid; 
+		}
+		$aid = (int) $aid; 
+		$fidDB = $db->query('SELECT fid FROM '.TABLE_PREFIX.'announcements WHERE `aid` = '.$aid.';');
+		$fid = $db->fetch_array($fidDB);
+		self::$fid = $fid; 
+		return (int) $fid['fid']; 
+	}
+}
+
+/*
 function bam_getTIDfromPID($pid) {
 	global $db;
 
@@ -1500,6 +1553,7 @@ function bam_getTIDfromPID($pid) {
 	} 
 	return false;
 }
+
 
 // This function takes a TID as an input, and returns the associated FID. 
 // This is used for forum display for announcements, and allows announcements to display on threads as well. 
@@ -1520,7 +1574,7 @@ function bam_getFIDfromAID ($aid) {
 	$fid = $db->fetch_array($fidDB);
 	return (int) $fid['fid']; 
 }
-
+*/
 /* ADMIN CP HOOKS */
 
 function bam_config_menu (&$sub_menu) {
@@ -1625,29 +1679,27 @@ function bam_reverse_rewrite ($url) {
 function bam_google_SEO_rewrites ($replacements) {
 	global $mybb, $plugins, $cache;
 	// Stub function that can be extended to enable compatibility with the Google SEO MyBB Plugin. 
-	
-	$activate_this_hook = false; // disabled at this time. 
+	// Disabled at this time. Uncomment the hook near the top of this file to enable this. 
 
 	// Check if the Google SEO plugin is activated. 
-	if ($activate_this_hook) {
-		$activePlugins = $cache->read("plugins"); 
+	$activePlugins = $cache->read("plugins"); 
 
-		if (in_array("google_seo", $activePlugins['active'])) {
-			$additionalReplacements = array(
-				/*'^([^&]*)&(.*)$' => 'http://yoursite/MyBB/$1?$2', */ // From the HTaccess file. Add back in if needed.  
-				'/sitemap-([^./]+)\.xml/' => 'misc.php?google_seo_sitemap=$1',
-				'/Forum-([^./]+)/' => 'forumdisplay.php?google_seo_forum=$1',
-				'/Thread-([^./]+)/' => 'showthread.php?google_seo_thread=$1',
-				'/Announcement-([^./]+)/' => 'announcements.php?google_seo_announcement=$1',
-				'/User-([^./]+)/' => 'member.php?action=profile&google_seo_user=$1',
-				'/Calendar-([^./]+)/' => 'calendar.php?google_seo_calendar=$1',
-				'/Event-([^./]+)/' => 'calendar.php?action=event&google_seo_event=$1',
-			);
+	if (in_array("google_seo", $activePlugins['active'])) {
+		$additionalReplacements = array(
+			/*'^([^&]*)&(.*)$' => 'http://yoursite/MyBB/$1?$2', */ // From the HTaccess file. Add back in if needed.  
+			'/sitemap-([^./]+)\.xml/' => 'misc.php?google_seo_sitemap=$1',
+			'/Forum-([^./]+)/' => 'forumdisplay.php?google_seo_forum=$1',
+			'/Thread-([^./]+)/' => 'showthread.php?google_seo_thread=$1',
+			'/Announcement-([^./]+)/' => 'announcements.php?google_seo_announcement=$1',
+			'/User-([^./]+)/' => 'member.php?action=profile&google_seo_user=$1',
+			'/Calendar-([^./]+)/' => 'calendar.php?google_seo_calendar=$1',
+			'/Event-([^./]+)/' => 'calendar.php?action=event&google_seo_event=$1',
+		);
 
-			// This is not functional at this time, and must be extended. A future release may expand upon this!
-			$replacements = array_merge($additionalReplacements, $replacements); 
-		}
+		// This is not functional at this time, and must be extended. A future release may expand upon this!
+		$replacements = array_merge($additionalReplacements, $replacements); 
 	}
+
 	return $replacements; 
 }
 
