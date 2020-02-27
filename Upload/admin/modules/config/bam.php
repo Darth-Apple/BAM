@@ -483,8 +483,6 @@ if(!defined("IN_MYBB")) {
 		$pinned = 0;
 		
 		// Make sure inputs aren't too long. Display error if so. 
-
-		// We must check to make sure these are set before we do anything with them. 
 		$alength = 0;
 		$plength = 0;
 		$clength = 0;
@@ -504,7 +502,7 @@ if(!defined("IN_MYBB")) {
 			$ulength = strlen($mybb->input['url']);
 		}
 
-				// We must check to make sure these are set before we do anything with them. 
+		// We must check to make sure these are set before we do anything with them. 
 		$alength = 0;
 		$plength = 0;
 		$clength = 0;
@@ -857,9 +855,8 @@ if(!defined("IN_MYBB")) {
 		require_once MYBB_ROOT."/inc/class_parser.php";
 		$parser = new postParser(); 
 
-		// If advanced mode is enabled, HTML is allowed by the post parser. 
-		
-		$allowHTML = ""; // Class parser checks if empty, not if "no"
+		// Handle whether HTML is enabled
+		$allowHTML = ""; // Class parser checks if empty, not if "no". Bug fix from BAM 1
 		if ($mybb->settings['bam_advanced_mode'] == 1) {
 			$allowHTML = "yes";
 		}
@@ -929,7 +926,6 @@ if(!defined("IN_MYBB")) {
 				$announcementText = $parser->parse_message("[url=".$querydata['link']."]".html_entity_decode($querydata['announcement'])."[/url]", $parser_options);
 			}
 			else {
-				// $data[$count]['announcement'];
 				$announcementText = $parser->parse_message(html_entity_decode($querydata['announcement']), $parser_options); // parse bbcode
 			}
 
@@ -1173,7 +1169,6 @@ $form_javascript = "
 		setCustomClass();
 
 		correctForumSelector(); 
-		// manageDisplayModes();
 	}
 
 
@@ -1196,10 +1191,8 @@ $form_javascript = "
 
 		function deleteRandomElements() {
 			var sel = document.getElementById('announcementType');
-			
 			var displayLocationSel = document.getElementById('location');
 			var forumClass = document.getElementById('forum_select');
-
 			
 			if (sel.tagName != 'SELECT') {
 				return; 
@@ -1232,7 +1225,6 @@ $form_javascript = "
 			if (specialPages != null) {
 				specialPages.parentNode.parentNode.style.display = displayVar;
 			}
-			
 		}
 
 		function manageDisplayModes (changed=null) {
@@ -1241,13 +1233,11 @@ $form_javascript = "
 			var text = displaySel.options[displaySel.selectedIndex].text;
 
 			// Determine whether which fields should be displayed. 
-
 			var displayVarAdditional = 'None';
 			var displayVarForums = 'None';
 			correctForumSelector();
 
 			if ((text == '" . $lang->bam_list_display_special . "') || value == 'special') {
-				
 				var displayVarAdditional = '';
 				var displayVarForums = 'None';
 			}
@@ -1264,7 +1254,6 @@ $form_javascript = "
 			var specialSelect = document.getElementById('additional_pages');
 			
 			// Display only the required fields regarding where announcements should be posted. 
-
 			forumClass.parentNode.parentNode.parentNode.style.display = displayVarForums; 
 			forumClass.parentNode.parentNode.style.display = displayVarForums; 
 			specialSelect.parentNode.parentNode.parentNode.style.display = displayVarAdditional;
@@ -1285,14 +1274,12 @@ $form_javascript = "
 		}
 
 		// Javascript for the custom class input field. 
-
 		function setCustomClass(changed=null) {
 			var classSel = document.getElementById('style');
 			var value = classSel.options[classSel.selectedIndex].value;
 			var text = classSel.options[classSel.selectedIndex].text;
 
 			// Determine whether the custom class field should be displayed.
-
 			var displayVar = 'none';
 			if ((text == '" . $lang->bam_custom . "') || value == 'bam_custom') {
 				var displayVar = '';
@@ -1314,14 +1301,12 @@ $form_javascript = "
 		}
 
 		// Shows a full list of tags and directives on click. 
-
 		function showAnnouncementTags() {
 			var announcement = document.getElementById('announcement_text');
 			var announcementContainer = announcement.parentNode.parentNode.getElementsByClassName('description')[0];
 			announcementContainer.innerHTML = '".$lang->bam_announcement_tags_alert."';
 			
 		}
-
  </script>";
 echo $form_javascript;
 $page->output_footer($lang->bam_title_acronym); 

@@ -183,7 +183,7 @@ INSTALLATION:
 -----------------------------------------------------
 COMPATIBILITY MODE (ADVANCED):  
 -----------------------------------------------------
-Leave this setting off unless you are unsure! 
+Leave this setting off if you are unsure! 
 
 BAM's default variables, template modifications, and hooks (how BAM interacts with MyBB) have been designed to ensure the best possible compatibility with a wide variety of MyBB forums. Occasionally, these default values may cause compatibility issues with other plugins, themes, or specific versions of PHP. 
 

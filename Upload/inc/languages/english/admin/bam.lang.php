@@ -11,9 +11,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-    
-     */
+    along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 $l['bam_title'] = "BAM+ Announcements Manager";
 $l['bam_title_acronym'] = "BAM+ Announcements Manager (Updated and Improved!)";
@@ -65,7 +63,6 @@ $l['bam_dismissal_savecookie_useronly'] = "Close and dismiss, but only if the us
 $l['bam_add_announcement'] = 'Add Announcement';
 $l['bam_edit_announcement'] = "Edit Announcement";
 $l['bam_manage_announcements'] = "Manage Announcements";
-
 
 $l['bam_manage'] = "Manage";
 $l['bam_manage_random'] = "Random Mode";
@@ -209,21 +206,17 @@ $l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; {newestmemb
 $l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; {newestmember_link} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Creates a link to the profile of the newest registered member.</i>";
 $l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; {threadreplies} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Show thread only. Parses to the number of replies in the current thread. </i>";
 $l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; {countingthread} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Experimental. Parses to current count in forum games/counting threads. Attempts to resolve and determine actual count if a user posts the wrong count. </i>";
-
 $l['bam_announcement_tags_alert'] .= "<br /><br /><b>Announcement Directives: </b><br />";
 $l['bam_announcement_tags_alert'] .= "&nbsp;&nbsp;&nbsp;&nbsp;These directives give BAM additional information on where to display announcements. These are experimental. See readme for examples. <br />";
 $l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; [@themes:1,2] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Display announcement only on theme IDs 1 and 2. </i>";
 $l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; [@languages:espanol] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Show announcement only in Spanish (or any language you choose). </i>";
 $l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; [@template:custom] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Use an alternative global template for this announcement (Advanced - use if you need javascript).</i>";
-// $l['bam_announcement_tags_alert'] .= "<br />&nbsp;&nbsp;&nbsp;&nbsp; [@disabled] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Ghost mode (disables announcement).</i>";
-
 $l['bam_announcement_tags_alert'] .= "<br /><br />These directives can be placed anywhere in your announcement\'s text, and will be removed before your announcement is displayed on your forum. These features are considered experimental. Please request support or visit the documentation with any questions!<br /><br />";
 
 $l['bam_announcement_too_long'] = "Error. Your announcement cannot be more than 1023 characters. ";
 $l['bam_announcement_link_too_long'] = "Error. Your announcement's URL cannot be more than 159 characters. ";
 $l['bam_class_too_long'] = "Error. Your custom classes cannot be more than 39 characters. ";
 $l['bam_additional_pages_too_long'] = "Error. Additional pages field cannot be more than 511 characters. ";
-
 // Lang strings for BAM's built in "upgrade advisor"
 
 $l['bam_upgrade_required'] = "<b> It looks like you have successfully uploaded BAM 2.0 to the server!</b> In order to use the new version, you must run BAM's upgrade script to refresh database fields and templates. This will migrate all of your existing announcements from BAM 1.0 to BAM+ 2.0. Make sure to visit BAM's settings after running your upgrade and verify that everything still looks correct.";
@@ -256,7 +249,3 @@ certain compatibility issues that may occur with untested versions of PHP, confl
 unless you experience issues.";
 
 $l['bam_admin_permissions'] = "Can manage BAM announcements?";
-
-// Future release? Teaser :)
-// $l['bam_spotlight_interval'] = "Bam Spotlight Interval: ";
-// $l['bam_spotlight_interval'] = "How many minutes should BAM wait before refreshing a spotlight announcement? This only applies to random mode announcements when spotlight mode is enabled!";

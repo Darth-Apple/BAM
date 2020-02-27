@@ -15,8 +15,6 @@
     
      */
 
-
-	/*ini_set('display_errors', 1); ini_set('display_startup_errors', 1); error_reporting(E_ALL); */
 global $mybb;
 
 global $templatelist;
@@ -755,7 +753,7 @@ function bam_parse_date($querydata) {
 			return ('('.my_date('F d, Y', htmlspecialchars($querydata['date'], ENT_QUOTES)).')');
 		}	
 		else { 
-			// Current year, don't display year. 
+			// We are on the current year, so we don't display the year on the announcement. 
 			return ('('.my_date('F d', htmlspecialchars($querydata['date'], ENT_QUOTES)).')');
 		}	
 	}
@@ -1582,7 +1580,7 @@ function global_display($pinned) {
 
 // This function rewrites SEO-friendly URLs from MyBB's included HTACCESS file. 
 // These links are converted internally to native URLs and parsed as such. 
-// BAM includes plguin hooks to add additional directives. A stub function has been provided to 
+// BAM includes plugin hooks to add additional directives. A stub function has been provided to 
 // demonstrate extensibility with additional URL rewrites. 
 
 // Note: Google SEO plugin is NOT supported at this time. A future release may expand upon this! 
