@@ -1,10 +1,3 @@
-NOTICE: You are viewing the final release candidate for BAM 2.0. This is nearly release-ready, tested, and safe to use on a live forum. It will be released by March 1st. If you discover any additional bugs before the final release date, please let me know as soon as possible! Any additional fixes will be implemented before the release. 
-
-Thank you! 
--Darth Apple
-
----- ---- ---- ---- 
-
 BAM Announcements Manager has been updated, and is better than ever before! This plugin allows you to manage announcements on your forum’s header area, specific boards, or on any page of your community. These are styled based on the announcements used on the MyBB Support Forum, so if you’ve been looking for a plugin to make similar announcements, this plugin is the answer to your requests! 
 
 
