@@ -1,4 +1,7 @@
-Notice: You are viewing BAM 2.0's final beta release. BAM 2.0 will be released once it is finalized and ready, with a tentative date of February 28, 2020. Please report any bugs, issues, or suggestions that you encounter so that fixes can be implemented into the final release!
+NOTICE: You are viewing the final release candidate for BAM 2.0. This is nearly release-ready, tested, and safe to use on a live forum. It will be released by March 1st. If you discover any additional bugs before the final release date, please let me know as soon as possible! Any additional fixes will be implemented before the release. 
+
+Thank you! 
+-Darth Apple
 
 ---- ---- ---- ---- 
 
@@ -49,7 +52,7 @@ EXAMPLES:
 - memberlist.php                          Displays on the Memberlist    
 - showthread.php?tid=947.                 Display only on a specific thread (in this case, thread 947)
 
-More documentation is available in advanced_documentation.txt. This is an advanced feature that is very powerful, but that has specific parameters that must be met in order to work properly. 
+This is an advanced feature that is very powerful, but that has specific parameters that must be met in order to work properly. 
 
 URL REWRITES: This plugin supports search engine friendly URLs as defined by MyBB's built-in htaccess file. You may paste these in exactly the same manner as native URLs, and BAM will convert these internally. 
 

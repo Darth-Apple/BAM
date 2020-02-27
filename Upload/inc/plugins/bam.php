@@ -1539,42 +1539,6 @@ class bam_TIDManager {
 	}
 }
 
-/*
-function bam_getTIDfromPID($pid) {
-	global $db;
-
-	// First, we must convert any URL parameters to TIDs. 
-	if ($pid != 0) {
-		$pid = (int) $pid; 
-		$querydata = $db->query('SELECT tid FROM '.TABLE_PREFIX.'posts WHERE PID = '.$pid.';');
-		$tid = $db->fetch_array($querydata); 
-		$tid = (int) $tid; 
-		return $tid; 
-	} 
-	return false;
-}
-
-
-// This function takes a TID as an input, and returns the associated FID. 
-// This is used for forum display for announcements, and allows announcements to display on threads as well. 
-function bam_getFIDfromTID ($tid) {
-	global $db; 
-	$tid = (int) $tid; 
-	$fidDB = $db->query('SELECT `fid` FROM '.TABLE_PREFIX.'threads WHERE `tid` = '.$tid.';');
-	$fid = $db->fetch_array($fidDB);
-	return (int) $fid['fid']; 
-}
-
-// This function takes an AID (announcement ID, standard MyBB core announcements) as an input, and returns the associated FID. 
-// This is used for forum display for announcements, and allows announcements to display on forum announcements as well. 
-function bam_getFIDfromAID ($aid) {
-	global $db; 
-	$aid = (int) $aid; 
-	$fidDB = $db->query('SELECT fid FROM '.TABLE_PREFIX.'announcements WHERE `aid` = '.$aid.';');
-	$fid = $db->fetch_array($fidDB);
-	return (int) $fid['fid']; 
-}
-*/
 /* ADMIN CP HOOKS */
 
 function bam_config_menu (&$sub_menu) {
