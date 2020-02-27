@@ -898,6 +898,7 @@ function bam_build_directives ($announcement) {
 	
 	if (strpos("-".$announcement, '[@')) {
 		$themesEnabled = bamExplodeThemes($announcement);
+		// print("Themes Exploded: " . var_dump($themesEnabled) . "<br />");
 		$languagesEnabled = bamExplodeLanguages($announcement);
 		$announcement = preg_replace('/\[@themes:([a-zA-Z0-9 ,_]*)\]/', "", $announcement);	
 		$announcement = preg_replace('/\[@languages:([a-zA-Z0-9 ,_]*)\]/', "", $announcement);
@@ -1496,13 +1497,13 @@ class bam_TIDManager {
 		global $db;
 		if (isset(self::$tid) && self::$tid != 0) {
 			return self::$tid; 
-		}
+		} 
 		// First, we must convert any URL parameters to TIDs. 
 		if ($pid != 0) {
 			$pid = (int) $pid; 
 			$querydata = $db->query('SELECT tid FROM '.TABLE_PREFIX.'posts WHERE PID = '.$pid.';');
 			$tid = $db->fetch_array($querydata); 
-			$tid = (int) $tid; 
+			$tid = (int) $tid['tid']; 
 			self::$tid = $tid; 
 			return $tid; 
 		} 
@@ -1516,11 +1517,11 @@ class bam_TIDManager {
 
 		if (isset(self::$fid) && self::$fid != 0) {
 			return self::$fid; 
-		}
+		} 
 		$tid = (int) $tid; 
 		$fidDB = $db->query('SELECT `fid` FROM '.TABLE_PREFIX.'threads WHERE `tid` = '.$tid.';');
 		$fid = $db->fetch_array($fidDB);
-		self::$fid = $fid; 
+		self::$fid = (int) $fid['fid']; 
 		return (int) $fid['fid']; 
 	}
 
@@ -1534,7 +1535,7 @@ class bam_TIDManager {
 		$aid = (int) $aid; 
 		$fidDB = $db->query('SELECT fid FROM '.TABLE_PREFIX.'announcements WHERE `aid` = '.$aid.';');
 		$fid = $db->fetch_array($fidDB);
-		self::$fid = $fid; 
+		self::$fid = (int) $fid['fid']; 
 		return (int) $fid['fid']; 
 	}
 }
