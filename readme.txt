@@ -1,3 +1,7 @@
+Note: You are viewing the development version of this plugin. As such, it has changes that are not fully release-ready. We recommend downloading BAM from the official MyBB Extend website, as it is fully tested and is more stable at this time! 
+
+----------------
+
 BAM Announcements Manager has been updated, and is better than ever before! This plugin allows you to manage announcements on your forum’s header area, specific boards, or on any page of your community. These are styled based on the announcements used on the MyBB Support Forum, so if you’ve been looking for a plugin to make similar announcements, this plugin is the answer to your requests! 
 
 
@@ -174,6 +178,16 @@ INSTALLATION:
   - This plugin adds a variable in your header template after the {$awaitingusers} variable on installation. On the default theme, this causes announcements to display before the page breadcrumbs. While this method seems to ensure the best compatibility of this plugin with various themes, some users may wish you have the announcements display after the breadcrumbs. To do this, simply find "<!-- BAM -->{$bam_announcements}<!-- /BAM -->" in your templates, and copy/paste this text to a new line after "<navigation>" in your header template. 
 
 -----------------------------------------------------
+TRANSLATIONS: 
+-----------------------------------------------------
+
+Deutsch_sie and Deutsch_du are provided with the github version of this plugin and are ready to use. This translation was kindly provided courtesy of @tc4me from https://autism-4all.at
+
+If you would like to create additional translations, you are allowed to create the translation file and to distribute the file bundled with BAM on the appropriate MyBB support forum/mod database for your language. When doing so, this bundled version must contain must include all licenses included with BAM, along with credit and a link back to the original plugin. Outside of that, my only request is that you also send the translation files to me (@Darth Apple on https://mybb.com) so that I can also upload them on the English community as well! 
+
+Many thanks to everyone who has translated BAM, both for previous versions and for BAM 2.0. Thanks to your efforts, BAM is more accessible for communities of various languages! 
+
+-----------------------------------------------------
 COMPATIBILITY MODE (ADVANCED):  
 -----------------------------------------------------
 Leave this setting off if you are unsure! 
@@ -191,11 +205,9 @@ EASTER EGGS AND EXTRAS:
 -------------------------------------------------------
 
  - Can create a banner with the CORRECT count on your counting thread (forum games), even if the count in your thread is offset from the actual reply count. Use the {countingthread} variable to enable this functionality. To demonstrate, try posting the wrong count in your counting thread. To use this feature, you will need to paste the link to your counting thread in the "Custom Pages and Parameters" field. 
-
+ 
  - {newmember} and {newmember_link} parse to the username and the profile link of the newest registered member, respectively. 
-
  - Updated ACP interface that displays more information (with new icons) about where announcements will be posted. 
-
  - Both BAM 1.0 and 2.0 allow you to turn your announcement into a link without the use of MyCode. Simply paste a link into the URL field!
 
 Copyright: 

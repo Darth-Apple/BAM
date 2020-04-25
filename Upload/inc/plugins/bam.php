@@ -74,7 +74,7 @@ function bam_info() {
 		'website'		=> 'http://www.makestation.net',
 		'author'		=> 'Darth Apple',
 		'authorsite'	=> 'http://www.makestation.net',
-		'version'		=> '2.0',
+		'version'		=> '2.1',
 		"compatibility"	=> "18*"
 	);
 }
@@ -189,6 +189,7 @@ function bam_install () {
 	.close_bam_announcement:hover {
 		float:right;
 		display:inline-block;
+		cursor: pointer;
 		color:#000;
 	}
 
