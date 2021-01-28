@@ -123,6 +123,10 @@ CAN I ADD MODERATOR CP ACCESS?
 
  - BAM does not have moderator control panel access at this time. Adding this would require a ground-up rewrite of the ACP module that BAM currently implements. However, administrator permissions are implemented in BAM 2.X. You may create customized administrator groups that only have access to BAM's announcement management panel. 
 
+CAN I PREVENT FORUM/BOARD FROM DISPLAYING ON NEWTHREAD/NEWREPLY PAGES? 
+
+ - Yes. BAM 2.1 added an unofficial [@forums:1,2,3,...] directive to fully override the functionality of the default forum selector. When this directive is present, it will ONLY display on the forum IDs listed, but will disable announcements from displaying on newthread.php, editpost.php, or newthread.php. Add this directive anywhere in your announcement's text to enable this override. 
+
 
 HOW DOES THE FORUM GAMES COUNTING THREAD VARIABLE WORK? 
  

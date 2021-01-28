@@ -261,9 +261,13 @@ function bam_install () {
 </script>
 <div class="bam_wrapper"><div class="bam_announcements {$slidedown}">{$announcements}</div></div>';
 		
-		// Create the BAM announcement template used for each individual announcement. 
-		$template['bam_announcement'] = '<p class="{$bam_unsticky} {$class}" id="announcement-{$bcprefix}{$announcement_id}">{$announcement} <span class="bam_date">{$date}</span>
-<span class=\'close_bam_announcement {$display_close}\'>x</span></p>'; 
+        // Create the BAM announcement template used for each individual announcement.
+        // Old (2.1) template.  
+		/* $template['bam_announcement'] = '<p class="{$bam_unsticky} {$class}" id="announcement-{$bcprefix}{$announcement_id}">{$announcement} <span class="bam_date">{$date}</span>
+<span class=\'close_bam_announcement {$display_close}\'>x</span></p>'; */ 
+
+        $template['bam_announcement'] = '<div class="{$bam_unsticky} {$class}" id="announcement-{$bcprefix}{$announcement_id}">{$announcement}<span class="bam_date">{$date}</span>
+<span class=\'close_bam_announcement {$display_close}\'>x</span></div>';
 	
 		// Insert the templates into the database. 
 		foreach($template as $title => $template_new){
@@ -915,6 +919,7 @@ function bam_build_directives ($announcement) {
             $announcement = preg_replace('/\[@forums:([a-zA-Z0-9 ,_]*)\]/', "", $announcement);
         }
                 
+        // New tag: [@displayall]
 		// Directive allows you to define a different template for this announcement. Useful if you need javascript in announcement. 
 		if (strpos("-".$announcement, '[@template:')) { 
 			$announcementTemplate = bamExplodeTemplates($announcement); 
