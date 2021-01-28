@@ -627,7 +627,8 @@ function bam_announcements ($compatibility = null) {
 			// Save an array of unpinned announcements. This allows us to re-order and display these later without running another query. 
 			
 			$data[$count]['date'] = $date;
-			$data[$count]['themesEnabled'] = $tagParser[1]['themesEnabled'];
+            $data[$count]['themesEnabled'] = $tagParser[1]['themesEnabled'];
+            $data[$count]['altForums'] = $tagParser[1]['altForums'];
 			$data[$count]['languagesEnabled'] = $tagParser[1]['languagesEnabled'];
 			$data[$count]['class'] = $class;
 			$data[$count]['display_close'] = $display_close;
@@ -869,7 +870,6 @@ function bam_display_conditions ($querydata, $directives) {
 
 		$querydata = $plugins->run_hooks("bam_announcements_display_conditions", $querydata);
 		if (isset($querydata['returnFalse'])) {
-			echo "returning false";
 			return false; 
 		} 
 
@@ -878,7 +878,6 @@ function bam_display_conditions ($querydata, $directives) {
 			// Check if there are theme tags or langage tags. 
 			if (bamThemeEnabled($directives['themesEnabled']) && bamLanguageEnabled($directives['languagesEnabled'])) {
 				return true; 
-				
 			}
 		}
 		return false; 
@@ -893,7 +892,8 @@ function bam_build_directives ($announcement) {
 	$themesEnabled = 0;
 	$languagesEnabled = 0;
 	$announcementTemplate = 'bam_announcement';
-	$disabled = false; 
+    $disabled = false; 
+    $altForums = null; // For use in alternate, unofficial forum tag. 
 	
 	if (strpos("-".$announcement, '[@')) {
 		$themesEnabled = bamExplodeThemes($announcement);
@@ -907,6 +907,13 @@ function bam_build_directives ($announcement) {
 			$disabled = true;
 		}	
 
+        // [2.1] This is an alternative, unofficial forumdisplay tag with custom functionality 
+        // Unlike the mainline setting, this disables display on newthread/reply pages. 
+        if (strpos("-".$announcement, '[@forum:')) { 
+			$altForums = bamExplodeForumTag($announcement); 
+            $announcement = preg_replace('/\[@forums:([a-zA-Z0-9 ,_]*)\]/', "", $announcement);
+        }
+                
 		// Directive allows you to define a different template for this announcement. Useful if you need javascript in announcement. 
 		if (strpos("-".$announcement, '[@template:')) { 
 			$announcementTemplate = bamExplodeTemplates($announcement); 
@@ -917,7 +924,8 @@ function bam_build_directives ($announcement) {
 	$directives = array(
 		'themesEnabled' => $themesEnabled,
 		'languagesEnabled' => $languagesEnabled,
-		'disabled' => $disabled, 
+        'disabled' => $disabled, 
+        'altForums' => $altForums, 
 		'template' => $announcementTemplate,
 	);
 	
@@ -936,7 +944,13 @@ function checkAnnouncementDisplay($announcement) {
 	// If you need to force this function to return true, modify $announcement such that this function is guaranteed to return true. 
 	// Announcement is not returned. Only a true or false value to determine whether the announcement displays. You can do as you please here. 
 	
-	$announcement = $plugins->run_hooks("bam_checkAnnouncementDisplay", $announcement);
+    $announcement = $plugins->run_hooks("bam_checkAnnouncementDisplay", $announcement);
+    
+    // [2.1] Unofficial template tag that overrides certain default behaviors of the mainline forum display tag. 
+    if (isset($announcement['altForums'])) {
+        $announcement['forums'] = $announcement['altForums']; 
+    }
+
 	if (isset($announcement['returnFalse'])) {
 		return false; 
 	} 
@@ -970,7 +984,23 @@ function checkAnnouncementDisplay($announcement) {
 			$explodedForums = explode(',', $announcement['forums']);
 
 			if (isset($mybb->input['fid']) && (in_array((int) $_GET['fid'], $explodedForums))) {
-				return true; // This board is enabled.
+                
+                // We are using default, mainline forum select. Render as normal. 
+                if (!isset($announcement['altForums'])) {
+                    return true; // This board is enabled.
+                } 
+                // [2.1] (Else) User has overriden default functionality with tag. 
+                // Make sure we aren't on a deny-listed page before rendering custom tag. 
+                else {
+                    if (defined('THIS_SCRIPT') && THIS_SCRIPT != 'editpost.php' && THIS_SCRIPT != "newreply.php" && THIS_SCRIPT != "newthread.php") {
+                        // [2.1] We are not on a deny-listed page. Render as normal. 
+                        return true; 
+                    }
+                    else {
+                        // [2.1] Tag has overrided the forum selector. Disable on new post/new reply pages. 
+                        return false; 
+                    }
+                }
 			}
 			else {
 				// User is browsing a thread. Get FID and see if it matches. 
@@ -979,7 +1009,20 @@ function checkAnnouncementDisplay($announcement) {
 					$fid = bam_TIDManager::bam_getFIDfromTID($tid); 
 
 					if (in_array($fid, $explodedForums)) {
-						return true;
+
+                        // Execute mainline functionality unless (unofficial) overide tag [@forums] exists. 
+                        if (empty($announcement['altForums'])) {
+                            return true;
+                        }
+                        else {
+                            // Execute override functionality ([@forums])
+                            if (defined('THIS_SCRIPT') && THIS_SCRIPT != 'editpost.php' && THIS_SCRIPT != "newreply.php" && THIS_SCRIPT != "newthread.php") {
+                                return true; // Not on deny-listed page. Render as normal. 
+                            }
+                            else {
+                                return false; // On a blocked page (new thread/edit post/new reply). Don't display. 
+                            }        
+                        }
 					} else {
 						return false; 
 					} 
@@ -1004,8 +1047,20 @@ function checkAnnouncementDisplay($announcement) {
 					$fid = bam_TIDManager::bam_getFIDfromAID($aid); 
 
 					if (in_array($fid, $explodedForums)) {
-						return true; // need to complete.
-					} else {
+
+                        // Execute mainline functionality/alternative functionality
+                        if (empty($announcement['altForums'])) {
+						    return true; // Mainline settng
+                        } 
+                        else {
+                            if (defined('THIS_SCRIPT') && THIS_SCRIPT != 'editpost.php' && THIS_SCRIPT != "newreply.php" && THIS_SCRIPT != "newthread.php") {
+                                return true; // Not on deny-listed page. Render as normal. 
+                            }
+                            else {
+                                return false; // On a blocked page (new thread/edit post/new reply). Don't display. 
+                            }        
+                        }
+                    } else {
 						return false; 
 					} 
 				}
@@ -1300,6 +1355,18 @@ function bamExplodeLanguages($announcementText) {
 		$matched_languages_raw = strtr($matched_languages_raw[0], array('[@languages:' => '', ']' => ''));
 		$explodedLanguages = explode(',', $matched_languages_raw);
 		return array_map('trim',$explodedLanguages);
+	}
+	return null;
+}
+
+// [2.1] Unofficial alternative forumdisplay tag with custom functionality. 
+// Unlike the mainline setting, this setting explicitely disables newreply/newthread display. 
+function bamExplodeForumTag($announcementText) { 
+	$matched_forums_raw = "";
+	if(preg_match('/\[@forums:([a-zA-Z0-9 ,_]*)\]/', $announcementText, $matched_forums_raw)) {
+		$matched_forums_raw = strtr($matched_forums_raw[0], array('[@forums:' => '', ']' => ''));
+		$explodedForums = explode(',', $matched_forums_raw);
+		return array_map('trim',$explodedForums);
 	}
 	return null;
 }
