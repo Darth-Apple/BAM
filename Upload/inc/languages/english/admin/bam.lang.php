@@ -16,7 +16,7 @@
 $l['bam_title'] = "BAM Announcements Manager";
 $l['bam_title_acronym'] = "BAM Announcements Manager (Updated and Improved!)";
 $l['bam_desc'] = "Allows you to create and manage announcements in your forum header.";
-$l['bam_announcements_menu'] = "BAM+ Announcements";
+$l['bam_announcements_menu'] = "BAM Announcements";
 $l['bam_enable'] = "Activate BAM Announcements Manager?";
 $l['bam_enable_desc'] = "Enable or disable BAM Announcements Manager without the need to uninstall this plugin. ";
 $l['bam_random_enable'] = "Enable/Disable Random Mode";

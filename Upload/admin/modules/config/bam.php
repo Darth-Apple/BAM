@@ -945,7 +945,7 @@ if(!defined("IN_MYBB")) {
 			else {
 				// Special pages icon
 				if (($querydata['additional_display_pages'] != null) && $querydata['global'] == 3) {
-					$prefixVal .= "<img src='styles/default/images/icons/custom.png' title='{$lang->bam_has_additional_pages}'alt='{$lang->bam_has_additional_pages}' />";
+					$prefixVal .= "<img src='styles/default/images/icons/custom.png'  style='margin-bottom: -2px;' title='{$lang->bam_has_additional_pages}'alt='{$lang->bam_has_additional_pages}' />";
 				}
 				
 				// Global icon

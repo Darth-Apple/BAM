@@ -874,7 +874,7 @@ function bam_display_conditions ($querydata, $directives) {
 		} 
 
 		// New in BAM 2.0: Random announcements are no longer rendered as normal announcements if random mode is disabled. 
-		if(bam_display_permissions($querydata['groups']) && checkAnnouncementDisplay($querydata)) {
+		if(bam_display_permissions($querydata['groups']) && checkAnnouncementDisplay($querydata, $directives)) {
 			// Check if there are theme tags or langage tags. 
 			if (bamThemeEnabled($directives['themesEnabled']) && bamLanguageEnabled($directives['languagesEnabled'])) {
 				return true; 
@@ -898,7 +898,8 @@ function bam_build_directives ($announcement) {
 	if (strpos("-".$announcement, '[@')) {
 		$themesEnabled = bamExplodeThemes($announcement);
 		// print("Themes Exploded: " . var_dump($themesEnabled) . "<br />");
-		$languagesEnabled = bamExplodeLanguages($announcement);
+        $languagesEnabled = bamExplodeLanguages($announcement);
+        // $altForums = bamExplodeForumTag($announcement);
 		$announcement = preg_replace('/\[@themes:([a-zA-Z0-9 ,_]*)\]/', "", $announcement);	
 		$announcement = preg_replace('/\[@languages:([a-zA-Z0-9 ,_]*)\]/', "", $announcement);
 		
@@ -909,7 +910,7 @@ function bam_build_directives ($announcement) {
 
         // [2.1] This is an alternative, unofficial forumdisplay tag with custom functionality 
         // Unlike the mainline setting, this disables display on newthread/reply pages. 
-        if (strpos("-".$announcement, '[@forum:')) { 
+        if (strpos("-".$announcement, '[@forums:')) { 
 			$altForums = bamExplodeForumTag($announcement); 
             $announcement = preg_replace('/\[@forums:([a-zA-Z0-9 ,_]*)\]/', "", $announcement);
         }
@@ -935,7 +936,7 @@ function bam_build_directives ($announcement) {
 // Function replaces deprecated global_display() in BAM 1.0. 
 // Checks if a specific announcement is enabled on the current page that the user is browsing. 
 
-function checkAnnouncementDisplay($announcement) {
+function checkAnnouncementDisplay($announcement, $directives = array()) {
 	global $mybb, $current_page, $plugins;
 	
 	// Run plugin hooks. 
@@ -947,8 +948,8 @@ function checkAnnouncementDisplay($announcement) {
     $announcement = $plugins->run_hooks("bam_checkAnnouncementDisplay", $announcement);
     
     // [2.1] Unofficial template tag that overrides certain default behaviors of the mainline forum display tag. 
-    if (isset($announcement['altForums'])) {
-        $announcement['forums'] = $announcement['altForums']; 
+    if (isset($directives['altForums'])) {
+        $announcement['forums'] = implode(',', $directives['altForums']); 
     }
 
 	if (isset($announcement['returnFalse'])) {
@@ -982,25 +983,17 @@ function checkAnnouncementDisplay($announcement) {
 		// User hasn't enabled announcement for every board. Check if the board we are on is in the list of enabled boards. 
 		else {
 			$explodedForums = explode(',', $announcement['forums']);
-
 			if (isset($mybb->input['fid']) && (in_array((int) $_GET['fid'], $explodedForums))) {
                 
-                // We are using default, mainline forum select. Render as normal. 
-                if (!isset($announcement['altForums'])) {
-                    return true; // This board is enabled.
+                // Mainline functionality
+                if (!isset($directives['altForums'])) {
+                    return true;
                 } 
-                // [2.1] (Else) User has overriden default functionality with tag. 
-                // Make sure we aren't on a deny-listed page before rendering custom tag. 
+                // Execute alternate functionality (unofficial 2.1 feature)
                 else {
-                    if (defined('THIS_SCRIPT') && THIS_SCRIPT != 'editpost.php' && THIS_SCRIPT != "newreply.php" && THIS_SCRIPT != "newthread.php") {
-                        // [2.1] We are not on a deny-listed page. Render as normal. 
-                        return true; 
-                    }
-                    else {
-                        // [2.1] Tag has overrided the forum selector. Disable on new post/new reply pages. 
-                        return false; 
-                    }
+                    return check_forumdisplay_denylist(); 
                 }
+
 			}
 			else {
 				// User is browsing a thread. Get FID and see if it matches. 
@@ -1009,19 +1002,13 @@ function checkAnnouncementDisplay($announcement) {
 					$fid = bam_TIDManager::bam_getFIDfromTID($tid); 
 
 					if (in_array($fid, $explodedForums)) {
-
-                        // Execute mainline functionality unless (unofficial) overide tag [@forums] exists. 
-                        if (empty($announcement['altForums'])) {
+                        // Mainline functionality
+                        if (!isset($directives['altForums'])) {
                             return true;
-                        }
+                        } 
+                        // Execute alternate functionality (unofficial 2.1 feature)
                         else {
-                            // Execute override functionality ([@forums])
-                            if (defined('THIS_SCRIPT') && THIS_SCRIPT != 'editpost.php' && THIS_SCRIPT != "newreply.php" && THIS_SCRIPT != "newthread.php") {
-                                return true; // Not on deny-listed page. Render as normal. 
-                            }
-                            else {
-                                return false; // On a blocked page (new thread/edit post/new reply). Don't display. 
-                            }        
+                            return check_forumdisplay_denylist(); 
                         }
 					} else {
 						return false; 
@@ -1035,7 +1022,14 @@ function checkAnnouncementDisplay($announcement) {
 					$fid = bam_TIDManager::bam_getFIDfromTID($tid); 
 
 					if (in_array($fid, $explodedForums)) {
-						return true;
+                        // Mainline functionality
+                        if (!isset($directives['altForums'])) {
+                            return true;
+                        } 
+                        // Execute alternate functionality (unofficial 2.1 feature)
+                        else {
+                            return check_forumdisplay_denylist(); 
+                        }
 					} else {
 						return false; 
 					} 
@@ -1047,18 +1041,13 @@ function checkAnnouncementDisplay($announcement) {
 					$fid = bam_TIDManager::bam_getFIDfromAID($aid); 
 
 					if (in_array($fid, $explodedForums)) {
-
-                        // Execute mainline functionality/alternative functionality
-                        if (empty($announcement['altForums'])) {
-						    return true; // Mainline settng
+                        // Mainline functionality
+                        if (!isset($directives['altForums'])) {
+                            return true;
                         } 
+                        // Execute alternate functionality (unofficial 2.1 feature)
                         else {
-                            if (defined('THIS_SCRIPT') && THIS_SCRIPT != 'editpost.php' && THIS_SCRIPT != "newreply.php" && THIS_SCRIPT != "newthread.php") {
-                                return true; // Not on deny-listed page. Render as normal. 
-                            }
-                            else {
-                                return false; // On a blocked page (new thread/edit post/new reply). Don't display. 
-                            }        
+                            return check_forumdisplay_denylist(); 
                         }
                     } else {
 						return false; 
@@ -1730,6 +1719,20 @@ function bam_google_SEO_rewrites ($replacements) {
 	}
 
 	return $replacements; 
+}
+
+// Helper function that determines if we are in a deny-listed page for forumdisplay announcements
+// This is an unofficial feature that requires template directives to enable 
+
+function check_forumdisplay_denylist() {
+    // Execute override functionality ([@forums])
+    
+    if ((defined('THIS_SCRIPT')) && (THIS_SCRIPT != 'editpost.php') && (THIS_SCRIPT != "newreply.php") && (THIS_SCRIPT != "newthread.php")) {
+        return true; // Not on deny-listed page. Render as normal. 
+    }
+    else {
+        return false; // On a blocked page (new thread/edit post/new reply). Don't display. 
+    }        
 }
 
 // Thank you for using, developing for, and viewing BAM's source. If you have any questions or would like to contribute,
