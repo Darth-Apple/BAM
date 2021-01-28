@@ -600,17 +600,17 @@ function bam_announcements ($compatibility = null) {
 		if (bam_display_conditions($querydata, $tagParser[1])) {
 			$announcement = $tagParser[0]; // announcement. 
 
+			// Make the announcement a link if it has a URL field defined.  
+			if(!empty($querydata['link'])) {
+				$announcement = '[url='.htmlspecialchars($querydata['link'], ENT_QUOTES).']'.htmlspecialchars($querydata['announcement'], ENT_QUOTES)."[/url]";
+			}
+
 			// Run announcements through the post parser to process BBcode, images, HTML (if enabled), etc. 
 			$announcement = $parser->parse_message(html_entity_decode($announcement), $parser_options); 
 			
 			// Get announcement ID for cookies. Used for saving dismissed announcements. 
 			$announcement_id = (int) $querydata['PID'];
 			$bcprefix = (int) $mybb->settings['bam_cookie_id_prefix']; // Used to reset dismissals if BAM is reinstalled.
-
-			// Make the announcement a link if it has a URL field defined.  
-			if(!empty($querydata['link'])) {
-				$announcement = '<a href=\''.htmlspecialchars($querydata['link'], ENT_QUOTES).'\'>'.htmlspecialchars($querydata['announcement'], ENT_QUOTES)."</a>";
-			}
 
 			$announcement = bam_parse_user_variables($announcement, $querydata['link']);
 			$dismissClass = bam_build_dismiss_class($querydata);
