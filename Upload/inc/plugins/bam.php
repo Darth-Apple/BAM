@@ -1270,7 +1270,6 @@ function bamExplodeThemes($announcementText) {
 
 function bamLanguageEnabled($languages) {
 	global $mybb; 
-	// $userLanguage = $mybb->user['language'];
 
 	// If the user is on the default language and this language is set for the announcement, display the announcement. 
 	if (!isset($mybb->user['language']) || $mybb->user['language'] == null) {
@@ -1428,7 +1427,7 @@ function parseThreadVariables($announcementText) {
 
 function getNewestMember() {
     global $db;
-    $querydata = $db->fetch_array($db->query('SELECT uid FROM mybb_users ORDER BY uid DESC LIMIT 1'));
+    $querydata = $db->fetch_array($db->query('SELECT uid FROM '.TABLE_PREFIX.'users ORDER BY uid DESC LIMIT 1'));
     return get_user($querydata['uid']);
 }
 
@@ -1562,7 +1561,6 @@ function bam_confighandler(&$actions) {
 // See comments in inc/plugins/bam_upgrade/bam_upgrade.php for more info on how this works. 
 
 function global_display($pinned) {
-	// echo "<br /> I'm active.";
 	global $mybb, $current_page;
 	if ($current_page == $mybb->settings['bam_index_page']) {
 		return true; // this is the index page. No need to check for global announcement settings. 
