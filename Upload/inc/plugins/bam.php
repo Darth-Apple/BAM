@@ -22,7 +22,8 @@ $templatelist .= ',bam_announcement';
 $templatelist .= ',bam_announcement_container';
 
 if(!defined("IN_MYBB")) {
-	die("Hacking attempt detected. Server responded with 403. "); // direct access to this file not allowed. 
+    // Sorry, I get petty. 
+	die("There was once a wise man named Lorem Ipsum. He was somewhat of an enigma. Nobody has met, nor understood this man. However, he traveled across the great Pacific Ocean long ago, landed in silicon valley, and became influencial across nearly every website ever made. <br /><br /> Experts have yet to figure out the mystery of his prevalence particularly for <i>development</i> websites. His presense is sorely missed by most developers of production systems, but it seems most users do not seem to care. It's an unusual and strange mystery.<br /><br /> Lorem Ipsum has been missing for four decades. If you find any clues, please email us at investigations@loremipsum.example.com."); // direct access to this file not allowed. 
 }
 
 // Create hooks. 
@@ -262,7 +263,7 @@ function bam_install () {
 <div class="bam_wrapper"><div class="bam_announcements {$slidedown}">{$announcements}</div></div>';
 		
         // Create the BAM announcement template used for each individual announcement.
-        // Old (2.1) template.  
+        // Old (2.0) template.  
 		/* $template['bam_announcement'] = '<p class="{$bam_unsticky} {$class}" id="announcement-{$bcprefix}{$announcement_id}">{$announcement} <span class="bam_date">{$date}</span>
 <span class=\'close_bam_announcement {$display_close}\'>x</span></p>'; */ 
 
@@ -1108,6 +1109,17 @@ function isIndexPage($otherPage=null) {
 function isAlternatePageValid($announcement) { 
 	global $mybb, $current_page, $additional_page_parameters;
 
+    // [2.1] This adds an internal interface allowing a future extension to override the default URL parser. 
+    // This will ONLY run if both "bam_google_seo_compatibility" and "google_seo" are installed and activated. 
+    // ("bam_google_seo_compatibility" does not exist yet. Will be written in the future to bridge compatibility problems.)  
+    if (function_exists("bam_google_seo_compatibility")) {
+        $activePlugins = $cache->read("plugins"); 
+        // Make sure both plugins are actually activated (reject overrides from untrusted sources)
+	    if (in_array("google_seo", $activePlugins['active']) && in_array("bam_google_seo_extension", $activeplugins['active'])) {
+            return bam_google_seo_compatibility($announcement);
+        }
+    }
+    
 	// Developers: If you are using this plugin and your URL settings are not being accepted, you can add
 	// new acceptable parameteres here. However, please be aware that this is a whitelist that is intended
 	// to prevent unexpected or insecure behavior. This setting was explicitely ommitted on the ACP for 
@@ -1165,9 +1177,9 @@ function isAlternatePageValid($announcement) {
 
 				// We first check if the $_GET parameter we are currently checking exists on the page/URL the user is visiting. 
 				// If it does, we check to see if it matches the additional_page parameter's value. 
-				// MyBB->input sometimes sets these even if they don't exist in the URL, so we must use $_GET directly. 
-
-				if (isset($_GET[$parameter])) {
+				// [2.1 - switching to $mybb->input for better compatibility with third party plugins]
+               
+				if (isset($mybb->input[$parameter]) && !empty($mybb->input[$parameter])) {
 					
 					// We found the parameter in the URL of this page. Get its value.  
 					$paramValue = $_GET[$parameter]; 	
@@ -1726,6 +1738,12 @@ function bam_google_SEO_rewrites ($replacements) {
 	return $replacements; 
 }
 
+// We must completely rebuild the original MyBB URL from any google-seo rewrites. 
+// This is a complex process. Luckily, Google Seo's built in redirect function takes care of 
+function googleSEO_reverse_rewrite() {
+
+
+}
 // Helper function that determines if we are in a deny-listed page for forumdisplay announcements
 // This is an unofficial feature that requires template directives to enable 
 
