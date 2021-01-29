@@ -22,7 +22,6 @@ $templatelist .= ',bam_announcement';
 $templatelist .= ',bam_announcement_container';
 
 if(!defined("IN_MYBB")) {
-    // Sorry, I get petty. 
 	die("There was once a wise man named Lorem Ipsum. He was somewhat of an enigma. Nobody has met, nor understood this man. However, he traveled across the great Pacific Ocean long ago, landed in silicon valley, and became influencial across nearly every website ever made. <br /><br /> Experts have yet to figure out the mystery of his prevalence particularly for <i>development</i> websites. His presense is sorely missed by most developers of production systems, but it seems most users do not seem to care. It's an unusual and strange mystery.<br /><br /> Lorem Ipsum has been missing for four decades. If you find any clues, please email us at investigations@loremipsum.example.com."); // direct access to this file not allowed. 
 }
 
@@ -263,10 +262,6 @@ function bam_install () {
 <div class="bam_wrapper"><div class="bam_announcements {$slidedown}">{$announcements}</div></div>';
 		
         // Create the BAM announcement template used for each individual announcement.
-        // Old (2.0) template.  
-		/* $template['bam_announcement'] = '<p class="{$bam_unsticky} {$class}" id="announcement-{$bcprefix}{$announcement_id}">{$announcement} <span class="bam_date">{$date}</span>
-<span class=\'close_bam_announcement {$display_close}\'>x</span></p>'; */ 
-
         $template['bam_announcement'] = '<div class="{$bam_unsticky} {$class}" id="announcement-{$bcprefix}{$announcement_id}">{$announcement}<span class="bam_date">{$date}</span>
 <span class=\'close_bam_announcement {$display_close}\'>x</span></div>';
 	
@@ -944,9 +939,7 @@ function bam_build_directives ($announcement) {
 
 function checkAnnouncementDisplay($announcement, $directives = array()) {
 	global $mybb, $current_page, $plugins;
-	
-	// Run plugin hooks. 
-	
+		
 	// Plugins: Set $announcement['returnFalse] to any value to force this function to deny displaying an announcement. 
 	// If you need to force this function to return true, modify $announcement such that this function is guaranteed to return true. 
 	// Announcement is not returned. Only a true or false value to determine whether the announcement displays. You can do as you please here. 
@@ -1115,7 +1108,7 @@ function isAlternatePageValid($announcement) {
     if (function_exists("bam_google_seo_compatibility")) {
         $activePlugins = $cache->read("plugins"); 
         // Make sure both plugins are actually activated (reject overrides from untrusted sources)
-	    if (in_array("google_seo", $activePlugins['active']) && in_array("bam_google_seo_extension", $activeplugins['active'])) {
+	    if (in_array("google_seo", $activePlugins['active']) && in_array("bam_google_seo_extension", $activePlugins['active'])) {
             return bam_google_seo_compatibility($announcement);
         }
     }
@@ -1738,15 +1731,9 @@ function bam_google_SEO_rewrites ($replacements) {
 	return $replacements; 
 }
 
-// We must completely rebuild the original MyBB URL from any google-seo rewrites. 
-// This is a complex process. Luckily, Google Seo's built in redirect function takes care of 
-function googleSEO_reverse_rewrite() {
 
-
-}
 // Helper function that determines if we are in a deny-listed page for forumdisplay announcements
 // This is an unofficial feature that requires template directives to enable 
-
 function check_forumdisplay_denylist() {
     // Execute override functionality ([@forums])
     
